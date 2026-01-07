@@ -26,7 +26,7 @@
         <!-- Header -->
         <header id="header" class="header"></header>
         <script>
-            load("#header", "./templates/header-logined.html");
+            load("#header", "./templates/header-logined.php");
         </script>
 
         <!-- MAIN -->
@@ -52,13 +52,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="./checkout.html" class="breadcrumbs__link">
+                            <a href="./checkout.php" class="breadcrumbs__link">
                                 Checkout
                                 <img src="./assets/icons/arrow-right.svg" alt="" />
                             </a>
                         </li>
                         <li>
-                            <a href="./shipping.html" class="breadcrumbs__link">
+                            <a href="./shipping.php" class="breadcrumbs__link">
                                 Shipping
                                 <img src="./assets/icons/arrow-right.svg" alt="" />
                             </a>
@@ -78,7 +78,7 @@
                                     <h2 class="cart-info__heading cart-info__heading--lv2">
                                         1. Shipping, arrives between Mon, May 16—Tue, May 24
                                     </h2>
-                                    <a class="cart-info__edit-btn" href="./shipping.html">
+                                    <a class="cart-info__edit-btn" href="./shipping.php">
                                         <img class="icon" src="./assets/icons/edit.svg" alt="" />
                                         Edit
                                     </a>
@@ -98,7 +98,7 @@
                                         <h3 class="payment-item__title">Items details</h3>
                                         <p class="payment-item__desc">2 items</p>
                                     </div>
-                                    <a href="./shipping.html" class="payment-item__detail">View details</a>
+                                    <a href="./shipping.php" class="payment-item__detail">View details</a>
                                 </article>
                             </div>
 
@@ -315,7 +315,7 @@
         <!-- Footer -->
         <footer id="footer" class="footer"></footer>
         <script>
-            load("#footer", "./templates/footer.html");
+            load("#footer", "./templates/footer.php");
         </script>
 
         <!-- Modal: confirm remove shopping cart item -->

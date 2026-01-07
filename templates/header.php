@@ -17,7 +17,7 @@
                 <img class="icon" src="./assets/icons/arrow-left.svg" alt="" />
             </button>
 
-            <a href="./checkout.html" class="nav-btn d-none d-md-flex">
+            <a href="./checkout.php" class="nav-btn d-none d-md-flex">
                 <img src="./assets/icons/buy.svg" alt="" class="nav-btn__icon icon" />
                 <span class="nav-btn__title">Cart</span>
                 <span class="nav-btn__qnt">3</span>
@@ -4544,8 +4544,8 @@
 
         <!-- Actions -->
         <div class="top-act">
-            <a href="./sign-in.html" class="btn btn--text d-md-none">Sign In</a>
-            <a href="./sign-up.html" class="top-act__sign-up btn btn--primary">Sign Up</a>
+            <a href="./sign-in.php" class="btn btn--text d-md-none">Sign In</a>
+            <a href="./sign-up.php" class="top-act__sign-up btn btn--primary">Sign Up</a>
         </div>
     </div>
 </div>

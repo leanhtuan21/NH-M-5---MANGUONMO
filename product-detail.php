@@ -26,7 +26,7 @@
         <!-- Header -->
         <header id="header" class="header"></header>
         <script>
-            load("#header", "./templates/header-logined.html");
+            load("#header", "./templates/header-logined.php");
         </script>
 
         <!-- MAIN -->
@@ -479,7 +479,7 @@
                                         <div class="col">
                                             <article class="product-card">
                                                 <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         <img
                                                             src="./assets/img/product/item-1.png"
                                                             alt=""
@@ -500,7 +500,7 @@
                                                     </button>
                                                 </div>
                                                 <h3 class="product-card__title">
-                                                    <a href="./product-detail.html"
+                                                    <a href="./product-detail.php"
                                                         >Coffee Beans - Espresso Arabica and Robusta Beans</a
                                                     >
                                                 </h3>
@@ -521,7 +521,7 @@
                                         <div class="col">
                                             <article class="product-card">
                                                 <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         <img
                                                             src="./assets/img/product/item-2.png"
                                                             alt=""
@@ -542,7 +542,7 @@
                                                     </button>
                                                 </div>
                                                 <h3 class="product-card__title">
-                                                    <a href="./product-detail.html"
+                                                    <a href="./product-detail.php"
                                                         >Lavazza Coffee Blends - Try the Italian Espresso</a
                                                     >
                                                 </h3>
@@ -563,7 +563,7 @@
                                         <div class="col">
                                             <article class="product-card">
                                                 <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         <img
                                                             src="./assets/img/product/item-3.png"
                                                             alt=""
@@ -584,7 +584,7 @@
                                                     </button>
                                                 </div>
                                                 <h3 class="product-card__title">
-                                                    <a href="./product-detail.html"
+                                                    <a href="./product-detail.php"
                                                         >Lavazza - Caffè Espresso Black Tin - Ground coffee</a
                                                     >
                                                 </h3>
@@ -605,7 +605,7 @@
                                         <div class="col">
                                             <article class="product-card">
                                                 <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         <img
                                                             src="./assets/img/product/item-4.png"
                                                             alt=""
@@ -626,7 +626,7 @@
                                                     </button>
                                                 </div>
                                                 <h3 class="product-card__title">
-                                                    <a href="./product-detail.html"
+                                                    <a href="./product-detail.php"
                                                         >Qualità Oro Mountain Grown - Espresso Coffee Beans</a
                                                     >
                                                 </h3>
@@ -647,7 +647,7 @@
                                         <div class="col">
                                             <article class="product-card">
                                                 <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         <img
                                                             src="./assets/img/product/item-1.png"
                                                             alt=""
@@ -668,7 +668,7 @@
                                                     </button>
                                                 </div>
                                                 <h3 class="product-card__title">
-                                                    <a href="./product-detail.html"
+                                                    <a href="./product-detail.php"
                                                         >Coffee Beans - Espresso Arabica and Robusta Beans</a
                                                     >
                                                 </h3>
@@ -689,7 +689,7 @@
                                         <div class="col">
                                             <article class="product-card">
                                                 <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         <img
                                                             src="./assets/img/product/item-2.png"
                                                             alt=""
@@ -710,7 +710,7 @@
                                                     </button>
                                                 </div>
                                                 <h3 class="product-card__title">
-                                                    <a href="./product-detail.html"
+                                                    <a href="./product-detail.php"
                                                         >Lavazza Coffee Blends - Try the Italian Espresso</a
                                                     >
                                                 </h3>
@@ -738,7 +738,7 @@
         <!-- Footer -->
         <footer id="footer" class="footer"></footer>
         <script>
-            load("#footer", "./templates/footer.html");
+            load("#footer", "./templates/footer.php");
         </script>
     </body>
 </html>

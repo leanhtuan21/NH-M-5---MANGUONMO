@@ -39,7 +39,7 @@
                     <h1 class="auth__heading">Reset your password</h1>
                     <p class="auth__desc">Enter your email and we'll send you a link to reset your password.</p>
                     <div class="auth__message message message--success">We have e-mailed your password reset link!</div>
-                    <form action="./index-logined.html" class="form auth__form auth__form-forgot">
+                    <form action="./index-logined.php" class="form auth__form auth__form-forgot">
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input type="email" name="" id="" placeholder="Email" class="form__input" required />
@@ -54,7 +54,7 @@
                     </form>
 
                     <p class="auth__text">
-                        <a href="./sign-in.html" class="auth__link auth__text-link">Back to Sign In</a>
+                        <a href="./sign-in.php" class="auth__link auth__text-link">Back to Sign In</a>
                     </p>
                 </div>
             </div>

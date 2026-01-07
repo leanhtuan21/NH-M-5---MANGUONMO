@@ -17,7 +17,7 @@
                 <img class="icon" src="./assets/icons/arrow-left.svg" alt="" />
             </button>
 
-            <a href="./checkout.html" class="nav-btn d-none d-md-flex">
+            <a href="./checkout.php" class="nav-btn d-none d-md-flex">
                 <img src="./assets/icons/buy.svg" alt="" class="nav-btn__icon icon" />
                 <span class="nav-btn__title">Cart</span>
                 <span class="nav-btn__qnt">3</span>
@@ -4563,7 +4563,7 @@
                             <img src="./assets/icons/arrow-up.png" alt="" class="act-dropdown__arrow" />
                             <div class="act-dropdown__top">
                                 <h2 class="act-dropdown__title">You have 3 item(s)</h2>
-                                <a href="./favourite.html" class="act-dropdown__view-all">See All</a>
+                                <a href="./favourite.php" class="act-dropdown__view-all">See All</a>
                             </div>
                             <div class="row row-cols-3 gx-2 act-dropdown__list">
                                 <!-- Cart preview item 1 -->
@@ -4614,7 +4614,7 @@
                             <div class="act-dropdown__separate"></div>
                             <div class="act-dropdown__checkout">
                                 <a
-                                    href="./checkout.html"
+                                    href="./checkout.php"
                                     class="btn btn--primary btn--rounded act-dropdown__checkout-btn"
                                 >
                                     Check Out All
@@ -4638,7 +4638,7 @@
                             <img src="./assets/icons/arrow-up.png" alt="" class="act-dropdown__arrow" />
                             <div class="act-dropdown__top">
                                 <h2 class="act-dropdown__title">You have 3 item(s)</h2>
-                                <a href="./checkout.html" class="act-dropdown__view-all">See All</a>
+                                <a href="./checkout.php" class="act-dropdown__view-all">See All</a>
                             </div>
                             <div class="row row-cols-3 gx-2 act-dropdown__list">
                                 <!-- Cart preview item 1 -->
@@ -4706,7 +4706,7 @@
                             </div>
                             <div class="act-dropdown__checkout">
                                 <a
-                                    href="./checkout.html"
+                                    href="./checkout.php"
                                     class="btn btn--primary btn--rounded act-dropdown__checkout-btn"
                                 >
                                     Check Out All
@@ -4739,10 +4739,10 @@
 
                         <ul class="user-menu__list">
                             <li>
-                                <a href="./profile.html" class="user-menu__link">Profile</a>
+                                <a href="./profile.php" class="user-menu__link">Profile</a>
                             </li>
                             <li>
-                                <a href="./favourite.html" class="user-menu__link">Favourite list</a>
+                                <a href="./favourite.php" class="user-menu__link">Favourite list</a>
                             </li>
                             <li class="user-menu__separate">
                                 <a href="#!" class="user-menu__link" id="switch-theme-btn">
@@ -4754,7 +4754,7 @@
                                 <a href="#!" class="user-menu__link">Settings</a>
                             </li>
                             <li class="user-menu__separate">
-                                <a href="./sign-in.html" class="user-menu__link">Logout</a>
+                                <a href="./sign-in.php" class="user-menu__link">Logout</a>
                             </li>
                         </ul>
                     </div>

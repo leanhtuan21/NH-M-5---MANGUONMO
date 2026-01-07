@@ -26,7 +26,7 @@
         <!-- Header -->
         <header id="header" class="header"></header>
         <script>
-            load("#header", "./templates/header-logined.html");
+            load("#header", "./templates/header-logined.php");
         </script>
 
         <!-- MAIN -->
@@ -59,7 +59,7 @@
                                     <h3 class="profile-menu__title">Manage Account</h3>
                                     <ul class="profile-menu__list">
                                         <li>
-                                            <a href="./edit-personal-info.html" class="profile-menu__link">
+                                            <a href="./edit-personal-info.php" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/profile.svg" alt="" class="icon" />
                                                 </span>
@@ -220,7 +220,7 @@
 
                                             <!-- Add new payment card -->
                                             <div class="col">
-                                                <a class="new-card" href="./add-new-card.html">
+                                                <a class="new-card" href="./add-new-card.php">
                                                     <img
                                                         src="./assets/icons/plus.svg"
                                                         alt=""
@@ -241,7 +241,7 @@
                                         <div class="row gy-md-2 row-cols-2 row-cols-lg-1">
                                             <!-- Account info 1 -->
                                             <div class="col">
-                                                <a href="./edit-personal-info.html">
+                                                <a href="./edit-personal-info.php">
                                                     <article class="account-info">
                                                         <div class="account-info__icon">
                                                             <img src="./assets/icons/message.svg" alt="" class="icon" />
@@ -256,7 +256,7 @@
 
                                             <!-- Account info 2 -->
                                             <div class="col">
-                                                <a href="./edit-personal-info.html">
+                                                <a href="./edit-personal-info.php">
                                                     <article class="account-info">
                                                         <div class="account-info__icon">
                                                             <img src="./assets/icons/calling.svg" alt="" class="icon" />
@@ -271,7 +271,7 @@
 
                                             <!-- Account info 3 -->
                                             <div class="col">
-                                                <a href="./edit-personal-info.html">
+                                                <a href="./edit-personal-info.php">
                                                     <article class="account-info">
                                                         <div class="account-info__icon">
                                                             <img
@@ -345,7 +345,7 @@
         <!-- Footer -->
         <footer id="footer" class="footer"></footer>
         <script>
-            load("#footer", "./templates/footer.html");
+            load("#footer", "./templates/footer.php");
         </script>
 
         <!-- Modal: confirm remove shopping cart item -->

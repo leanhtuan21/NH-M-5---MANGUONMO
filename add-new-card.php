@@ -26,7 +26,7 @@
         <!-- Header -->
         <header id="header" class="header"></header>
         <script>
-            load("#header", "./templates/header-logined.html");
+            load("#header", "./templates/header-logined.php");
         </script>
 
         <!-- MAIN -->
@@ -59,7 +59,7 @@
                                     <h3 class="profile-menu__title">Manage Account</h3>
                                     <ul class="profile-menu__list">
                                         <li>
-                                            <a href="./edit-personal-info.html" class="profile-menu__link">
+                                            <a href="./edit-personal-info.php" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/profile.svg" alt="" class="icon" />
                                                 </span>
@@ -160,7 +160,7 @@
                                 <div class="row gy-3">
                                     <div class="col-12">
                                         <h2 class="cart-info__heading">
-                                            <a href="./profile.html">
+                                            <a href="./profile.php">
                                                 <img
                                                     src="./assets/icons/arrow-left.svg"
                                                     alt=""
@@ -170,7 +170,7 @@
                                             Add credit or debit card
                                         </h2>
 
-                                        <form action="./profile.html" class="form form-card">
+                                        <form action="./profile.php" class="form form-card">
                                             <!-- Form row 1 -->
                                             <div class="form__row">
                                                 <div class="form__group">
@@ -327,7 +327,7 @@
                                             </div>
 
                                             <div class="form-card__bottom">
-                                                <a class="btn btn--text" href="./profile.html">Cancel</a>
+                                                <a class="btn btn--text" href="./profile.php">Cancel</a>
                                                 <button class="btn btn--primary btn--rounded">Save card</button>
                                             </div>
                                         </form>
@@ -343,7 +343,7 @@
         <!-- Footer -->
         <footer id="footer" class="footer"></footer>
         <script>
-            load("#footer", "./templates/footer.html");
+            load("#footer", "./templates/footer.php");
         </script>
 
         <!-- Modal: confirm remove shopping cart item -->

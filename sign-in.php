@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Create new password | Grocery Mart</title>
+        <title>Sign in | Grocery Mart</title>
 
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
@@ -26,7 +26,10 @@
         <main class="auth">
             <!-- Auth intro -->
             <div class="auth__intro d-md-none">
-                <img src="./assets/img/auth/forgot-password.png" alt="" class="auth__intro-img" />
+                <img src="./assets/img/auth/intro.svg" alt="" class="auth__intro-img" />
+                <p class="auth__intro-text">
+                    The best of luxury brand values, high quality products, and innovative services
+                </p>
             </div>
 
             <!-- Auth content -->
@@ -36,25 +39,27 @@
                         <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
                         <h2 class="logo__title">grocerymart</h2>
                     </a>
-                    <h1 class="auth__heading">Create new password</h1>
-                    <p class="auth__desc">At least 6 characters, with uppercase and lowercase letters.</p>
-                    <form action="./sign-in.html" class="form auth__form auth__form-forgot">
+                    <h1 class="auth__heading">Hello Again!</h1>
+                    <p class="auth__desc">
+                        Welcome back to sign in. As a returning customer, you have access to your previously saved all
+                        information.
+                    </p>
+                    <form action="./index-logined.php" class="form auth__form">
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input
-                                    type="password"
+                                    type="email"
                                     name=""
                                     id=""
-                                    placeholder="New password"
+                                    placeholder="Email"
                                     class="form__input"
-                                    required
                                     autofocus
-                                    minlength="6"
+                                    required
                                 />
-                                <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
+                                <img src="./assets/icons/message.svg" alt="" class="form__input-icon" />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
-                            <p class="form__error">Password must be at least 6 characters</p>
+                            <p class="form__error">Email is not in correct format</p>
                         </div>
                         <div class="form__group">
                             <div class="form__text-input">
@@ -62,7 +67,7 @@
                                     type="password"
                                     name=""
                                     id=""
-                                    placeholder="Confirm new password"
+                                    placeholder="Password"
                                     class="form__input"
                                     required
                                     minlength="6"
@@ -71,11 +76,27 @@
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
                             <p class="form__error">Password must be at least 6 characters</p>
+                        </div>
+                        <div class="form__group form__group--inline">
+                            <label class="form__checkbox">
+                                <input type="checkbox" name="" id="" class="form__checkbox-input d-none" />
+                                <span class="form__checkbox-label">Set as default card</span>
+                            </label>
+                            <a href="./reset-password.php" class="auth__link form__pull-right">Forgot password?</a>
                         </div>
                         <div class="form__group auth__btn-group">
-                            <button class="btn btn--primary auth__btn form__submit-btn">Reset password</button>
+                            <button class="btn btn--primary auth__btn form__submit-btn">Sign In</button>
+                            <button class="btn btn--outline auth__btn btn--no-margin">
+                                <img src="./assets/icons/google.svg" alt="" class="btn__icon icon" />
+                                Sign in with Google
+                            </button>
                         </div>
                     </form>
+
+                    <p class="auth__text">
+                        Don’t have an account yet?
+                        <a href="./sign-up.php" class="auth__link auth__text-link">Sign Up</a>
+                    </p>
                 </div>
             </div>
         </main>

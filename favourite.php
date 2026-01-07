@@ -26,7 +26,7 @@
         <!-- Header -->
         <header id="header" class="header"></header>
         <script>
-            load("#header", "./templates/header-logined.html");
+            load("#header", "./templates/header-logined.php");
         </script>
 
         <!-- MAIN -->
@@ -84,7 +84,7 @@
                                                 checked
                                             />
                                         </label>
-                                        <a href="./product-detail.html">
+                                        <a href="./product-detail.php">
                                             <img
                                                 src="./assets/img/product/item-1.png"
                                                 alt=""
@@ -94,7 +94,7 @@
                                         <div class="cart-item__content">
                                             <div class="cart-item__content-left">
                                                 <h3 class="cart-item__title">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         Coffee Beans - Espresso Arabica and Robusta Beans
                                                     </a>
                                                 </h3>
@@ -163,7 +163,7 @@
                                                 checked
                                             />
                                         </label>
-                                        <a href="./product-detail.html">
+                                        <a href="./product-detail.php">
                                             <img
                                                 src="./assets/img/product/item-2.png"
                                                 alt=""
@@ -173,7 +173,7 @@
                                         <div class="cart-item__content">
                                             <div class="cart-item__content-left">
                                                 <h3 class="cart-item__title">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         Lavazza Coffee Blends - Try the Italian Espresso
                                                     </a>
                                                 </h3>
@@ -241,7 +241,7 @@
                                                 class="cart-info__checkbox-input"
                                             />
                                         </label>
-                                        <a href="./product-detail.html">
+                                        <a href="./product-detail.php">
                                             <img
                                                 src="./assets/img/product/item-3.png"
                                                 alt=""
@@ -251,7 +251,7 @@
                                         <div class="cart-item__content">
                                             <div class="cart-item__content-left">
                                                 <h3 class="cart-item__title">
-                                                    <a href="./product-detail.html">
+                                                    <a href="./product-detail.php">
                                                         Qualità Oro Mountain Grown - Espresso Coffee Beans
                                                     </a>
                                                 </h3>
@@ -323,7 +323,7 @@
                                             </a>
                                         </div>
                                         <a
-                                            href="./checkout.html"
+                                            href="./checkout.php"
                                             class="cart-info__checkout-all btn btn--primary btn--rounded"
                                         >
                                             All Check Out
@@ -340,7 +340,7 @@
         <!-- Footer -->
         <footer id="footer" class="footer"></footer>
         <script>
-            load("#footer", "./templates/footer.html");
+            load("#footer", "./templates/footer.php");
         </script>
 
         <!-- Modal: confirm remove shopping cart item -->

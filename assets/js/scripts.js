@@ -7,7 +7,7 @@ const $$ = document.querySelectorAll.bind(document);
  * Cách dùng:
  * <div id="parent"></div>
  * <script>
- *  load("#parent", "./path-to-template.html");
+ *  load("#parent", "./path-to-template.php");
  * </script>
  */
 function load(selector, path) {

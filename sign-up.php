@@ -48,7 +48,7 @@
                     </a>
                     <h1 class="auth__heading">Sign Up</h1>
                     <p class="auth__desc">Let’s create your account and Shop like a pro and save money.</p>
-                    <form action="./index-logined.html" class="form auth__form">
+                    <form action="./index-logined.php" class="form auth__form">
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input
@@ -114,7 +114,7 @@
 
                     <p class="auth__text">
                         You have an account yet?
-                        <a href="./sign-in.html" class="auth__link auth__text-link">Sign In</a>
+                        <a href="./sign-in.php" class="auth__link auth__text-link">Sign In</a>
                     </p>
                 </div>
             </div>
