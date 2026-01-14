@@ -25,6 +25,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Email không đúng định dạng";
     }
 
+    // --- MỚI THÊM: 2.1 Kiểm tra email phải chứa số ---
+    elseif (!preg_match('/[0-9]/', $email)) {
+        $error = "Email phải chứa ít nhất 1 chữ số";
+    }
+    // ------------------------------------------------
+
     // 3. Kiểm tra độ mạnh mật khẩu
     elseif (
         strlen($password) < 6 ||
