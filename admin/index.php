@@ -224,11 +224,11 @@ try {
         <main class="main-content">
             <header class="page-header">
                 <h1 class="page-title">Tổng quan</h1>
-                <div class="user-info">
+                <a href="add-product.php"><div class="user-info">
                     <button class="btn btn--primary btn--small">
                         <i class="ph ph-plus"></i> Thêm sản phẩm
                     </button>
-                </div>
+                </div></a>
             </header>
 
             <div class="stats-grid">
