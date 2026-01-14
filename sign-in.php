@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['user_role'] = $user['role'];
 
                 /* ===== THÔNG BÁO ĐĂNG NHẬP THÀNH CÔNG ===== */
-                $_SESSION['login_success'] = "Đăng nhập thành công. Chúc bạn có trải nghiệm mua hàng vui vẻ của shop chúng tôi!";
+                $_SESSION['success_message'] = "Đăng nhập thành công. Chào mừng {$user['full_name']}!";
 
                 /* ===== PHÂN QUYỀN & CHUYỂN TRANG ===== */
                 if (strtolower($user['role']) === 'admin') {
@@ -113,9 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 mysqli_close($conn);
 ?>
 
-
-
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -139,6 +136,19 @@ mysqli_close($conn);
 
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
+
+      <style>
+            /* TẮT ICON CON MẮT MẶC ĐỊNH CỦA TRÌNH DUYỆT (Chrome / Edge) */
+            input[type="password"]::-ms-reveal,
+            input[type="password"]::-ms-clear {
+                display: none;
+            }
+
+            input[type="password"]::-webkit-textfield-decoration-container {
+                display: none !important;
+            }
+        </style>
+
     </head>
    
     <body>
@@ -164,11 +174,12 @@ mysqli_close($conn);
                     </p>
                     
                    <!-- Thông báo lỗi từ PHP -->
-                    <?php if ($error_message != ""): ?>
+                   <?php if (!empty($error_message)): ?>
                         <p style="color: #ff4d4f; background: #fff1f0; padding: 10px; border-radius: 5px; text-align: center; font-size: 1.4rem; margin-bottom: 20px;">
-                            ⚠️ <?php echo $error_message; ?>
+                            ⚠️ <?= htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
                         </p>
                     <?php endif; ?>
+
 
 
                     <form action="" method="POST" class="form auth__form">
@@ -199,25 +210,34 @@ mysqli_close($conn);
                                     required
                                     minlength="6"
                                 />
-                                <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
+                               
+                                <!-- Icon khóa: dùng để ẩn / hiện mật khẩu -->
+                                <img
+                                    src="./assets/icons/lock.svg"
+                                    alt="Ẩn / hiện mật khẩu"
+                                    class="form__input-icon"
+                                    id="toggle-password"
+                                    style="cursor: pointer;"
+                                />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
                             <p class="form__error">Mật khẩu phải có ít nhất 6 kí tự</p>
                         </div>
-                        <script>
-                            const togglePassword = document.querySelector('#toggle-password');
-                            const passwordInput = document.querySelector('#password-input');
 
-                            togglePassword.addEventListener('click', function () {
-                                // Kiểm tra loại input hiện tại
-                                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                                passwordInput.setAttribute('type', type);
-                                
-                                // Thay đổi độ mờ của icon để người dùng biết là đang kích hoạt
-                                this.style.opacity = type === 'text' ? '1' : '0.5';
-                            });
+                        <!-- Chức năng ẩn hiện để xem mật khẩu khi nhập -->
+                       <script>
+                            const togglePassword = document.getElementById('toggle-password');
+                            const passwordInput = document.getElementById('password-input');
+
+                            if (togglePassword && passwordInput) {
+                                togglePassword.addEventListener('click', function () {
+                                    passwordInput.type =
+                                        passwordInput.type === 'password' ? 'text' : 'password';
+                                });
+                            }
                         </script>
-                        
+
+
                         <div class="form__group form__group--inline">
                             <label class="form__checkbox">
                                 <input type="checkbox" name="" id="" class="form__checkbox-input d-none" />
