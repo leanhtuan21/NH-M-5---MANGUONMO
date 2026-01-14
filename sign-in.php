@@ -1,7 +1,9 @@
 <?php
 session_start();
 
-// --- 1. KẾT NỐI CƠ SỞ DỮ LIỆU ---
+// --- CHỨC NĂNG 1: CẤU HÌNH HỆ THỐNG ---
+date_default_timezone_set('Asia/Ha_Noi');
+
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -13,16 +15,16 @@ if (!$conn) {
 }
 
 $error_message = "";
+$max_attempts = 5;    // Số lần thử tối đa
+$lockout_time = 15;   // Thời gian khóa (phút)
 
-// --- 2. XỬ LÝ ĐĂNG NHẬP ---
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    // (6) Kiểm tra tồn tại POST
+    //ktra tài khoản có tồn tại
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // (2) Dùng prepared statement chống SQL Injection
-    $sql = "SELECT id, full_name, password, role FROM users WHERE email = ?";
+    // Lấy thông tin user (bao gồm cả cột role để phân quyền)
+    $sql = "SELECT id, full_name, password, role, login_attempts, lockout_until FROM users WHERE email = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "s", $email);
     mysqli_stmt_execute($stmt);
@@ -30,34 +32,71 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($result && mysqli_num_rows($result) === 1) {
         $user = mysqli_fetch_assoc($result);
+        $now = new DateTime();
+        $is_locked = false;
 
-        // (1) CHỈ kiểm tra mật khẩu bằng password_verify
-        if (password_verify($password, $user['password'])) {
-
-            // (5) Regenerate session ID
-            session_regenerate_id(true);
-
-            $_SESSION['user_id']   = $user['id'];
-            $_SESSION['user_name'] = $user['full_name'];
-            $_SESSION['user_role'] = $user['role'];
-
-            if ($user['role'] == 1) {
-                header("Location: admin-dashboard.php");
-            } else {
-                header("Location: index-logined.php");
+        // --- CHỨC NĂNG 2: KIỂM TRA TRẠNG THÁI KHÓA ---
+        if ($user['lockout_until']) {
+            $lockout_until = new DateTime($user['lockout_until']);
+            if ($lockout_until > $now) {
+                $is_locked = true;
+                $diff = $lockout_until->diff($now);
+                $error_message = "Tài khoản bị khóa. Vui lòng thử lại sau " . ($diff->i > 0 ? $diff->i . " phút " : "") . $diff->s . " giây.";
             }
-            exit();
-        } else {
-            $error_message = "Mật khẩu không chính xác!";
+        }
+
+        if (!$is_locked) {
+            // --- CHỨC NĂNG 3: XÁC THỰC MẬT KHẨU ---
+            if (password_verify($password, $user['password'])) {
+                
+                // Đăng nhập đúng: Reset lại số lần sai về 0
+                $reset_sql = "UPDATE users SET login_attempts = 0, lockout_until = NULL WHERE id = ?";
+                $reset_stmt = mysqli_prepare($conn, $reset_sql);
+                mysqli_stmt_bind_param($reset_stmt, "i", $user['id']);
+                mysqli_stmt_execute($reset_stmt);
+
+                // Lưu thông tin vào Session
+                session_regenerate_id(true);
+                $_SESSION['user_id']   = $user['id'];
+                $_SESSION['user_name'] = $user['full_name'];
+                $_SESSION['user_role'] = $user['role']; // Lưu quyền của user
+
+                // --- CHỨC NĂNG 6: PHÂN QUYỀN ĐIỀU HƯỚNG ---
+                // Kiểm tra vai trò để chuyển hướng trang phù hợp
+                if ($user['role'] === 'admin') {
+                    // Nếu là Admin -> Vào trang quản trị
+                    header("Location: admin-dashboard.php");
+                } else {
+                    // Nếu là khách hàng -> Vào trang chủ đã đăng nhập
+                    header("Location: index-logined.php");
+                }
+                exit();
+                
+            } else {
+                // --- CHỨC NĂNG 4: XỬ LÝ KHI SAI MẬT KHẨU ---
+                $new_attempts = $user['login_attempts'] + 1;
+                
+                if ($new_attempts >= $max_attempts) {
+                    $unlock_at = $now->modify("+$lockout_time minutes")->format('Y-m-d H:i:s');
+                    $update_sql = "UPDATE users SET login_attempts = ?, lockout_until = ? WHERE id = ?";
+                    $up_stmt = mysqli_prepare($conn, $update_sql);
+                    mysqli_stmt_bind_param($up_stmt, "isi", $new_attempts, $unlock_at, $user['id']);
+                    $error_message = "Bạn đã nhập sai quá $max_attempts lần. Tài khoản bị khóa $lockout_time phút.";
+                } else {
+                    $update_sql = "UPDATE users SET login_attempts = ? WHERE id = ?";
+                    $up_stmt = mysqli_prepare($conn, $update_sql);
+                    mysqli_stmt_bind_param($up_stmt, "ii", $new_attempts, $user['id']);
+                    $remaining = $max_attempts - $new_attempts;
+                    $error_message = "Mật khẩu không chính xác! Bạn còn $remaining lần thử.";
+                }
+                mysqli_stmt_execute($up_stmt);
+            }
         }
     } else {
         $error_message = "Email này chưa được đăng ký!";
     }
-
     mysqli_stmt_close($stmt);
 }
-
-// (7) Đóng kết nối CSDL
 mysqli_close($conn);
 ?>
 
