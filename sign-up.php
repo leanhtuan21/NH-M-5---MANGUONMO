@@ -33,8 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
             $stmt = $conn->prepare(
-                "INSERT INTO users (email, password, role, created_at)
-                 VALUES (?, ?, 'user', NOW())"
+                "INSERT INTO users (email, password)
+                 VALUES (?, ?)"
             );
             $stmt->bind_param("ss", $email, $hashedPassword);
 
