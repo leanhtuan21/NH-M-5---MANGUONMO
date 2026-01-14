@@ -60,11 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // 6. Lưu mật khẩu đã mã hóa bằng MD5 
             $hashedPassword = md5($password);
 
-            $stmt = $conn->prepare(
-                "INSERT INTO users (email, password) VALUES (?, ?)"
-            );
-            $stmt->bind_param("ss", $email, $hashedPassword);
+            $full_name = "";
 
+            $stmt = $conn->prepare(
+                "INSERT INTO users (full_name, email, password)
+                VALUES (?, ?, ?)"
+            );
+
+            $stmt->bind_param("sss", $full_name, $email, $hashedPassword);
 
             if ($stmt->execute()) {
                 $success = "Đăng ký thành công! Đang chuyển sang trang đăng nhập...";
