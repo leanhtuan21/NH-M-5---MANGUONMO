@@ -1,48 +1,71 @@
 <?php
 $error = "";
+$success = "";
+$email_value = ""; // Biến để lưu lại email người dùng nhập
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $conn = new mysqli("localhost", "root", "", "grocery_mart_db");
     if ($conn->connect_error) {
-        die("Kết nối CSDL thất bại");
+        die("Kết nối CSDL thất bại: " . $conn->connect_error);
     }
 
-    $email = $_POST['email'] ?? '';
+    $email = trim($_POST['email'] ?? '');
+    $email_value = $email; // Giữ lại giá trị email để hiển thị lại form
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
+    // 1. Kiểm tra rỗng
     if (empty($email) || empty($password) || empty($confirm_password)) {
         $error = "Vui lòng nhập đầy đủ thông tin";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Email không hợp lệ";
-    } elseif (strlen($password) < 6) {
-        $error = "Mật khẩu phải có ít nhất 6 ký tự";
-    } elseif ($password !== $confirm_password) {
-        $error = "Mật khẩu xác nhận không khớp";
-    } else {
+    }
 
+    // 2. Kiểm tra định dạng email
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Email không đúng định dạng";
+    }
+
+    // 3. Kiểm tra độ mạnh mật khẩu
+    elseif (
+        strlen($password) < 6 ||
+        !preg_match('/[A-Z]/', $password) ||      // chữ hoa
+        !preg_match('/[a-z]/', $password) ||      // chữ thường
+        !preg_match('/[0-9]/', $password) ||      // số
+        !preg_match('/[\W]/', $password)          // ký tự đặc biệt
+    ) {
+        $error = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt";
+    }
+
+    // 4. Kiểm tra xác nhận mật khẩu
+    elseif ($password !== $confirm_password) {
+        $error = "Mật khẩu xác nhận không khớp";
+    }
+
+    else {
+        // 5. Kiểm tra email đã tồn tại chưa
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $error = "Email đã được đăng ký";
+            $error = "Email này đã được đăng ký";
         } else {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            // 6. Lưu mật khẩu đã mã hóa bằng MD5 
+            $hashedPassword = md5($password);
 
             $stmt = $conn->prepare(
-                "INSERT INTO users (email, password)
-                 VALUES (?, ?)"
+                "INSERT INTO users (email, password) VALUES (?, ?)"
             );
             $stmt->bind_param("ss", $email, $hashedPassword);
 
+
             if ($stmt->execute()) {
-                header("Location: sign-in.php");
-                exit;
+                $success = "Đăng ký thành công! Đang chuyển sang trang đăng nhập...";
+                // Dòng này sẽ tự động chuyển trang sau 2 giây
+                header("refresh:2;url=sign-in.php"); 
             } else {
-                $error = "Đăng ký thất bại";
+                $error = "Đăng ký không thành công: " . $conn->error;
             }
         }
         $stmt->close();
@@ -59,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Sign up | Grocery Mart</title>
 
-        <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
@@ -67,18 +89,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
 
-        <!-- Fonts -->
         <link rel="stylesheet" href="./assets/fonts/stylesheet.css" />
 
-        <!-- Styles -->
         <link rel="stylesheet" href="./assets/css/main.css" />
 
-        <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
+
+        <style>
+            .alert {
+                padding: 12px;
+                border-radius: 8px;
+                font-size: 1.4rem;
+                font-weight: 500;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+            .alert-danger {
+                background-color: #ffe5e5;
+                color: #d32f2f;
+                border: 1px solid #ffcccc;
+            }
+            .alert-success {
+                background-color: #e5ffe5;
+                color: #2e7d32;
+                border: 1px solid #ccffcc;
+            }
+        </style>
     </head>
     <body>
         <main class="auth">
-            <!-- Auth intro -->
             <div class="auth__intro">
                 <a href="./" class="logo auth__intro-logo d-none d-md-flex">
                     <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
@@ -93,7 +132,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </button>
             </div>
 
-            <!-- Auth content -->
             <div id="auth-content" class="auth__content hide">
                 <div class="auth__content-inner">
                     <a href="./" class="logo">
@@ -102,7 +140,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     </a>
                     <h1 class="auth__heading">Đăng ký</h1>
                     <p class="auth__desc">Hãy tạo tài khoản của bạn và mua sắm như một chuyên gia đồng thời tiết kiệm tiền.</p>
-                    <form  method="POST" class="form auth__form">
+
+                    <?php if (!empty($error)): ?>
+                        <div class="alert alert-danger">
+                            <?php echo $error; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($success)): ?>
+                        <div class="alert alert-success">
+                            <?php echo $success; ?>
+                        </div>
+                    <?php endif; ?>
+                    <form method="POST" class="form auth__form">
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input
@@ -113,18 +163,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     class="form__input"
                                     autofocus
                                     required
+                                    value="<?php echo htmlspecialchars($email_value); ?>" 
                                 />
                                 <img src="./assets/icons/message.svg" alt="" class="form__input-icon" />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
-                            <p class="form__error">Email không đúng định dạng</p>
-                        </div>
+                            </div>
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input
                                     type="password"
                                     name="password"
-                                    id=""
+                                    id="password"
                                     placeholder="Password"
                                     class="form__input"
                                     required
@@ -133,8 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
-                            <p class="form__error">Mật khẩu phải có ít nhất 6 ký tự</p>
-                        </div>
+                             </div>
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input
@@ -149,7 +198,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
-                            <p class="form__error">Mật khẩu phải có ít nhất 6 ký tự</p>
                         </div>
                         <div class="form__group form__group--inline">
                             <label class="form__checkbox">
