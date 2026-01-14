@@ -28,9 +28,8 @@
             <div class="auth__intro d-md-none">
                 <img src="./assets/img/auth/intro.svg" alt="" class="auth__intro-img" />
                 <p class="auth__intro-text">
-                    Trải nghiệm những giá trị thương hiệu xa xỉ, sản phẩm chất lượng cao và dịch vụ sáng tạo nhất_
+                    Khám phá hương vị cà phê nguyên chất, sản phẩm thượng hạng và trải nghiệm mua sắm tuyệt vời nhất
                 </p>
-                <p>Hãy đăng nhập để có trải nghiệm tốt nhất</p>
             </div>
 
             <!-- Auth content -->
@@ -40,9 +39,9 @@
                         <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
                         <h2 class="logo__title">Grocerymart</h2>
                     </a>
-                    <h1 class="auth__heading">Chào mừng bạn quay trở lại!</h1>
+                    <h1 class="auth__heading">Chào mừng bạn trở lại!</h1>
                     <p class="auth__desc">
-                        Vui lòng đăng nhập để tiếp tục. Là khách hàng cũ, bạn có thể truy cập vào tất cả thông tin đã lưu trước đó
+                        Đăng nhập để tiếp tục hành trình khám phá hương vị cà phê
                     </p>
                     <form action="./index-logined.php" class="form auth__form">
                         <div class="form__group">
@@ -59,7 +58,7 @@
                                 <img src="./assets/icons/message.svg" alt="" class="form__input-icon" />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
-                            <p class="form__error">Email không đúng định dạng</p>
+                            <p class="form__error">Địa chỉ email không hợp lệ</p>
                         </div>
                         <div class="form__group">
                             <div class="form__text-input">
@@ -82,7 +81,7 @@
                                 <input type="checkbox" name="" id="" class="form__checkbox-input d-none" />
                                 <span class="form__checkbox-label">Ghi nhớ đăng nhập</span>
                             </label>
-                            <a href="./reset-password.php" class="auth__link form__pull-right">Quên mật khẩu</a>
+                            <a href="./reset-password.php" class="auth__link form__pull-right">Quên mật khẩu?</a>
                         </div>
                         <div class="form__group auth__btn-group">
                             <button class="btn btn--primary auth__btn form__submit-btn">Đăng nhập</button>
@@ -95,7 +94,7 @@
 
                     <p class="auth__text">
                         Bạn chưa có tài khoản ?
-                        <a href="./sign-up.php" class="auth__link auth__text-link">Đăng ký ngay</a>
+                        <a href="./sign-up.php" class="auth__link auth__text-link">Đăng ký</a>
                     </p>
                 </div>
             </div>
