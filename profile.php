@@ -1,3 +1,29 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+/* Chưa đăng nhập thì đá về login */
+if (!isset($_SESSION['email'])) {
+    header("Location: sign-in.php");
+    exit;
+}
+
+$email = $_SESSION['email'];
+
+/* Lấy thông tin user */
+$sql = "SELECT email, phone, address FROM users WHERE email = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
+
+if (!$user) {
+    echo "Không tìm thấy người dùng";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -168,7 +194,9 @@
                                                         </div>
                                                         <div>
                                                             <h3 class="account-info__title">Email</h3>
-                                                            <p class="account-info__desc">tarek97.ta@gmail.com</p>
+                                                            <p class="account-info__desc">
+                                                                <?= htmlspecialchars($user['email']) ?>
+                                                            </p>
                                                         </div>
                                                     </article>
                                                 </a>
@@ -182,7 +210,9 @@
                                                         </div>
                                                         <div>
                                                             <h3 class="account-info__title">Số điện thoại</h3>
-                                                            <p class="account-info__desc">+000 11122 2345 657</p>
+                                                            <p class="account-info__desc">
+                                                                <?= htmlspecialchars($user['phone'] ?? 'Chưa cập nhật') ?>
+                                                            </p>
                                                         </div>
                                                     </article>
                                                 </a>
@@ -197,7 +227,7 @@
                                                         <div>
                                                             <h3 class="account-info__title">Địa chỉ</h3>
                                                             <p class="account-info__desc">
-                                                                Đại sứ quán Bangladesh, Washington, DC 20008
+                                                                <?= htmlspecialchars($user['address'] ?? 'Chưa cập nhật') ?>
                                                             </p>
                                                         </div>
                                                     </article>
