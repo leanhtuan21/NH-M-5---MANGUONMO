@@ -2,7 +2,7 @@
 session_start();
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
-// --- KẾT NỐI CSDL ---
+/* ===== KẾT NỐI CƠ SỞ DỮ LIỆU ===== */
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -13,53 +13,70 @@ if (!$conn) {
     die("Kết nối thất bại: " . mysqli_connect_error());
 }
 
+/* ===== KHAI BÁO BIẾN KIỂM SOÁT ===== */
 $error_message = "";
 $max_attempts = 5;
-$lockout_time = 60; // 1 phút
+$lockout_time = 30;
 
+/* ===== XỬ LÝ REQUEST ĐĂNG NHẬP ===== */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $password = trim($_POST['password'] ?? '');
 
-    // --- KIỂM TRA KHÓA ---
-    if (isset($_SESSION['lockout_until']) && time() < $_SESSION['lockout_until']) {
+    /* ===== RESET KHI ĐỔI EMAIL ===== */
+    if (isset($_SESSION['last_email']) && $_SESSION['last_email'] !== $email) {
+        unset($_SESSION['login_attempts']);
+        unset($_SESSION['lockout_until']);
+    }
+    $_SESSION['last_email'] = $email;
 
-        $remaining = $_SESSION['lockout_until'] - time();
+    /* ===== TẠO KEY SESSION THEO EMAIL ===== */
+    $attempt_key = 'login_attempts_' . md5($email);
+    $lock_key    = 'lockout_until_' . md5($email);
+
+    /* ===== KIỂM TRA KHÓA ĐĂNG NHẬP ===== */
+    if (isset($_SESSION[$lock_key]) && time() < $_SESSION[$lock_key]) {
+
+        $remaining = $_SESSION[$lock_key] - time();
         $error_message = "Tài khoản đang bị tạm khóa. Vui lòng thử lại sau $remaining giây.";
 
     } else {
 
-        // Hết thời gian khóa → reset
-        if (isset($_SESSION['lockout_until']) && time() >= $_SESSION['lockout_until']) {
-            unset($_SESSION['lockout_until']);
-            unset($_SESSION['login_attempts']);
+        /* ===== RESET SAU KHI HẾT KHÓA ===== */
+        if (isset($_SESSION[$lock_key]) && time() >= $_SESSION[$lock_key]) {
+            unset($_SESSION[$lock_key]);
+            unset($_SESSION[$attempt_key]);
         }
 
-        // --- TRUY VẤN USER ---
+        /* ===== TRUY VẤN USER ===== */
         $sql = "SELECT id, full_name, password, role FROM users WHERE email = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
+        /* ===== KIỂM TRA TỒN TẠI USER ===== */
         if ($result && mysqli_num_rows($result) === 1) {
 
             $user = mysqli_fetch_assoc($result);
 
-            // --- SO KHỚP MẬT KHẨU BẰNG MD5 ---
+            /* ===== KIỂM TRA MẬT KHẨU (MD5) ===== */
             if (md5($password) === $user['password']) {
 
-                // ĐÚNG → RESET ĐẾM
-                unset($_SESSION['login_attempts']);
-                unset($_SESSION['lockout_until']);
+                /* ===== TẠO SESSION ĐĂNG NHẬP ===== */
+                unset($_SESSION[$attempt_key]);
+                unset($_SESSION[$lock_key]);
 
                 session_regenerate_id(true);
                 $_SESSION['user_id']   = $user['id'];
                 $_SESSION['user_name'] = $user['full_name'];
                 $_SESSION['user_role'] = $user['role'];
 
-                // PHÂN QUYỀN (CHỐNG LỖI HOA / THƯỜNG)
+                /* ===== THÔNG BÁO ĐĂNG NHẬP THÀNH CÔNG ===== */
+                $_SESSION['login_success'] = "Đăng nhập thành công. Chúc bạn có trải nghiệm mua hàng vui vẻ của shop chúng tôi!";
+
+                /* ===== PHÂN QUYỀN & CHUYỂN TRANG ===== */
                 if (strtolower($user['role']) === 'admin') {
                     header("Location: admin-dashboard.php");
                 } else {
@@ -68,29 +85,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 exit();
 
             } else {
-                // SAI MẬT KHẨU
-                $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
-
-                if ($_SESSION['login_attempts'] >= $max_attempts) {
-                    $_SESSION['lockout_until'] = time() + $lockout_time;
-                    $error_message = "Nhập sai quá 5 lần. Tài khoản bị khóa 1 phút.";
-                } else {
-                    $remaining_tries = $max_attempts - $_SESSION['login_attempts'];
-                    $error_message = "Email hoặc mật khẩu không chính xác! Bạn còn $remaining_tries lần thử.";
-                }
+                /* ===== SAI MẬT KHẨU ===== */
+                $_SESSION[$attempt_key] = ($_SESSION[$attempt_key] ?? 0) + 1;
             }
 
         } else {
-            // EMAIL KHÔNG TỒN TẠI → VẪN TÍNH LÀ SAI
-            $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
+            /* ===== EMAIL KHÔNG TỒN TẠI ===== */
+            $_SESSION[$attempt_key] = ($_SESSION[$attempt_key] ?? 0) + 1;
+        }
 
-            if ($_SESSION['login_attempts'] >= $max_attempts) {
-                $_SESSION['lockout_until'] = time() + $lockout_time;
-                $error_message = "Nhập sai quá 5 lần. Tài khoản bị khóa 1 phút.";
-            } else {
-                $remaining_tries = $max_attempts - $_SESSION['login_attempts'];
-                $error_message = "Email hoặc mật khẩu không chính xác! Bạn còn $remaining_tries lần thử.";
-            }
+        /* ===== GIỚI HẠN ĐĂNG NHẬP SAI ===== */
+        if ($_SESSION[$attempt_key] >= $max_attempts) {
+            $_SESSION[$lock_key] = time() + $lockout_time;
+            $error_message = "Nhập sai quá 5 lần. Tài khoản bị khóa 30s.";
+        } else {
+            $remaining_tries = $max_attempts - $_SESSION[$attempt_key];
+            $error_message = "Email hoặc mật khẩu không chính xác! Bạn còn $remaining_tries lần thử.";
         }
 
         if (isset($stmt)) {
@@ -99,8 +109,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+/* ===== ĐÓNG KẾT NỐI CSDL ===== */
 mysqli_close($conn);
 ?>
+
 
 
 
@@ -188,12 +200,6 @@ mysqli_close($conn);
                                     minlength="6"
                                 />
                                 <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
-                                <img 
-                                    src="./assets/icons/eye.svg" 
-                                    alt="Toggle Password" 
-                                    id="toggle-password"
-                                    style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; width: 20px; opacity: 0.5;"
-                                />
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                             </div>
                             <p class="form__error">Mật khẩu phải có ít nhất 6 kí tự</p>
