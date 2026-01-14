@@ -1,3 +1,6 @@
+<?php
+    echo "Xin chào";
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
