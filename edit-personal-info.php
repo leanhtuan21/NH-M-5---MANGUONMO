@@ -1,5 +1,44 @@
 <?php
-    echo "Xin chào";
+session_start();
+require_once 'db_connect.php';
+
+if (!isset($_SESSION['email'])) {
+    header("Location: sign-in.php");
+    exit;
+}
+$email = $_SESSION['email'];
+
+
+/* 3. Lấy thông tin user từ CSDL */
+$sql = "SELECT full_name, email, phone, address 
+        FROM users 
+        WHERE email = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
+/* 5. Gán dữ liệu ra form */
+$full_name = $user['full_name'] ?? '';
+$phone     = $user['phone'] ?? '';
+$address   = $user['address'] ?? '';
+/* 6. Xử lý cập nhật */
+if (isset($_POST['update_profile'])) {
+    $full_name = trim($_POST['full_name'] ?? '');
+    $phone     = trim($_POST['phone'] ?? '');
+    $address   = trim($_POST['address'] ?? '');
+    $sql_update = "UPDATE users 
+                   SET full_name = ?, phone = ?, address = ? 
+                   WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $sql_update);
+    mysqli_stmt_bind_param($stmt, "ssss", $full_name, $phone, $address, $email);
+    mysqli_stmt_execute($stmt);
+    // cập nhật lại session để header hiển thị đúng tên
+    $_SESSION['user_name'] = $full_name;
+    header("Location: profile.php");
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -166,7 +205,7 @@
                                             Thông tin cá nhân
                                         </h2>
 
-                                        <form action="./profile.php" class="form form-card">
+                                        <form method="post" class="form form-card">
                                             <!-- Form row 1 -->
                                             <div class="form__row">
                                                 <div class="form__group">
@@ -176,6 +215,8 @@
                                                     <div class="form__text-input">
                                                         <input
                                                             type="text"
+                                                            name="full_name"
+                                                            value="<?= htmlspecialchars($full_name) ?>"
                                                             id="full-name"
                                                             placeholder="Nhập họ và tên"
                                                             class="form__input"
@@ -199,6 +240,7 @@
                                                         <input
                                                             type="text"
                                                             id="email-adress"
+                                                            value="<?= htmlspecialchars($user['email']) ?>"
                                                             placeholder="Nhập email"
                                                             class="form__input"
                                                             required
@@ -222,6 +264,8 @@
                                                     <div class="form__text-input">
                                                         <input
                                                             type="text"
+                                                            name="phone"
+                                                            value="<?= htmlspecialchars($phone) ?>"
                                                             id="phone-number"
                                                             placeholder="Nhập số điện thoại"
                                                             class="form__input"
@@ -242,8 +286,9 @@
                                                     </label>
                                                     <div class="form__text-input">
                                                         <input
-                                                            type="password"
-                                                            id="password"
+                                                            type="text"
+                                                            name="address"
+                                                            value="<?= htmlspecialchars($address) ?>"
                                                             placeholder="Nhập mật địa chỉ"
                                                             class="form__input"
                                                             required
@@ -260,7 +305,7 @@
 
                                             <div class="form-card__bottom">
                                                 <a class="btn btn--text" href="./profile.php">Hủy</a>
-                                                <button class="btn btn--primary btn--rounded">Lưu thay đổi</button>
+                                                <button type="submit" name="update_profile" class="btn btn--primary btn--rounded">Lưu thay đổi</button>
                                             </div>
                                         </form>
                                     </div>
