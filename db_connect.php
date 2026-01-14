@@ -5,7 +5,7 @@
 
     $local = 'localhost';
     $user  = 'root';
-    $pass  = '';
+    $pass  = '123456789';
     $db    = 'grocery_mart_db'; 
 
     
