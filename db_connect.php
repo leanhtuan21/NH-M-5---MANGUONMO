@@ -7,9 +7,9 @@
     $user  = 'root';
     $pass  = '';
     $db    = 'grocery_mart_db'; 
-
+    $port = 3308;
     
-    $conn = new mysqli($local, $user, $pass, $db);
+    $conn = new mysqli($local, $user, $pass, $db, $port);
 
     
     if($conn->connect_error){
