@@ -10,14 +10,15 @@ $email = $_SESSION['email'];
 $full_name = $_SESSION['user_name'];
 
 /* 3. Lấy thông tin user từ CSDL */
-$sql = "SELECT full_name, email, phone, address 
-        FROM users 
+$sql = "SELECT full_name, email, phone, address, avatar
+        FROM users
         WHERE email = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "s", $email);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
+$avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
 /* 5. Gán dữ liệu ra form */
 $full_name = $user['full_name'] ?? '';
 $phone     = $user['phone'] ?? '';
@@ -43,7 +44,34 @@ if (isset($_POST['update_profile'])) {
     header("Location: profile.php");
     exit;
 }
+// Ảnh đại diện
+if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
 
+    $allow_ext = ['jpg', 'jpeg', 'png', 'webp'];
+    $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($ext, $allow_ext)) {
+        echo "<script>alert('Chỉ chấp nhận JPG, PNG, WEBP');</script>";
+    } else {
+
+        $avatar_name = 'avatar_' . time() . '.' . $ext;
+        $upload_dir = __DIR__ . '/assets/img/avatar/';
+        $upload_path = $upload_dir . $avatar_name;
+
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
+
+            // cập nhật DB
+            $sql = "UPDATE users SET avatar = ? WHERE email = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "ss", $avatar_name, $email);
+            mysqli_stmt_execute($stmt);
+            // CẬP NHẬT SESSION
+            $_SESSION['avatar'] = $avatar_name;
+            header("Location: profile.php");
+            exit;
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
