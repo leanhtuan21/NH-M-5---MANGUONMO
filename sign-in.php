@@ -2,16 +2,8 @@
 session_start();
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
-/* === KẾT NỐI CƠ SỞ DỮ LIỆU === */
-$host = "localhost";
-$user = "root";
-$pass = "";
-$dbname = "grocery_mart_db";
-
-$conn = mysqli_connect($host, $user, $pass, $dbname);
-if (!$conn) {
-    die("Kết nối thất bại: " . mysqli_connect_error());
-}
+/* === KẾT NỐI VỚI FILE CSDL === */
+require_once __DIR__ . "/db_connect.php";
 
 /* === LẤY EMAIL ĐÃ GHI NHỚ (ĐỂ ĐIỀN VÀO INPUT === */
 if (isset($_COOKIE['remember_email'])) {
