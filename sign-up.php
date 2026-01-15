@@ -102,6 +102,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <link rel="stylesheet" href="./assets/css/main.css" />
 
+
+
+
         <script src="./assets/js/scripts.js"></script>
 
         <style>
@@ -122,6 +125,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 background-color: #e5ffe5;
                 color: #2e7d32;
                 border: 1px solid #ccffcc;
+            }
+            .form__text-input {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .form__input-icon-eye {
+                position: absolute;
+                right: 12px; /* Khoảng cách từ bên phải vào */
+                padding: 10px;
+                z-index: 2;
+                transition: opacity 0.3s;
+            }
+
+            .form__input-icon-eye:hover {
+                opacity: 0.7;
+            }
+
+            /* Đảm bảo text không bị ghi đè lên icon */
+            .form__input {
+                padding-right: 45px !important; 
             }
         </style>
     </head>
@@ -190,22 +215,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     minlength="6"
                                 />
                                 <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
-                                <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
+                                <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="password" style="cursor: pointer; right: 15px; position: absolute; width: 20px;" />
                             </div>
-                             </div>
+                        </div>
+
                         <div class="form__group">
                             <div class="form__text-input">
                                 <input
                                     type="password"
                                     name="confirm_password"
-                                    id=""
+                                    id="confirm_password"
                                     placeholder="Confirm password"
                                     class="form__input"
                                     required
                                     minlength="6"
                                 />
                                 <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
-                                <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
+                                <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="confirm_password" style="cursor: pointer; right: 15px; position: absolute; width: 20px;" />
                             </div>
                         </div>
                         <div class="form__group form__group--inline">
@@ -232,6 +258,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </main>
         <script>
             window.dispatchEvent(new Event("template-loaded"));
+            document.querySelectorAll('.js-toggle-password').forEach(item => {
+        item.addEventListener('click', function() {
+            // Lấy ID của input mục tiêu từ attribute data-target
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                // Bạn có thể thay đổi src của icon sang hình con mắt gạch chéo nếu có
+                // this.src = "./assets/icons/eye-slash.svg"; 
+            } else {
+                passwordInput.type = 'password';
+                // this.src = "./assets/icons/eye.svg";
+            }
+        });
+    });
         </script>
         
     </body>
