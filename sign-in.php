@@ -366,11 +366,6 @@ mysqli_close($conn);
                         
                         <div class="form__group auth__btn-group">
                             <button type="submit" class="btn btn--primary auth__btn form__submit-btn">Đăng nhập</button>
-                            
-                            <button type="button" class="btn btn--outline auth__btn btn--no-margin">
-                                <img src="./assets/icons/google.svg" alt="" class="btn__icon icon" />
-                                Đăng nhập với Google
-                            </button>
                         </div>
                     </form>
 
