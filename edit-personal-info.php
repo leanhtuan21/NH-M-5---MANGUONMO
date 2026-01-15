@@ -31,6 +31,7 @@ if (isset($_POST['update_profile'])) {
         echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số');</script>";
         exit;
     }
+
     $address   = trim($_POST['address'] ?? '');
     $sql_update = "UPDATE users 
                    SET full_name = ?, phone = ?, address = ? 
