@@ -31,7 +31,6 @@ if (isset($_POST['update_profile'])) {
         echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số');</script>";
         exit;
     }
-
     $address   = trim($_POST['address'] ?? '');
     $sql_update = "UPDATE users 
                    SET full_name = ?, phone = ?, address = ? 
@@ -70,6 +69,33 @@ if (isset($_POST['update_profile'])) {
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
     </head>
+    <style>
+        .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    /* ảnh avatar */
+    .profile-user__avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    /* dấu cộng nằm trong ảnh */
+    .avatar-plus {
+        position: absolute;
+        inset: 0; /* phủ toàn ảnh */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: #000;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+    }
+    </style>
     <body>
         <!-- Header -->
         <header id="header" class="header"></header>
@@ -97,9 +123,32 @@ if (isset($_POST['update_profile'])) {
                             <aside class="profile__sidebar">
                                 <!-- User -->
                                 <div class="profile-user">
-                                    <img src="./assets/img/avatar/avatar-3.png" alt="" class="profile-user__avatar" />
-                                    <h1 class="profile-user__name">Imran Khan</h1>
-                                    <p class="profile-user__desc">Ngày đăng ký: 17/05/2022</p>
+                                    <form method="POST" enctype="multipart/form-data">
+                                        <label for="upload-avatar" class="avatar-wrapper">
+                                            <img
+                                                src="./assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                                                class="profile-user__avatar"
+                                                alt="Avatar"
+                                                onerror="this.src='./assets/img/avatar/avatar-3.png'"
+                                            >
+                                            <span class="avatar-plus">+</span>
+                                        </label>
+
+                                        <input
+                                            type="file"
+                                            id="upload-avatar"
+                                            name="avatar"
+                                            accept="image/*"
+                                            hidden
+                                            onchange="this.form.submit()"
+                                        >
+                                    </form>
+                                    <h1 class="header-user__name">
+                                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                    </h1>
+                                    <p class="header-user__email">
+                                        <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                    </p>
                                 </div>
 
                                 <!-- Menu 1 -->
