@@ -11,7 +11,7 @@ if (!isset($_SESSION['email'])) {
 $email = $_SESSION['email'];
 
 /* Lấy thông tin user */
-$sql = "SELECT email, phone, address FROM users WHERE email = ?";
+$sql = "SELECT email, phone, address, avatar FROM users WHERE email = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "s", $email);
 mysqli_stmt_execute($stmt);
@@ -21,6 +21,34 @@ $user = mysqli_fetch_assoc($result);
 if (!$user) {
     echo "Không tìm thấy người dùng";
     exit;
+}
+
+// Ảnh đại diện
+if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
+
+    $allow_ext = ['jpg', 'jpeg', 'png', 'webp'];
+    $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($ext, $allow_ext)) {
+        echo "<script>alert('Chỉ chấp nhận JPG, PNG, WEBP');</script>";
+    } else {
+
+        $avatar_name = 'avatar_' . time() . '.' . $ext;
+        $upload_dir = __DIR__ . '/assets/img/avatar/';
+        $upload_path = $upload_dir . $avatar_name;
+
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
+
+            // cập nhật DB
+            $sql = "UPDATE users SET avatar = ? WHERE email = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "ss", $avatar_name, $email);
+            mysqli_stmt_execute($stmt);
+
+            header("Location: profile.php");
+            exit;
+        }
+    }
 }
 ?>
 
@@ -74,12 +102,33 @@ if (!$user) {
                         <div class="col-3 col-xl-4 col-lg-5 col-md-12">
                             <aside class="profile__sidebar">
                                 <!-- User -->
+                                <?php
+                                    $avatar = !empty($user['avatar']) ? $user['avatar'] : 'default.png';
+                                ?>
                                 <div class="profile-user">
-                                    <img src="./assets/img/avatar/avatar-3.png" alt="" class="profile-user__avatar" />
-                                    <h1 class="profile-user__name">Imran Khan</h1>
-                                    <p class="profile-user__desc">Ngày đăng ký: 17/05/2022</p>
+                                    <label for="upload-avatar" class="avatar-wrapper">
+                                        <img src="./assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                                            class="profile-user__avatar"
+                                            alt="Avatar">
+                                        <span class="avatar-edit">
+                                            <img src="./assets/icons/camera.svg" alt="">
+                                        </span>
+                                    </label>
+                                    <form method="POST" enctype="multipart/form-data">
+                                        <input type="file"
+                                            id="upload-avatar"
+                                            name="avatar"
+                                            accept="image/*"
+                                            onchange="this.form.submit()"
+                                            hidden>
+                                    </form>
+                                    <h1 class="header-user__name">
+                                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                    </h1>
+                                    <p class="header-user__email">
+                                        <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                    </p>
                                 </div>
-
                                 <!-- Menu 1 -->
                                 <div class="profile-menu">
                                     <h3 class="profile-menu__title">Quản lý tài khoản</h3>
