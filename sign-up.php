@@ -102,10 +102,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <link rel="stylesheet" href="./assets/css/main.css" />
 
-
-
-
-        <script src="./assets/js/scripts.js"></script>
+        <script src="./assets/js/scripts.js">
+        </script>
 
         <style>
             .alert {
@@ -157,9 +155,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
                     <h1 class="logo__title">grocerymart</h1>
                 </a>
-                <img src="./assets/img/auth/intro.svg" alt="" class="auth__intro-img" />
+                <img src="https://giatruongcoffee.com/wp-content/uploads/2017/08/ca-phe-bot-rang-xay-2.jpg" alt="" class="auth__intro-img" />
                 <p class="auth__intro-text">
-                Hội tụ những giá trị tốt nhất của thương hiệu xa xỉ, sản phẩm chất lượng cao và dịch vụ sáng tạo
+                Trải nghiệm cà phê nguyên bản – đậm đà, tinh tế và khác biệt.
                 </p>
                 <button class="auth__intro-next d-none d-md-flex js-toggle" toggle-target="#auth-content">
                     <img src="./assets/img/auth/intro-arrow.svg" alt="" />
@@ -170,10 +168,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="auth__content-inner">
                     <a href="./" class="logo">
                         <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
-                        <h1 class="logo__title">Cửa hàng tạp hóa</h1>
+                        <h1 class="logo__title">Coffee Shop</h1>
                     </a>
                     <h1 class="auth__heading">Đăng ký</h1>
-                    <p class="auth__desc">Hãy tạo tài khoản của bạn và mua sắm như một chuyên gia đồng thời tiết kiệm tiền.</p>
+                    <p class="auth__desc">Đăng ký tài khoản để lựa chọn cà phê bột & hạt rang phù hợp với nhu cầu của bạn.</p>
 
                     <?php if (!empty($error)): ?>
                         <div class="alert alert-danger">
@@ -242,10 +240,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                         <div class="form__group auth__btn-group">
                             <button class="btn btn--primary auth__btn form__submit-btn">Đăng ký</button>
-                            <button class="btn btn--outline auth__btn btn--no-margin">
-                                <img src="./assets/icons/google.svg" alt="" class="btn__icon icon" />
-                                Đăng ký bằng Google
-                            </button>
+                            
                         </div>
                     </form>
 
@@ -256,10 +251,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </div>
         </main>
-        <script>
-            window.dispatchEvent(new Event("template-loaded"));
-            document.querySelectorAll('.js-toggle-password').forEach(item => {
-        item.addEventListener('click', function() {
+    <script>
+        window.dispatchEvent(new Event("template-loaded"));
+        document.querySelectorAll('.js-toggle-password').forEach(item => {
+            item.addEventListener('click', function() {
             // Lấy ID của input mục tiêu từ attribute data-target
             const targetId = this.getAttribute('data-target');
             const passwordInput = document.getElementById(targetId);
@@ -272,9 +267,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 passwordInput.type = 'password';
                 // this.src = "./assets/icons/eye.svg";
             }
+            });
         });
-    });
-        </script>
+    </script>
         
     </body>
 </html>
