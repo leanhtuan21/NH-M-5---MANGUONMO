@@ -1,3 +1,34 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../db_connect.php';
+
+$email = $_SESSION['email'] ?? null;
+
+$avatar = 'avatar-3.png';
+$user_name = 'User';
+
+if ($email) {
+    $sql = "SELECT email, full_name, avatar FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($result);
+
+    if ($user) {
+        $user_name = $user['full_name'];
+        // Nếu có avatar và file tồn tại thì dùng
+        if (!empty($user['avatar']) &&
+            file_exists(__DIR__ . '/../assets/img/avatar/' . $user['avatar'])
+        ) {
+            $avatar = $user['avatar'];
+        }
+    }
+}
+?>
 <div class="container">
     <div class="top-bar">
         <!-- More -->
@@ -4718,7 +4749,11 @@
             </div>
 
             <div class="top-act__user">
-                <img src="./assets/img/avatar.jpg" alt="" class="top-act__avatar" />
+                <img
+                    src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                    alt="Avatar"
+                    class="user-menu__avatar"
+                />
 
                 <!-- Dropdown -->
                 <div class="act-dropdown top-act__dropdown">
@@ -4730,10 +4765,18 @@
                         />
 
                         <div class="user-menu__top">
-                            <img src="./assets/img/avatar.jpg" alt="" class="user-menu__avatar" />
-                            <div>
-                                <p class="user-menu__name">John Smith</p>
-                                <p>@johnsmith</p>
+                            <img
+                                src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                                alt="Avatar"
+                                class="user-menu__avatar"
+                            />
+                            <div class="header-user__info">
+                                <p class="header-user__name">
+                                    <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                </p>
+                                <p class="header-user__email">
+                                    <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                </p>
                             </div>
                         </div>
 

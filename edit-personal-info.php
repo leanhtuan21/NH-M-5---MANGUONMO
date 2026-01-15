@@ -25,7 +25,13 @@ $address   = $user['address'] ?? '';
 /* 6. Xử lý cập nhật */
 if (isset($_POST['update_profile'])) {
     $full_name = trim($_POST['full_name'] ?? '');
-    $phone     = trim($_POST['phone'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    // kiểm tra số điện thoại: đúng 10 chữ số
+    if (!preg_match('/^[0-9]{10}$/', $phone)) {
+        echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số');</script>";
+        exit;
+    }
+
     $address   = trim($_POST['address'] ?? '');
     $sql_update = "UPDATE users 
                    SET full_name = ?, phone = ?, address = ? 
@@ -267,10 +273,13 @@ if (isset($_POST['update_profile'])) {
                                                             name="phone"
                                                             value="<?= htmlspecialchars($phone) ?>"
                                                             id="phone-number"
-                                                            placeholder="Nhập số điện thoại"
+                                                            placeholder="Nhập số điện thoại (10 chữ số)"
                                                             class="form__input"
                                                             required
+                                                            pattern="[0-9]{10}"
+                                                            title="Số điện thoại phải gồm đúng 10 chữ số"
                                                         />
+
                                                         <img
                                                             src="./assets/icons/form-error.svg"
                                                             alt=""
