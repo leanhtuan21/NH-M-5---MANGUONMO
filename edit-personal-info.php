@@ -7,7 +7,7 @@ if (!isset($_SESSION['email'])) {
     exit;
 }
 $email = $_SESSION['email'];
-
+$full_name = $_SESSION['user_name'];
 
 /* 3. Lấy thông tin user từ CSDL */
 $sql = "SELECT full_name, email, phone, address 
@@ -243,7 +243,7 @@ if (isset($_POST['update_profile'])) {
                                                             value="<?= htmlspecialchars($user['email']) ?>"
                                                             placeholder="Nhập email"
                                                             class="form__input"
-                                                            required
+                                                            disabled
                                                         />
                                                         <img
                                                             src="./assets/icons/form-error.svg"
