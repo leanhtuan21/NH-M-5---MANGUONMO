@@ -7,7 +7,7 @@ require_once __DIR__ . '/../db_connect.php';
 
 $email = $_SESSION['email'] ?? null;
 
-$avatar = 'default.png';
+$avatar = 'avatar-3.png';
 $user_name = 'User';
 
 if ($email) {
@@ -19,8 +19,13 @@ if ($email) {
     $user = mysqli_fetch_assoc($result);
 
     if ($user) {
-        $avatar = $user['avatar'] ?: 'default.png';
         $user_name = $user['full_name'];
+        // Nếu có avatar và file tồn tại thì dùng
+        if (!empty($user['avatar']) &&
+            file_exists(__DIR__ . '/../assets/img/avatar/' . $user['avatar'])
+        ) {
+            $avatar = $user['avatar'];
+        }
     }
 }
 ?>
