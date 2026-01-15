@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <div class="container">
     <div class="top-bar">
         <!-- More -->
@@ -4731,9 +4736,13 @@
 
                         <div class="user-menu__top">
                             <img src="./assets/img/avatar.jpg" alt="" class="user-menu__avatar" />
-                            <div>
-                                <p class="user-menu__name">John Smith</p>
-                                <p>@johnsmith</p>
+                            <div class="header-user__info">
+                                <p class="header-user__name">
+                                    <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                </p>
+                                <p class="header-user__email">
+                                    <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                </p>
                             </div>
                         </div>
 
