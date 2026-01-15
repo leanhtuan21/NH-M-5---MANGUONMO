@@ -44,7 +44,8 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
             $stmt = mysqli_prepare($conn, $sql);
             mysqli_stmt_bind_param($stmt, "ss", $avatar_name, $email);
             mysqli_stmt_execute($stmt);
-
+            // CẬP NHẬT SESSION
+            $_SESSION['avatar'] = $avatar_name;
             header("Location: profile.php");
             exit;
         }
@@ -76,6 +77,33 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
     </head>
+    <style>
+        .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    /* ảnh avatar */
+    .profile-user__avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    /* dấu cộng nằm trong ảnh */
+    .avatar-plus {
+        position: absolute;
+        inset: 0; /* phủ toàn ảnh */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: #000;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+    }
+    </style>
     <body>
         <!-- Header -->
         <header id="header" class="header"></header>
@@ -103,24 +131,28 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                             <aside class="profile__sidebar">
                                 <!-- User -->
                                 <?php
-                                    $avatar = !empty($user['avatar']) ? $user['avatar'] : 'default.png';
+                                    $avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
                                 ?>
                                 <div class="profile-user">
-                                    <label for="upload-avatar" class="avatar-wrapper">
-                                        <img src="./assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
-                                            class="profile-user__avatar"
-                                            alt="Avatar">
-                                        <span class="avatar-edit">
-                                            <img src="./assets/icons/camera.svg" alt="">
-                                        </span>
-                                    </label>
                                     <form method="POST" enctype="multipart/form-data">
-                                        <input type="file"
+                                        <label for="upload-avatar" class="avatar-wrapper">
+                                            <img
+                                                src="./assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                                                class="profile-user__avatar"
+                                                alt="Avatar"
+                                                onerror="this.src='./assets/img/avatar/avatar-3.png'"
+                                            >
+                                            <span class="avatar-plus">+</span>
+                                        </label>
+
+                                        <input
+                                            type="file"
                                             id="upload-avatar"
                                             name="avatar"
                                             accept="image/*"
+                                            hidden
                                             onchange="this.form.submit()"
-                                            hidden>
+                                        >
                                     </form>
                                     <h1 class="header-user__name">
                                         <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
