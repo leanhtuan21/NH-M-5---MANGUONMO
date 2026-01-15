@@ -2,6 +2,27 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+require_once __DIR__ . '/../db_connect.php';
+
+$email = $_SESSION['email'] ?? null;
+
+$avatar = 'default.png';
+$user_name = 'User';
+
+if ($email) {
+    $sql = "SELECT email, full_name, avatar FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($result);
+
+    if ($user) {
+        $avatar = $user['avatar'] ?: 'default.png';
+        $user_name = $user['full_name'];
+    }
+}
 ?>
 <div class="container">
     <div class="top-bar">
@@ -4723,7 +4744,11 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
 
             <div class="top-act__user">
-                <img src="./assets/img/avatar.jpg" alt="" class="top-act__avatar" />
+                <img
+                    src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                    alt="Avatar"
+                    class="user-menu__avatar"
+                />
 
                 <!-- Dropdown -->
                 <div class="act-dropdown top-act__dropdown">
@@ -4735,7 +4760,11 @@ if (session_status() === PHP_SESSION_NONE) {
                         />
 
                         <div class="user-menu__top">
-                            <img src="./assets/img/avatar.jpg" alt="" class="user-menu__avatar" />
+                            <img
+                                src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                                alt="Avatar"
+                                class="user-menu__avatar"
+                            />
                             <div class="header-user__info">
                                 <p class="header-user__name">
                                     <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
