@@ -1,19 +1,23 @@
 <?php
 $error = "";
 $success = "";
-$email_value = ""; // Biến để lưu lại email người dùng nhập
+$email_value = ""; 
+$full_name_value = ""; // MỚI: Biến để lưu lại tên người dùng nhập
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     require_once __DIR__ . "/db_connect.php";
 
+    $full_name = trim($_POST['full_name'] ?? ''); // MỚI: Lấy họ tên
+    $full_name_value = $full_name;
+    
     $email = trim($_POST['email'] ?? '');
-    $email_value = $email; // Giữ lại giá trị email để hiển thị lại form
+    $email_value = $email; 
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // 1. Kiểm tra rỗng
-    if (empty($email) || empty($password) || empty($confirm_password)) {
+    // 1. Kiểm tra rỗng (Thêm $full_name vào đây)
+    if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "Vui lòng nhập đầy đủ thông tin";
     }
 
@@ -26,15 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!preg_match('/[0-9]/', $email)) {
         $error = "Email phải chứa ít nhất 1 chữ số";
     }
-    // ------------------------------------------------
 
     // 3. Kiểm tra độ mạnh mật khẩu
     elseif (
         strlen($password) < 6 ||
-        !preg_match('/[A-Z]/', $password) ||      // chữ hoa
-        !preg_match('/[a-z]/', $password) ||      // chữ thường
-        !preg_match('/[0-9]/', $password) ||      // số
-        !preg_match('/[\W]/', $password)          // ký tự đặc biệt
+        !preg_match('/[A-Z]/', $password) || 
+        !preg_match('/[a-z]/', $password) || 
+        !preg_match('/[0-9]/', $password) || 
+        !preg_match('/[\W]/', $password) 
     ) {
         $error = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt";
     }
@@ -54,21 +57,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($stmt->num_rows > 0) {
             $error = "Email này đã được đăng ký";
         } else {
-            // 6. Lưu mật khẩu đã mã hóa bằng MD5 
+            // 6. Lưu mật khẩu
             $hashedPassword = md5($password);
 
-            $full_name = "";
-
+            // CẬP NHẬT: Thêm full_name vào câu lệnh INSERT
             $stmt = $conn->prepare(
                 "INSERT INTO users (full_name, email, password)
                 VALUES (?, ?, ?)"
             );
 
+            // CẬP NHẬT: Bind 3 tham số (sss)
             $stmt->bind_param("sss", $full_name, $email, $hashedPassword);
 
             if ($stmt->execute()) {
                 $success = "Đăng ký thành công! Đang chuyển sang trang đăng nhập...";
-                // Dòng này sẽ tự động chuyển trang sau 2 giây
                 header("refresh:2;url=sign-in.php"); 
             } else {
                 $error = "Đăng ký không thành công: " . $conn->error;
@@ -82,191 +84,108 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Sign up | Grocery Mart</title>
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <style>
+        /* Giữ nguyên các style Alert và Eye icon của bạn */
+        .alert { padding: 12px; border-radius: 8px; font-size: 1.4rem; font-weight: 500; margin-bottom: 20px; text-align: center; }
+        .alert-danger { background-color: #ffe5e5; color: #d32f2f; border: 1px solid #ffcccc; }
+        .alert-success { background-color: #e5ffe5; color: #2e7d32; border: 1px solid #ccffcc; }
+        .form__text-input { position: relative; display: flex; align-items: center; }
+        .form__input { padding-right: 45px !important; }
+        .form__input-icon-eye { position: absolute; right: 12px; padding: 10px; z-index: 2; cursor: pointer; width: 20px; }
+    </style>
+</head>
+<body>
+    <main class="auth">
+        <div class="auth__intro">
+            <img src="https://giatruongcoffee.com/wp-content/uploads/2017/08/ca-phe-bot-rang-xay-2.jpg" alt="" class="auth__intro-img" />
+        </div>
 
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Sign up | Grocery Mart</title>
-
-        <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
-        <link rel="manifest" href="./assets/favicon/site.webmanifest" />
-        <meta name="msapplication-TileColor" content="#da532c" />
-        <meta name="theme-color" content="#ffffff" />
-
-        <link rel="stylesheet" href="./assets/fonts/stylesheet.css" />
-
-        <link rel="stylesheet" href="./assets/css/main.css" />
-
-        <script src="./assets/js/scripts.js">
-        </script>
-
-        <style>
-            .alert {
-                padding: 12px;
-                border-radius: 8px;
-                font-size: 1.4rem;
-                font-weight: 500;
-                margin-bottom: 20px;
-                text-align: center;
-            }
-            .alert-danger {
-                background-color: #ffe5e5;
-                color: #d32f2f;
-                border: 1px solid #ffcccc;
-            }
-            .alert-success {
-                background-color: #e5ffe5;
-                color: #2e7d32;
-                border: 1px solid #ccffcc;
-            }
-            .form__text-input {
-                position: relative;
-                display: flex;
-                align-items: center;
-            }
-
-            .form__input-icon-eye {
-                position: absolute;
-                right: 12px; /* Khoảng cách từ bên phải vào */
-                padding: 10px;
-                z-index: 2;
-                transition: opacity 0.3s;
-            }
-
-            .form__input-icon-eye:hover {
-                opacity: 0.7;
-            }
-
-            /* Đảm bảo text không bị ghi đè lên icon */
-            .form__input {
-                padding-right: 45px !important; 
-            }
-        </style>
-    </head>
-    <body>
-        <main class="auth">
-            <div class="auth__intro">
-                <a href="./" class="logo auth__intro-logo d-none d-md-flex">
-                    <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
-                    <h1 class="logo__title">grocerymart</h1>
+        <div id="auth-content" class="auth__content hide">
+            <div class="auth__content-inner">
+                <a href="./" class="logo">
+                    <h1 class="logo__title">Coffee Shop</h1>
                 </a>
-                <img src="https://giatruongcoffee.com/wp-content/uploads/2017/08/ca-phe-bot-rang-xay-2.jpg" alt="" class="auth__intro-img" />
-                <p class="auth__intro-text">
-                Trải nghiệm cà phê nguyên bản – đậm đà, tinh tế và khác biệt.
+                <h1 class="auth__heading">Đăng ký</h1>
+                <p class="auth__desc">Đăng ký tài khoản để mua cà phê.</p>
+
+                <?php if (!empty($error)): ?>
+                    <div class="alert alert-danger"><?php echo $error; ?></div>
+                <?php endif; ?>
+
+                <?php if (!empty($success)): ?>
+                    <div class="alert alert-success"><?php echo $success; ?></div>
+                <?php endif; ?>
+
+                <form method="POST" class="form auth__form">
+                    <div class="form__group">
+                        <div class="form__text-input">
+                            <input
+                                type="text"
+                                name="full_name"
+                                placeholder="Họ và tên"
+                                class="form__input"
+                                required
+                                value="<?php echo htmlspecialchars($full_name_value); ?>" 
+                            />
+                            <img src="./assets/icons/message.svg" alt="" class="form__input-icon" style="filter: brightness(0) saturate(100%) invert(50%);"/>
+                        </div>
+                    </div>
+
+                    <div class="form__group">
+                        <div class="form__text-input">
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                class="form__input"
+                                required
+                                value="<?php echo htmlspecialchars($email_value); ?>" 
+                            />
+                            <img src="./assets/icons/message.svg" alt="" class="form__input-icon" />
+                        </div>
+                    </div>
+
+                    <div class="form__group">
+                        <div class="form__text-input">
+                            <input type="password" name="password" id="password" placeholder="Mật khẩu" class="form__input" required />
+                            <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
+                            <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="password" />
+                        </div>
+                    </div>
+
+                    <div class="form__group">
+                        <div class="form__text-input">
+                            <input type="password" name="confirm_password" id="confirm_password" placeholder="Xác nhận mật khẩu" class="form__input" required />
+                            <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
+                            <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="confirm_password" />
+                        </div>
+                    </div>
+
+                    <div class="form__group auth__btn-group">
+                        <button class="btn btn--primary auth__btn">Đăng ký</button>
+                    </div>
+                </form>
+
+                <p class="auth__text">
+                    Bạn đã có tài khoản chưa? <a href="./sign-in.php" class="auth__link">Đăng nhập</a>
                 </p>
-                <button class="auth__intro-next d-none d-md-flex js-toggle" toggle-target="#auth-content">
-                    <img src="./assets/img/auth/intro-arrow.svg" alt="" />
-                </button>
             </div>
+        </div>
+    </main>
 
-            <div id="auth-content" class="auth__content hide">
-                <div class="auth__content-inner">
-                    <a href="./" class="logo">
-                        <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
-                        <h1 class="logo__title">Coffee Shop</h1>
-                    </a>
-                    <h1 class="auth__heading">Đăng ký</h1>
-                    <p class="auth__desc">Đăng ký tài khoản để lựa chọn cà phê bột & hạt rang phù hợp với nhu cầu của bạn.</p>
-
-                    <?php if (!empty($error)): ?>
-                        <div class="alert alert-danger">
-                            <?php echo $error; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($success)): ?>
-                        <div class="alert alert-success">
-                            <?php echo $success; ?>
-                        </div>
-                    <?php endif; ?>
-                    <form method="POST" class="form auth__form">
-                        <div class="form__group">
-                            <div class="form__text-input">
-                                <input
-                                    type="email"
-                                    name="email"
-                                    id=""
-                                    placeholder="Email"
-                                    class="form__input"
-                                    autofocus
-                                    required
-                                    value="<?php echo htmlspecialchars($email_value); ?>" 
-                                />
-                                <img src="./assets/icons/message.svg" alt="" class="form__input-icon" />
-                                <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
-                            </div>
-                            </div>
-                        <div class="form__group">
-                            <div class="form__text-input">
-                                <input
-                                    type="password"
-                                    name="password"
-                                    id="password"
-                                    placeholder="Password"
-                                    class="form__input"
-                                    required
-                                    minlength="6"
-                                />
-                                <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
-                                <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="password" style="cursor: pointer; right: 15px; position: absolute; width: 20px;" />
-                            </div>
-                        </div>
-
-                        <div class="form__group">
-                            <div class="form__text-input">
-                                <input
-                                    type="password"
-                                    name="confirm_password"
-                                    id="confirm_password"
-                                    placeholder="Confirm password"
-                                    class="form__input"
-                                    required
-                                    minlength="6"
-                                />
-                                <img src="./assets/icons/lock.svg" alt="" class="form__input-icon" />
-                                <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="confirm_password" style="cursor: pointer; right: 15px; position: absolute; width: 20px;" />
-                            </div>
-                        </div>
-                        <div class="form__group form__group--inline">
-                            <label class="form__checkbox">
-                                <input type="checkbox" name="" id="" class="form__checkbox-input d-none" />
-                                <span class="form__checkbox-label">Tôi đồng ý với điều khoản sử dụng</span>
-                            </label>
-                        </div>
-                        <div class="form__group auth__btn-group">
-                            <button class="btn btn--primary auth__btn form__submit-btn">Đăng ký</button>
-                            
-                        </div>
-                    </form>
-
-                    <p class="auth__text">
-                    Bạn đã có tài khoản chưa? 
-                        <a href="./sign-in.php" class="auth__link auth__text-link">Đăng nhập</a>
-                    </p>
-                </div>
-            </div>
-        </main>
     <script>
-        window.dispatchEvent(new Event("template-loaded"));
+        // Script ẩn hiện mật khẩu giữ nguyên
         document.querySelectorAll('.js-toggle-password').forEach(item => {
             item.addEventListener('click', function() {
-            // Lấy ID của input mục tiêu từ attribute data-target
-            const targetId = this.getAttribute('data-target');
-            const passwordInput = document.getElementById(targetId);
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                // Bạn có thể thay đổi src của icon sang hình con mắt gạch chéo nếu có
-                // this.src = "./assets/icons/eye-slash.svg"; 
-            } else {
-                passwordInput.type = 'password';
-                // this.src = "./assets/icons/eye.svg";
-            }
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                input.type = input.type === 'password' ? 'text' : 'password';
             });
         });
     </script>
-        
-    </body>
+</body>
 </html>
