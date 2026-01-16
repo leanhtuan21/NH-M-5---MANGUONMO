@@ -2,33 +2,27 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once __DIR__ . '/../db_connect.php';
-
-$email = $_SESSION['email'] ?? null;
-
-$avatar = 'avatar-3.png';
-$user_name = 'User';
-
-if ($email) {
-    $sql = "SELECT email, full_name, avatar FROM users WHERE email = ?";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $user = mysqli_fetch_assoc($result);
-
-    if ($user) {
-        $user_name = $user['full_name'];
-        // Nếu có avatar và file tồn tại thì dùng
-        if (!empty($user['avatar']) &&
-            file_exists(__DIR__ . '/../assets/img/avatar/' . $user['avatar'])
-        ) {
-            $avatar = $user['avatar'];
-        }
-    }
+if (!isset($_SESSION['user_id'])) {
+    return;
 }
+
+$user_id = (int)$_SESSION['user_id'];
+
+$sql = "SELECT full_name, email, avatar FROM users WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$user = mysqli_fetch_assoc($result);
+
+if (!$user) {
+    return; // tránh lỗi
+}
+$avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
 ?>
+
 <div class="container">
     <div class="top-bar">
         <!-- More -->
@@ -4750,32 +4744,37 @@ if ($email) {
 
             <div class="top-act__user">
                 <img
-                    src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                    src="./assets/img/avatar/<?= htmlspecialchars($user['avatar'] ) ?>"
+                    class="top-act__avatar"
                     alt="Avatar"
-                    class="user-menu__avatar"
-                />
-
+                    onerror="this.src='./assets/img/avatar/avatar-3.png'"
+                >
                 <!-- Dropdown -->
                 <div class="act-dropdown top-act__dropdown">
                     <div class="act-dropdown__inner user-menu">
-                        <img
+                         <img
                             src="./assets/icons/arrow-up.png"
                             alt=""
                             class="act-dropdown__arrow top-act__dropdown-arrow"
                         />
-
                         <div class="user-menu__top">
-                            <img
-                                src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
-                                alt="Avatar"
-                                class="user-menu__avatar"
+                             <img
+                                src="./assets/icons/arrow-up.png"
+                                alt=""
+                                class="act-dropdown__arrow top-act__dropdown-arrow"
                             />
                             <div class="header-user__info">
-                                <p class="header-user__name">
-                                    <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
-                                </p>
+                                <img
+                                    src="./assets/img/avatar/<?= htmlspecialchars($user['avatar'] ) ?>"
+                                    class="user-menu__avatar"
+                                    alt="Avatar"
+                                    onerror="this.src='./assets/img/avatar/avatar-3.png'"
+                                >
+                                <h1 class="header-user__name">
+                                    <?= htmlspecialchars($user['full_name']) ?>
+                                </h1>
                                 <p class="header-user__email">
-                                    <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                    <?= htmlspecialchars($user['email']) ?>
                                 </p>
                             </div>
                         </div>
