@@ -37,10 +37,9 @@ if (isset($_POST['update_profile'])) {
                     SET phone = ?, address = ?
                     WHERE id = ?";
     $stmt = mysqli_prepare($conn, $sql_update);
-    mysqli_stmt_bind_param($stmt, "sssi", $full_name, $phone, $address, $user_id);
+    mysqli_stmt_bind_param($stmt, "ssi", $phone, $address, $user_id);
     mysqli_stmt_execute($stmt);
     // cập nhật lại session để header hiển thị đúng tên
-    $_SESSION['user_name'] = $full_name;
     header("Location: profile.php");
     exit;
 }
@@ -49,7 +48,10 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
 
     $allow_ext = ['jpg', 'jpeg', 'png', 'webp'];
     $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-
+    if ($_FILES['avatar']['size'] > 2 * 1024 * 1024) {
+        echo "<script>alert('Ảnh tối đa 2MB');</script>";
+        exit;
+    }
     if (!in_array($ext, $allow_ext)) {
         echo "<script>alert('Chỉ chấp nhận JPG, PNG, WEBP');</script>";
     } else {
@@ -303,8 +305,7 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                             id="full-name"
                                                             placeholder="Nhập họ và tên"
                                                             class="form__input"
-                                                            disabled
-                                                            autofocus
+                                                            readonly
                                                         />
                                                         <img
                                                             src="./assets/icons/form-error.svg"
