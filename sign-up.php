@@ -2,31 +2,33 @@
 $error = "";
 $success = "";
 $email_value = ""; 
-$full_name_value = ""; // MỚI: Biến để lưu lại tên người dùng nhập
+$full_name_value = ""; 
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     require_once __DIR__ . "/db_connect.php";
 
-    $full_name = trim($_POST['full_name'] ?? ''); // MỚI: Lấy họ tên
+    $full_name = trim($_POST['full_name'] ?? ''); 
     $full_name_value = $full_name;
     
     $email = trim($_POST['email'] ?? '');
     $email_value = $email; 
     $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+    $password = trim($_POST['password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
 
-    // 1. Kiểm tra rỗng (Thêm $full_name vào đây)
+    // 1. Kiểm tra rỗng và Checkbox
     if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "Vui lòng nhập đầy đủ thông tin";
+    } 
+    elseif (empty($terms)) {
+        $error = "Bạn phải đồng ý với điều khoản sử dụng để tiếp tục";
     }
-
     // 2. Kiểm tra định dạng email
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Email không đúng định dạng";
     }
-
-    // --- MỚI THÊM: 2.1 Kiểm tra email phải chứa số ---
+    // 2.1 Kiểm tra email phải chứa số
     elseif (!preg_match('/[0-9]/', $email)) {
         $error = "Email phải chứa ít nhất 1 chữ số";
     }
@@ -48,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     else {
-        // 5. Kiểm tra email đã tồn tại chưa
+        // 5. Kiểm tra email đã tồn tại
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -57,17 +59,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($stmt->num_rows > 0) {
             $error = "Email này đã được đăng ký";
         } else {
-            // 6. Lưu mật khẩu
+            // 6. Xử lý lưu mật khẩu và role
             $hashedPassword = md5($password);
+            
+            // --- MỚI: Định nghĩa role mặc định ---
+            $role_default = 'user'; 
 
-            // CẬP NHẬT: Thêm full_name vào câu lệnh INSERT
+            // --- CẬP NHẬT CÂU LỆNH INSERT ---
+            // Thêm role vào câu lệnh SQL
             $stmt = $conn->prepare(
-                "INSERT INTO users (full_name, email, password)
-                VALUES (?, ?, ?)"
+                "INSERT INTO users (full_name, email, password, role)
+                VALUES (?, ?, ?, ?)"
             );
 
-            // CẬP NHẬT: Bind 3 tham số (sss)
-            $stmt->bind_param("sss", $full_name, $email, $hashedPassword);
+            // --- CẬP NHẬT BIND_PARAM ---
+            // "ssss" nghĩa là 4 tham số đều là string (full_name, email, password, role)
+            $stmt->bind_param("ssss", $full_name, $email, $hashedPassword, $role_default);
 
             if ($stmt->execute()) {
                 $success = "Đăng ký thành công! Đang chuyển sang trang đăng nhập...";
@@ -86,22 +93,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Sign up | Grocery Mart</title>
+    <title>Sign up | Coffee Shop</title>
     <link rel="stylesheet" href="./assets/css/main.css" />
+
     <style>
-        /* Giữ nguyên các style Alert và Eye icon của bạn */
+
         .alert { padding: 12px; border-radius: 8px; font-size: 1.4rem; font-weight: 500; margin-bottom: 20px; text-align: center; }
         .alert-danger { background-color: #ffe5e5; color: #d32f2f; border: 1px solid #ffcccc; }
         .alert-success { background-color: #e5ffe5; color: #2e7d32; border: 1px solid #ccffcc; }
         .form__text-input { position: relative; display: flex; align-items: center; }
         .form__input { padding-right: 45px !important; }
         .form__input-icon-eye { position: absolute; right: 12px; padding: 10px; z-index: 2; cursor: pointer; width: 20px; }
+        
+        /* Style cho Checkbox */
+        .form__checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            margin: 15px 0;
+            font-size: 1.4rem;
+            color: #666;
+        }
+        .form__checkbox-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .auth__intro-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            border-radius: 10px;
+        }
+        .auth__intro:hover .auth__intro-img { transform: scale(1.1); }
+        .auth__intro { overflow: hidden; }
     </style>
 </head>
 <body>
     <main class="auth">
         <div class="auth__intro">
-            <img src="https://giatruongcoffee.com/wp-content/uploads/2017/08/ca-phe-bot-rang-xay-2.jpg" alt="" class="auth__intro-img" />
+            <img src="https://thuytinhgiare.com/wp-content/uploads/2023/07/hinh-anh-ly-ca-phe-muoi.jpg" alt="" class="auth__intro-img" />
         </div>
 
         <div id="auth-content" class="auth__content hide">
@@ -110,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <h1 class="logo__title">Coffee Shop</h1>
                 </a>
                 <h1 class="auth__heading">Đăng ký</h1>
-                <p class="auth__desc">Đăng ký tài khoản để mua cà phê.</p>
+                <p class="auth__desc">Bắt đầu hành trình khám phá hương vị cà phê nguyên bản.</p>
 
                 <?php if (!empty($error)): ?>
                     <div class="alert alert-danger"><?php echo $error; ?></div>
@@ -123,28 +158,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <form method="POST" class="form auth__form">
                     <div class="form__group">
                         <div class="form__text-input">
-                            <input
-                                type="text"
-                                name="full_name"
-                                placeholder="Họ và tên"
-                                class="form__input"
-                                required
-                                value="<?php echo htmlspecialchars($full_name_value); ?>" 
-                            />
+                            <input type="text" name="full_name" placeholder="Họ và tên" class="form__input" required value="<?php echo htmlspecialchars($full_name_value); ?>" />
                             <img src="./assets/icons/message.svg" alt="" class="form__input-icon" style="filter: brightness(0) saturate(100%) invert(50%);"/>
                         </div>
                     </div>
 
                     <div class="form__group">
                         <div class="form__text-input">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                class="form__input"
-                                required
-                                value="<?php echo htmlspecialchars($email_value); ?>" 
-                            />
+                            <input type="email" name="email" placeholder="Email" class="form__input" required value="<?php echo htmlspecialchars($email_value); ?>" />
                             <img src="./assets/icons/message.svg" alt="" class="form__input-icon" />
                         </div>
                     </div>
@@ -165,6 +186,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                     </div>
 
+                    <div class="form__group">
+                        <label class="form__checkbox">
+                            <input type="checkbox" name="terms" class="form__checkbox-input" required />
+                            <span class="form__checkbox-label">Tôi đồng ý với <a href="#" style="color: #007bff; text-decoration: underline;">điều khoản sử dụng</a></span>
+                        </label>
+                    </div>
+
                     <div class="form__group auth__btn-group">
                         <button class="btn btn--primary auth__btn">Đăng ký</button>
                     </div>
@@ -178,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </main>
 
     <script>
-        // Script ẩn hiện mật khẩu giữ nguyên
+
         document.querySelectorAll('.js-toggle-password').forEach(item => {
             item.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');
