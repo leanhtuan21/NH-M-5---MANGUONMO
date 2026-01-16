@@ -3,17 +3,19 @@ session_start();
 require_once 'db_connect.php';
 
 /* Chưa đăng nhập thì đá về login */
-if (!isset($_SESSION['email'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: sign-in.php");
     exit;
 }
 
-$email = $_SESSION['email'];
+$user_id = $_SESSION['user_id'];
 
-/* Lấy thông tin user */
-$sql = "SELECT email, phone, address, avatar FROM users WHERE email = ?";
+/* Lấy thông tin user theo ID */
+$sql = "SELECT id, full_name, email, phone, address, avatar 
+        FROM users 
+        WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
@@ -22,7 +24,6 @@ if (!$user) {
     echo "Không tìm thấy người dùng";
     exit;
 }
-
 // Ảnh đại diện
 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
 
@@ -40,9 +41,9 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
 
             // cập nhật DB
-            $sql = "UPDATE users SET avatar = ? WHERE email = ?";
+            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "ss", $avatar_name, $email);
+            mysqli_stmt_bind_param($stmt, "si", $avatar_name, $user_id);
             mysqli_stmt_execute($stmt);
             // CẬP NHẬT SESSION
             $_SESSION['avatar'] = $avatar_name;
@@ -77,7 +78,7 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
     </head>
-    <style>
+        <style>
         .avatar-wrapper {
         position: relative;
         display: inline-block;
@@ -130,14 +131,11 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                         <div class="col-3 col-xl-4 col-lg-5 col-md-12">
                             <aside class="profile__sidebar">
                                 <!-- User -->
-                                <?php
-                                    $avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
-                                ?>
                                 <div class="profile-user">
                                     <form method="POST" enctype="multipart/form-data">
                                         <label for="upload-avatar" class="avatar-wrapper">
                                             <img
-                                                src="./assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
+                                                src="./assets/img/avatar/<?= htmlspecialchars($user['avatar'] ) ?>"
                                                 class="profile-user__avatar"
                                                 alt="Avatar"
                                                 onerror="this.src='./assets/img/avatar/avatar-3.png'"
@@ -155,10 +153,10 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                         >
                                     </form>
                                     <h1 class="header-user__name">
-                                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                        <?= htmlspecialchars($user['full_name']) ?>
                                     </h1>
                                     <p class="header-user__email">
-                                        <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                        <?= htmlspecialchars($user['email']) ?>
                                     </p>
                                 </div>
                                 <!-- Menu 1 -->
