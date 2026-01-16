@@ -26,7 +26,6 @@ $phone     = $user['phone'] ?? '';
 $address   = $user['address'] ?? '';
 /* 6. Xử lý cập nhật */
 if (isset($_POST['update_profile'])) {
-    $full_name = trim($_POST['full_name'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     // kiểm tra số điện thoại: đúng 10 chữ số
     if (!preg_match('/^[0-9]{10}$/', $phone)) {
@@ -35,10 +34,10 @@ if (isset($_POST['update_profile'])) {
     }
     $address   = trim($_POST['address'] ?? '');
     $sql_update = "UPDATE users 
-                    SET full_name = ?, phone = ?, address = ?
+                    SET phone = ?, address = ?
                     WHERE id = ?";
     $stmt = mysqli_prepare($conn, $sql_update);
-    mysqli_stmt_bind_param($stmt, "sssi", $full_name, $phone, $address, $email);
+    mysqli_stmt_bind_param($stmt, "sssi", $full_name, $phone, $address, $user_id);
     mysqli_stmt_execute($stmt);
     // cập nhật lại session để header hiển thị đúng tên
     $_SESSION['user_name'] = $full_name;
