@@ -2,19 +2,20 @@
 session_start();
 require_once 'db_connect.php';
 
-if (!isset($_SESSION['email'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: sign-in.php");
     exit;
 }
+$user_id = $_SESSION['user_id'];
 $email = $_SESSION['email'];
 $full_name = $_SESSION['user_name'];
 
 /* 3. Lấy thông tin user từ CSDL */
-$sql = "SELECT full_name, email, phone, address, avatar
+$sql = "SELECT id, full_name, email, phone, address, avatar
         FROM users
-        WHERE email = ?";
+        WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
@@ -34,10 +35,10 @@ if (isset($_POST['update_profile'])) {
     }
     $address   = trim($_POST['address'] ?? '');
     $sql_update = "UPDATE users 
-                   SET full_name = ?, phone = ?, address = ? 
-                   WHERE email = ?";
+                    SET full_name = ?, phone = ?, address = ?
+                    WHERE id = ?";
     $stmt = mysqli_prepare($conn, $sql_update);
-    mysqli_stmt_bind_param($stmt, "ssss", $full_name, $phone, $address, $email);
+    mysqli_stmt_bind_param($stmt, "sssi", $full_name, $phone, $address, $email);
     mysqli_stmt_execute($stmt);
     // cập nhật lại session để header hiển thị đúng tên
     $_SESSION['user_name'] = $full_name;
@@ -61,9 +62,9 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
 
             // cập nhật DB
-            $sql = "UPDATE users SET avatar = ? WHERE email = ?";
+            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "ss", $avatar_name, $email);
+            mysqli_stmt_bind_param($stmt, "si", $avatar_name, $user_id);
             mysqli_stmt_execute($stmt);
             // CẬP NHẬT SESSION
             $_SESSION['avatar'] = $avatar_name;
@@ -172,10 +173,10 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                         >
                                     </form>
                                     <h1 class="header-user__name">
-                                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                        <?= htmlspecialchars($user['full_name']) ?>
                                     </h1>
                                     <p class="header-user__email">
-                                        <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                        <?= htmlspecialchars($user['email']) ?>
                                     </p>
                                 </div>
 
@@ -299,11 +300,11 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                         <input
                                                             type="text"
                                                             name="full_name"
-                                                            value="<?= htmlspecialchars($full_name) ?>"
+                                                            value="<?= htmlspecialchars($user['full_name']) ?>"
                                                             id="full-name"
                                                             placeholder="Nhập họ và tên"
                                                             class="form__input"
-                                                            required
+                                                            disabled
                                                             autofocus
                                                         />
                                                         <img
