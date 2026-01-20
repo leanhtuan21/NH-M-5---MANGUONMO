@@ -24,6 +24,7 @@ if (!$user) {
     echo "Không tìm thấy người dùng";
     exit;
 }
+$avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
 // Ảnh đại diện
 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
 
