@@ -8,7 +8,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Grocery Mart</title>
-
+    <link rel="preconnect" href="https://fon.com" />
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
@@ -22,6 +22,7 @@
 
         <!-- Styles -->
         <link rel="stylesheet" href="./assets/css/main.css" />
+        <link rel="stylesheet" href="./assets/css/panagition.css" />
 
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
@@ -104,10 +105,12 @@
                             </article>
                         </a>
                     </div>
+                   
+                
                 </div>
-            </section>
 
-            <!-- Browse Products -->
+          
+            </section>            <!-- Browse Products -->
             <section class="home__container">
                 <div class="home__row">
                     <h2 class="home__heading">List Product</h2>
@@ -242,8 +245,13 @@
                 <div class="row row-cols-5 row-cols-lg-2 row-cols-sm-1 g-3">
                     <!-- Product card 1 -- hiển thị sản pham 1 -->
                      <?php
-
-                        $sql = "SELECT * FROM `products` JOIN product_images ON product_images.product_id=products.id WHERE is_main =1";
+                     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                        $limit = 8; // Số sản phẩm mỗi trang
+                        $start = ($page - 1) * $limit;
+                        $sql = "SELECT * FROM `products` 
+                                JOIN product_images ON product_images.product_id=products.id 
+                                WHERE is_main = 1 
+                                LIMIT $start, $limit";
                         $result = $conn->query($sql);
                         // echo "<pre>";
                         while ($row = $result->fetch_assoc()){
@@ -277,6 +285,13 @@
                             ';
                         }
 
+                         // Tính tổng số trang ngay tại đây
+                        $sql_total = "SELECT * FROM `products` ";
+                        $result_total = $conn->query($sql_total);
+                        $recode_toltal = $result_total->num_rows;
+                        $total_page = ceil($recode_toltal / $limit);
+        include "panigation.php";
+    
                     ?>
                     <!-- <div class="col">
                         <article class="product-card">
