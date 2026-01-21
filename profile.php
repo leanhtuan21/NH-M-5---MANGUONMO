@@ -1,9 +1,66 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+/* Chưa đăng nhập thì đá về login */
+if (!isset($_SESSION['user_id'])) {
+    header("Location: sign-in.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
+/* Lấy thông tin user theo ID */
+$sql = "SELECT id, full_name, email, phone, address, avatar 
+        FROM users 
+        WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
+
+if (!$user) {
+    echo "Không tìm thấy người dùng";
+    exit;
+}
+$avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
+// Ảnh đại diện
+if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
+
+    $allow_ext = ['jpg', 'jpeg', 'png', 'webp'];
+    $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($ext, $allow_ext)) {
+        echo "<script>alert('Chỉ chấp nhận JPG, PNG, WEBP');</script>";
+    } else {
+
+        $avatar_name = 'avatar_' . time() . '.' . $ext;
+        $upload_dir = __DIR__ . '/assets/img/avatar/';
+        $upload_path = $upload_dir . $avatar_name;
+
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
+
+            // cập nhật DB
+            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "si", $avatar_name, $user_id);
+            mysqli_stmt_execute($stmt);
+            // CẬP NHẬT SESSION
+            $_SESSION['avatar'] = $avatar_name;
+            header("Location: profile.php");
+            exit;
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Profile | Grocery Mart</title>
+        <title>Hồ sơ cá nhân | Grocery Mart</title>
 
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
@@ -22,6 +79,33 @@
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
     </head>
+        <style>
+        .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    /* ảnh avatar */
+    .profile-user__avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    /* dấu cộng nằm trong ảnh */
+    .avatar-plus {
+        position: absolute;
+        inset: 0; /* phủ toàn ảnh */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: #000;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+    }
+    </style>
     <body>
         <!-- Header -->
         <header id="header" class="header"></header>
@@ -35,7 +119,7 @@
                 <!-- Search bar -->
                 <div class="profile-container">
                     <div class="search-bar d-none d-md-flex">
-                        <input type="text" name="" id="" placeholder="Search for item" class="search-bar__input" />
+                        <input type="text" placeholder="Tìm kiếm sản phẩm" class="search-bar__input" />
                         <button class="search-bar__submit">
                             <img src="./assets/icons/search.svg" alt="" class="search-bar__icon icon" />
                         </button>
@@ -49,29 +133,43 @@
                             <aside class="profile__sidebar">
                                 <!-- User -->
                                 <div class="profile-user">
-                                    <img src="./assets/img/avatar/avatar-3.png" alt="" class="profile-user__avatar" />
-                                    <h1 class="profile-user__name">Imran Khan</h1>
-                                    <p class="profile-user__desc">Registered: 17th May 2022</p>
-                                </div>
+                                    <form method="POST" enctype="multipart/form-data">
+                                        <label for="upload-avatar" class="avatar-wrapper">
+                                            <img
+                                                src="./assets/img/avatar/<?= htmlspecialchars($user['avatar'] ) ?>"
+                                                class="profile-user__avatar"
+                                                alt="Avatar"
+                                                onerror="this.src='./assets/img/avatar/avatar-3.png'"
+                                            >
+                                            <span class="avatar-plus">+</span>
+                                        </label>
 
+                                        <input
+                                            type="file"
+                                            id="upload-avatar"
+                                            name="avatar"
+                                            accept="image/*"
+                                            hidden
+                                            onchange="this.form.submit()"
+                                        >
+                                    </form>
+                                    <h1 class="header-user__name">
+                                        <?= htmlspecialchars($user['full_name']) ?>
+                                    </h1>
+                                    <p class="header-user__email">
+                                        <?= htmlspecialchars($user['email']) ?>
+                                    </p>
+                                </div>
                                 <!-- Menu 1 -->
                                 <div class="profile-menu">
-                                    <h3 class="profile-menu__title">Manage Account</h3>
+                                    <h3 class="profile-menu__title">Quản lý tài khoản</h3>
                                     <ul class="profile-menu__list">
                                         <li>
                                             <a href="./edit-personal-info.php" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/profile.svg" alt="" class="icon" />
                                                 </span>
-                                                Personal info
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/location.svg" alt="" class="icon" />
-                                                </span>
-                                                Addresses
+                                                Thông tin cá nhân
                                             </a>
                                         </li>
                                         <li>
@@ -79,7 +177,7 @@
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/message-2.svg" alt="" class="icon" />
                                                 </span>
-                                                Communications & privacy
+                                                Quyền riêng tư & liên hệ
                                             </a>
                                         </li>
                                     </ul>
@@ -87,14 +185,14 @@
 
                                 <!-- Menu 2 -->
                                 <div class="profile-menu">
-                                    <h3 class="profile-menu__title">My items</h3>
+                                    <h3 class="profile-menu__title">Sản phẩm của tôi</h3>
                                     <ul class="profile-menu__list">
                                         <li>
                                             <a href="#!" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/download.svg" alt="" class="icon" />
                                                 </span>
-                                                Reorder
+                                                Đặt lại đơn hàng
                                             </a>
                                         </li>
                                         <li>
@@ -102,7 +200,7 @@
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/heart.svg" alt="" class="icon" />
                                                 </span>
-                                                Lists
+                                                Danh sách yêu thích
                                             </a>
                                         </li>
                                         <li>
@@ -110,7 +208,7 @@
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/gift-2.svg" alt="" class="icon" />
                                                 </span>
-                                                Registries
+                                                Quà tặng
                                             </a>
                                         </li>
                                     </ul>
@@ -118,14 +216,14 @@
 
                                 <!-- Menu 3 -->
                                 <div class="profile-menu">
-                                    <h3 class="profile-menu__title">Subscriptions & plans</h3>
+                                    <h3 class="profile-menu__title">Gói & đăng ký</h3>
                                     <ul class="profile-menu__list">
                                         <li>
                                             <a href="#!" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/shield.svg" alt="" class="icon" />
                                                 </span>
-                                                Protection plans
+                                                Gói bảo vệ
                                             </a>
                                         </li>
                                     </ul>
@@ -133,14 +231,14 @@
 
                                 <!-- Menu 4 -->
                                 <div class="profile-menu">
-                                    <h3 class="profile-menu__title">Customer Service</h3>
+                                    <h3 class="profile-menu__title">Hỗ trợ khách hàng</h3>
                                     <ul class="profile-menu__list">
                                         <li>
                                             <a href="#!" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/info.svg" alt="" class="icon" />
                                                 </span>
-                                                Help
+                                                Trợ giúp
                                             </a>
                                         </li>
                                         <li>
@@ -148,98 +246,26 @@
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/danger.svg" alt="" class="icon" />
                                                 </span>
-                                                Terms of Use
+                                                Điều khoản sử dụng
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
                             </aside>
                         </div>
+
                         <div class="col-9 col-xl-8 col-lg-7 col-md-12">
                             <div class="cart-info">
                                 <div class="row gy-3">
-                                    <!-- My Wallet -->
-                                    <div class="col-12">
-                                        <h2 class="cart-info__heading">My Wallet</h2>
-                                        <p class="cart-info__desc profile__desc">Payment methods</p>
-
-                                        <div class="row gy-md-2 row-cols-3 row-cols-xl-2 row-cols-lg-1">
-                                            <!-- Payment card 1 -->
-                                            <div class="col">
-                                                <article class="payment-card" style="--bg-color: #1e2e69">
-                                                    <img
-                                                        src="./assets/img/card/plane-bg.svg"
-                                                        alt=""
-                                                        class="payment-card__img"
-                                                    />
-                                                    <div class="payment-card__top">
-                                                        <img src="./assets/img/card/plane.svg" alt="" />
-                                                        <span class="payment-card__type">FeatherCard</span>
-                                                    </div>
-                                                    <div class="payment-card__number">1234 4567 8901 2221</div>
-                                                    <div class="payment-card__bottom">
-                                                        <div>
-                                                            <p class="payment-card__label">Card Holder</p>
-                                                            <p class="payment-card__value">Imran Khan</p>
-                                                        </div>
-                                                        <div class="payment-card__expired">
-                                                            <p class="payment-card__label">Expired</p>
-                                                            <p class="payment-card__value">10/22</p>
-                                                        </div>
-                                                        <div class="payment-card__circle"></div>
-                                                    </div>
-                                                </article>
-                                            </div>
-
-                                            <!-- Payment card 2 -->
-                                            <div class="col">
-                                                <article class="payment-card" style="--bg-color: #354151">
-                                                    <img
-                                                        src="./assets/img/card/leaf-bg.svg"
-                                                        alt=""
-                                                        class="payment-card__img"
-                                                    />
-                                                    <div class="payment-card__top">
-                                                        <img src="./assets/img/card/leaf.svg" alt="" />
-                                                        <span class="payment-card__type">FeatherCard</span>
-                                                    </div>
-                                                    <div class="payment-card__number">1234 4567 2221 8901</div>
-                                                    <div class="payment-card__bottom">
-                                                        <div>
-                                                            <p class="payment-card__label">Card Holder</p>
-                                                            <p class="payment-card__value">Imran Khan</p>
-                                                        </div>
-                                                        <div class="payment-card__expired">
-                                                            <p class="payment-card__label">Expired</p>
-                                                            <p class="payment-card__value">11/22</p>
-                                                        </div>
-                                                        <div class="payment-card__circle"></div>
-                                                    </div>
-                                                </article>
-                                            </div>
-
-                                            <!-- Add new payment card -->
-                                            <div class="col">
-                                                <a class="new-card" href="./add-new-card.php">
-                                                    <img
-                                                        src="./assets/icons/plus.svg"
-                                                        alt=""
-                                                        class="new-card__icon icon"
-                                                    />
-                                                    <p class="new-card__text">Add New Card</p>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <!-- Account info -->
                                     <div class="col-12">
-                                        <h2 class="cart-info__heading">Account info</h2>
+                                        <h2 class="cart-info__heading">Thông tin tài khoản</h2>
                                         <p class="cart-info__desc profile__desc">
-                                            Addresses, contact information and password
+                                            Địa chỉ, thông tin liên hệ và mật khẩu
                                         </p>
+
                                         <div class="row gy-md-2 row-cols-2 row-cols-lg-1">
-                                            <!-- Account info 1 -->
                                             <div class="col">
                                                 <a href="./edit-personal-info.php">
                                                     <article class="account-info">
@@ -247,14 +273,15 @@
                                                             <img src="./assets/icons/message.svg" alt="" class="icon" />
                                                         </div>
                                                         <div>
-                                                            <h3 class="account-info__title">Email Address</h3>
-                                                            <p class="account-info__desc">tarek97.ta@gmail.com</p>
+                                                            <h3 class="account-info__title">Email</h3>
+                                                            <p class="account-info__desc">
+                                                                <?= htmlspecialchars($user['email']) ?>
+                                                            </p>
                                                         </div>
                                                     </article>
                                                 </a>
                                             </div>
 
-                                            <!-- Account info 2 -->
                                             <div class="col">
                                                 <a href="./edit-personal-info.php">
                                                     <article class="account-info">
@@ -262,28 +289,25 @@
                                                             <img src="./assets/icons/calling.svg" alt="" class="icon" />
                                                         </div>
                                                         <div>
-                                                            <h3 class="account-info__title">Phone number</h3>
-                                                            <p class="account-info__desc">+000 11122 2345 657</p>
+                                                            <h3 class="account-info__title">Số điện thoại</h3>
+                                                            <p class="account-info__desc">
+                                                                <?= htmlspecialchars($user['phone'] ?? 'Chưa cập nhật') ?>
+                                                            </p>
                                                         </div>
                                                     </article>
                                                 </a>
                                             </div>
 
-                                            <!-- Account info 3 -->
                                             <div class="col">
                                                 <a href="./edit-personal-info.php">
                                                     <article class="account-info">
                                                         <div class="account-info__icon">
-                                                            <img
-                                                                src="./assets/icons/location.svg"
-                                                                alt=""
-                                                                class="icon"
-                                                            />
+                                                            <img src="./assets/icons/location.svg" alt="" class="icon" />
                                                         </div>
                                                         <div>
-                                                            <h3 class="account-info__title">Add an address</h3>
+                                                            <h3 class="account-info__title">Địa chỉ</h3>
                                                             <p class="account-info__desc">
-                                                                Bangladesh Embassy, Washington, DC 20008
+                                                                <?= htmlspecialchars($user['address'] ?? 'Chưa cập nhật') ?>
                                                             </p>
                                                         </div>
                                                     </article>
@@ -293,47 +317,42 @@
                                     </div>
 
                                     <div class="col-12">
-                                        <h2 class="cart-info__heading">Lists</h2>
-                                        <p class="cart-info__desc profile__desc">2 items - Primary</p>
+                                        <h2 class="cart-info__heading">Danh sách yêu thích</h2>
+                                        <p class="cart-info__desc profile__desc">2 sản phẩm - Chính</p>
 
-                                        <!-- Favourite item 1 -->
                                         <article class="favourite-item">
-                                            <img
-                                                src="./assets/img/product/item-1.png"
-                                                alt=""
-                                                class="favourite-item__thumb"
-                                            />
+                                            <img src="./assets/img/product/item-1.png" alt="" class="favourite-item__thumb" />
                                             <div>
                                                 <h3 class="favourite-item__title">
-                                                    Coffee Beans - Espresso Arabica and Robusta Beans
+                                                    Hạt cà phê Espresso Arabica & Robusta
                                                 </h3>
                                                 <div class="favourite-item__content">
                                                     <span class="favourite-item__price">$47.00</span>
-                                                    <button class="btn btn--primary btn--rounded">Add to cart</button>
+                                                    <button class="btn btn--primary btn--rounded">
+                                                        Thêm vào giỏ hàng
+                                                    </button>
                                                 </div>
                                             </div>
                                         </article>
 
                                         <div class="separate" style="--margin: 20px"></div>
 
-                                        <!-- Favourite item 2 -->
                                         <article class="favourite-item">
-                                            <img
-                                                src="./assets/img/product/item-2.png"
-                                                alt=""
-                                                class="favourite-item__thumb"
-                                            />
+                                            <img src="./assets/img/product/item-2.png" alt="" class="favourite-item__thumb" />
                                             <div>
                                                 <h3 class="favourite-item__title">
-                                                    Lavazza Coffee Blends - Try the Italian Espresso
+                                                    Cà phê Lavazza – Hương vị Espresso Ý
                                                 </h3>
                                                 <div class="favourite-item__content">
                                                     <span class="favourite-item__price">$53.00</span>
-                                                    <button class="btn btn--primary btn--rounded">Add to cart</button>
+                                                    <button class="btn btn--primary btn--rounded">
+                                                        Thêm vào giỏ hàng
+                                                    </button>
                                                 </div>
                                             </div>
                                         </article>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -348,19 +367,19 @@
             load("#footer", "./templates/footer.php");
         </script>
 
-        <!-- Modal: confirm remove shopping cart item -->
+        <!-- Modal -->
         <div id="delete-confirm" class="modal modal--small hide">
             <div class="modal__content">
-                <p class="modal__text">Do you want to remove this item from shopping cart?</p>
+                <p class="modal__text">Bạn có muốn xóa sản phẩm này khỏi giỏ hàng không?</p>
                 <div class="modal__bottom">
                     <button class="btn btn--small btn--outline modal__btn js-toggle" toggle-target="#delete-confirm">
-                        Cancel
+                        Hủy
                     </button>
                     <button
                         class="btn btn--small btn--danger btn--primary modal__btn btn--no-margin js-toggle"
                         toggle-target="#delete-confirm"
                     >
-                        Delete
+                        Xóa
                     </button>
                 </div>
             </div>
