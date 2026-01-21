@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             font-size: 14px;
                             border: 1px solid <?= $message_type === 'error' ? '#f5c2c7' : '#abefc6' ?>;
                             background-color: <?= $message_type === 'error' ? '#fdecea' : '#ecfdf3' ?>;
-                            color: <?= $message_type === 'error' ? '#b42318' : '#027a48' ?>;
+                            color: <?= $message_type === 'error' ? '#b42318' : '#027a47' ?>;
                             text-align: center;
                         "
                     >
