@@ -5,7 +5,7 @@ $email_value = ""; // Biến để lưu lại email người dùng nhập
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $conn = new mysqli("localhost", "root", "", "grocery_mart_db");
+    $conn = new mysqli("localhost", "root", "123456789", "grocery_mart_db");
     if ($conn->connect_error) {
         die("Kết nối CSDL thất bại: " . $conn->connect_error);
     }
