@@ -13,17 +13,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     $email = trim($_POST['email'] ?? '');
     $email_value = $email; 
-    $password = $_POST['password'] ?? '';
+
+    // --- CẬP NHẬT: Thêm trim() cho mật khẩu ---
     $password = trim($_POST['password'] ?? '');
     $confirm_password = trim($_POST['confirm_password'] ?? '');
+    
+    $terms = $_POST['terms'] ?? '';
 
     // 1. Kiểm tra rỗng và Checkbox
     if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "Vui lòng nhập đầy đủ thông tin";
     } 
-    elseif (empty($terms)) {
-        $error = "Bạn phải đồng ý với điều khoản sử dụng để tiếp tục";
-    }
     // 2. Kiểm tra định dạng email
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Email không đúng định dạng";
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!preg_match('/[0-9]/', $email)) {
         $error = "Email phải chứa ít nhất 1 chữ số";
     }
-
+    
     // 3. Kiểm tra độ mạnh mật khẩu
     elseif (
         strlen($password) < 6 ||
@@ -62,18 +62,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // 6. Xử lý lưu mật khẩu và role
             $hashedPassword = md5($password);
             
-            // --- MỚI: Định nghĩa role mặc định ---
+            // Định nghĩa role mặc định
             $role_default = 'user'; 
 
-            // --- CẬP NHẬT CÂU LỆNH INSERT ---
-            // Thêm role vào câu lệnh SQL
+            // CÂU LỆNH INSERT
             $stmt = $conn->prepare(
                 "INSERT INTO users (full_name, email, password, role)
                 VALUES (?, ?, ?, ?)"
             );
 
-            // --- CẬP NHẬT BIND_PARAM ---
-            // "ssss" nghĩa là 4 tham số đều là string (full_name, email, password, role)
+            // BIND_PARAM
             $stmt->bind_param("ssss", $full_name, $email, $hashedPassword, $role_default);
 
             if ($stmt->execute()) {
@@ -142,7 +140,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div id="auth-content" class="auth__content hide">
             <div class="auth__content-inner">
                 <a href="./" class="logo">
-                    <h1 class="logo__title">Coffee Shop</h1>
+                    <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
+                    <h2 class="logo__title">Coffee Shop</h2>
                 </a>
                 <h1 class="auth__heading">Đăng ký</h1>
                 <p class="auth__desc">Bắt đầu hành trình khám phá hương vị cà phê nguyên bản.</p>
@@ -185,14 +184,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <img src="./assets/icons/eye.svg" alt="" class="form__input-icon-eye js-toggle-password" data-target="confirm_password" />
                         </div>
                     </div>
-
-                    <div class="form__group">
-                        <label class="form__checkbox">
-                            <input type="checkbox" name="terms" class="form__checkbox-input" required />
-                            <span class="form__checkbox-label">Tôi đồng ý với <a href="#" style="color: #007bff; text-decoration: underline;">điều khoản sử dụng</a></span>
-                        </label>
-                    </div>
-
                     <div class="form__group auth__btn-group">
                         <button class="btn btn--primary auth__btn">Đăng ký</button>
                     </div>
