@@ -4606,4 +4606,17 @@ html {
   margin-top: 30px;
 }
 
+.auth__message-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.auth__form-message {
+    margin: 12px 0 20px;
+    text-align: center;
+    width: 100%;
+}
+
+
 /*# sourceMappingURL=main.css.map */
