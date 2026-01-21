@@ -110,7 +110,7 @@
             <!-- Browse Products -->
             <section class="home__container">
                 <div class="home__row">
-                    <h2 class="home__heading">Total LavAzza 1320</h2>
+                    <h2 class="home__heading">List Product</h2>
                     <div class="filter-wrap">
                         <button class="filter-btn js-toggle" toggle-target="#home-filter">
                             Filter
