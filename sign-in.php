@@ -157,7 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     /* PHÂN QUYỀN THEO ROLE */
                     if (strtolower($user['role']) === 'admin') {
-                        header("Location: admin-dashboard.php");
+                        header("Location: admin/index.php");
                     } else {
                         header("Location: index-logined.php");
                     }
