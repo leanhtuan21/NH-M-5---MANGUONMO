@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #00B289;       /* Xanh Mint đậm hiện đại */
+    --primary-hover: #009470;
+    --sidebar-bg: #1C2434;    /* Màu xanh đen đậm */
+    --body-bg: #F1F5F9;       /* Xám khói sáng */
+    --text-main: #334155;
+    --text-muted: #64748B;
+    --white: #ffffff;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --border-radius: 12px;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-main);
+    font-size: 0.925rem;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    min-height: 100vh;
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-brand {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.sidebar-brand span { color: var(--primary); }
+
+.nav-link {
+    color: #94A3B8 !important;
+    padding: 14px 28px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    border-right: 3px solid transparent;
+    transition: all 0.25s ease;
+    margin-bottom: 2px;
+}
+
+.nav-link i { width: 24px; font-size: 1.15rem; margin-right: 12px; }
+
+.nav-link:hover {
+    background-color: rgba(255,255,255,0.03);
+    color: var(--white) !important;
+}
+
+.nav-link.active {
+    background: linear-gradient(90deg, rgba(0,178,137,0.1) 0%, rgba(0,0,0,0) 100%);
+    color: var(--primary) !important;
+    border-right-color: var(--primary);
+}
+
+.sidebar-label {
+    padding: 20px 28px 10px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #64748B;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* --- MAIN CONTENT --- */
+.main-content { margin-left: 260px; padding: 30px; }
+
+/* --- CARDS --- */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--white);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+
+.card-header {
+    background: var(--white);
+    border-bottom: 1px solid #E2E8F0;
+    padding: 20px 25px;
+    font-weight: 700;
+    color: var(--text-main);
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- STATS CARD --- */
+.stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.stat-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+}
+
+.bg-light-primary { background: #D1FAE5; color: #059669; }
+.bg-light-info { background: #DBEAFE; color: #2563EB; }
+.bg-light-warning { background: #FEF3C7; color: #D97706; }
+.bg-light-danger { background: #FEE2E2; color: #DC2626; }
+
+/* --- TABLE --- */
+.table thead th {
+    background: #F8FAFC;
+    color: #64748B;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 16px 24px;
+    border-bottom: 1px solid #E2E8F0;
+}
+.table tbody td {
+    padding: 18px 24px;
+    vertical-align: middle;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+/* --- BADGES --- */
+.status-badge { padding: 6px 14px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; }
+.status-completed { background: #D1FAE5; color: #059669; }
+.status-pending { background: #FEF3C7; color: #B45309; }
+.status-cancel { background: #FEE2E2; color: #DC2626; }
+.status-info { background: #E0F2FE; color: #0369A1; }
+
+.btn-primary {
+    background-color: var(--primary);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.btn-primary:hover { background-color: var(--primary-hover); }
