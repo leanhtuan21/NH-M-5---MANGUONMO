@@ -21,9 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "Vui lòng nhập đầy đủ thông tin";
     } 
-    elseif (empty($terms)) {
-        $error = "Bạn phải đồng ý với điều khoản sử dụng để tiếp tục";
-    }
+    
     // 2. Kiểm tra định dạng email
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Email không đúng định dạng";
@@ -186,12 +184,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                     </div>
 
-                    <div class="form__group">
+                    <!-- <div class="form__group">
                         <label class="form__checkbox">
                             <input type="checkbox" name="terms" class="form__checkbox-input" required />
                             <span class="form__checkbox-label">Tôi đồng ý với <a href="#" style="color: #007bff; text-decoration: underline;">điều khoản sử dụng</a></span>
                         </label>
-                    </div>
+                    </div> -->
 
                     <div class="form__group auth__btn-group">
                         <button class="btn btn--primary auth__btn">Đăng ký</button>

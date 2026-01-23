@@ -271,7 +271,7 @@
                                 </button>
                             </div>
                             <h3 class="product-card__title">
-                                <a href="./product-detail.php">Coffee Beans - Espresso Arabica and Robusta Beans</a>
+                                <a href="./product-detail.php">'.$row['name'].'</a>
                             </h3>
                             <p class="product-card__brand">Lavazza</p>
                             <div class="product-card__row">
