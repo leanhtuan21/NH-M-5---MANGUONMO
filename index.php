@@ -1,3 +1,93 @@
+<?php
+require_once __DIR__ . "/db_connect.php";
+
+// Lấy dữ liệu từ URL và làm sạch khoảng trắng thừa ở hai đầu
+$keyword      = trim($_GET['keyword'] ?? '');
+$min_price    = $_GET['min_price'] ?? '';
+$max_price    = $_GET['max_price'] ?? '';
+$weight       = $_GET['weight'] ?? '';
+$brand_filter = trim($_GET['brand_filter'] ?? '');
+
+// Flags kiểm tra trạng thái
+$isSearching = !empty($keyword);
+$isFiltering = (!empty($min_price) || !empty($max_price) || !empty($weight) || !empty($brand_filter));
+
+// Câu lệnh SQL cơ bản (Luôn JOIN để lấy được ảnh từ bảng categories)
+$sql = "SELECT p.*, c.thumb AS image 
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.id 
+        WHERE 1=1";
+$params = [];
+$types = "";
+
+// 1. XỬ LÝ TÌM KIẾM (Loại bỏ hoàn toàn khoảng trắng để so khớp linh hoạt)
+if ($isSearching) {
+    // REPLACE(p.name, ' ', '') giúp "Trung Nguyên" thành "TrungNguyên" trong DB khi so sánh
+    $sql .= " AND (REPLACE(p.name, ' ', '') LIKE ? OR REPLACE(p.brand, ' ', '') LIKE ?)";
+    
+    // Loại bỏ khoảng trắng của từ khóa người dùng nhập vào
+    $clean_keyword = "%" . str_replace(' ', '', $keyword) . "%";
+    $params[] = $clean_keyword; 
+    $params[] = $clean_keyword;
+    $types .= "ss";
+}
+
+// 2. XỬ LÝ BỘ LỌC
+if ($min_price !== '') {
+    $sql .= " AND p.price >= ?";
+    $params[] = $min_price; $types .= "d";
+}
+if ($max_price !== '') {
+    $sql .= " AND p.price <= ?";
+    $params[] = $max_price; $types .= "d";
+}
+if (!empty($weight)) {
+    $sql .= " AND p.weight_unit = ?";
+    $params[] = $weight; $types .= "s";
+}
+if (!empty($brand_filter)) {
+    $sql .= " AND REPLACE(p.brand, ' ', '') LIKE ?";
+    $clean_brand = "%" . str_replace(' ', '', $brand_filter) . "%";
+    $params[] = $clean_brand; 
+    $types .= "s";
+}
+
+// Thực thi truy vấn chính
+$stmt = $conn->prepare($sql);
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+$stmt->execute();
+$result = $stmt->get_result();
+
+// 3. XỬ LÝ KẾT QUẢ VÀ THÔNG BÁO
+$message = "";
+if ($result->num_rows > 0) {
+    $productList = $result;
+    
+    if ($isSearching && $isFiltering) {
+        $message = "Tìm thấy " . $result->num_rows . " sản phẩm cho từ khóa <strong>'" . htmlspecialchars($keyword) . "'</strong> kèm bộ lọc";
+    } elseif ($isSearching) {
+        $message = "Kết quả tìm kiếm cho: <strong>'" . htmlspecialchars($keyword) . "'</strong> (" . $result->num_rows . " sản phẩm)";
+    } elseif ($isFiltering) {
+        $message = "Tìm thấy " . $result->num_rows . " sản phẩm theo bộ lọc";
+    } else {
+        $message = "Tất cả sản phẩm";
+    }
+} else {
+    // Trường hợp KHÔNG có kết quả: Gợi ý sản phẩm ngẫu nhiên (Vẫn phải JOIN để lấy ảnh)
+    $productList = $conn->query("SELECT p.*, c.thumb AS image 
+                                 FROM products p 
+                                 LEFT JOIN categories c ON p.category_id = c.id 
+                                 ORDER BY RAND() LIMIT 4");
+    
+    if ($isSearching) {
+        $message = "Không tìm thấy sản phẩm nào cho từ khóa '" . htmlspecialchars($keyword) . "'. Gợi ý cho bạn:";
+    } else {
+        $message = "Không có sản phẩm nào khớp bộ lọc. Gợi ý cho bạn:";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -22,6 +112,21 @@
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
     </head>
+    <style>
+            .search-box {
+                position: relative;
+            }
+            .search-input {
+                width: 0;
+                opacity: 0;
+                transition: 0.3s;
+                padding: 6px 10px;
+            }
+            .search-box.active .search-input {
+                width: 200px;
+                opacity: 1;
+            }
+        </style>
     <body>
         <!-- Header -->
         <header id="header" class="header"></header>
@@ -55,100 +160,56 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Browse Categories -->
             <section class="home__container">
+
                 <div class="home__row">
-                    <h2 class="home__heading">Browse Categories</h2>
-                </div>
-                <div class="home__cate row row-cols-3 row-cols-md-1">
-                    <!-- Category item 1 -->
-                    <div class="col">
-                        <a href="#!">
-                            <article class="cate-item">
-                                <img src="./assets/img/category-item/item-1.png" alt="" class="cate-item__thumb" />
-                                <div class="cate-item__info">
-                                    <h3 class="cate-item__title">$24 - $150</h3>
-                                    <p class="cate-item__desc">New sumatra mandeling coffe blend</p>
-                                </div>
-                            </article>
-                        </a>
-                    </div>
-
-                    <!-- Category item 2 -->
-                    <div class="col">
-                        <a href="#!">
-                            <article class="cate-item">
-                                <img src="./assets/img/category-item/item-2.png" alt="" class="cate-item__thumb" />
-                                <div class="cate-item__info">
-                                    <h3 class="cate-item__title">$37 - $160</h3>
-                                    <p class="cate-item__desc">Espresso arabica and robusta beans</p>
-                                </div>
-                            </article>
-                        </a>
-                    </div>
-
-                    <!-- Category item 3 -->
-                    <div class="col">
-                        <a href="#!">
-                            <article class="cate-item">
-                                <img src="./assets/img/category-item/item-3.png" alt="" class="cate-item__thumb" />
-                                <div class="cate-item__info">
-                                    <h3 class="cate-item__title">$32 - $160</h3>
-                                    <p class="cate-item__desc">Lavazza top class whole bean coffee blend</p>
-                                </div>
-                            </article>
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Browse Products -->
-            <section class="home__container">
-                <div class="home__row">
-                    <h2 class="home__heading">Total LavAzza 1320</h2>
+                    <h2 class="home__heading"><?php echo $message; ?></h2>
+                    <!-- Lọc sản phẩm theo tìm kiếm  -->
                     <div class="filter-wrap">
                         <button class="filter-btn js-toggle" toggle-target="#home-filter">
-                            Filter
+                            Lọc
                             <img src="./assets/icons/filter.svg" alt="" class="filter-btn__icon icon" />
                         </button>
 
                         <div id="home-filter" class="filter hide">
                             <img src="./assets/icons/arrow-up.png" alt="" class="filter__arrow" />
-                            <h3 class="filter__heading">Filter</h3>
-                            <form action="" class="filter__form form">
+                            <h3 class="filter__heading">Bộ lọc</h3>
+                            
+                            <form action="" method="GET" class="filter__form form">
+                                
+                                <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>">
+
                                 <div class="filter__row filter__content">
-                                    <!-- Filter column 1 -->
+                                    
                                     <div class="filter__col">
-                                        <label for="" class="form__label">Price</label>
+                                        <label for="" class="form__label">Giá bán</label>
                                         <div class="filter__form-group">
-                                            <div
-                                                class="filter__form-slider"
-                                                style="--min-value: 10%; --max-value: 60%"
-                                            ></div>
+                                            <div class="filter__form-slider" style="--min-value: 10%; --max-value: 60%"></div>
                                         </div>
                                         <div class="filter__form-group filter__form-group--inline">
                                             <div>
-                                                <label for="" class="form__label form__label--small"> Minimum </label>
+                                                <label class="form__label form__label--small">Thấp nhất</label>
                                                 <div class="filter__form-text-input filter__form-text-input--small">
-                                                    <input
-                                                        type="text"
-                                                        name=""
-                                                        id=""
-                                                        class="filter__form-input"
-                                                        value="$30.00"
+                                                    <input 
+                                                        type="number" 
+                                                        id="min-price-input"
+                                                        name="min_price" 
+                                                        value="<?php echo htmlspecialchars($min_price); ?>"
+                                                        class="filter__form-input" 
+                                                        placeholder="0"
                                                     />
                                                 </div>
                                             </div>
                                             <div>
-                                                <label for="" class="form__label form__label--small"> Maximum </label>
+                                                <label class="form__label form__label--small">Cao nhất</label>
                                                 <div class="filter__form-text-input filter__form-text-input--small">
-                                                    <input
-                                                        type="text"
-                                                        name=""
-                                                        id=""
-                                                        class="filter__form-input"
-                                                        value="$100.00"
+                                                    <input 
+                                                        type="number" 
+                                                        id="max-price-input"
+                                                        name="max_price" 
+                                                        value="<?php echo htmlspecialchars($max_price); ?>"
+                                                        class="filter__form-input" 
+                                                        placeholder="1000"
                                                     />
                                                 </div>
                                             </div>
@@ -157,77 +218,50 @@
 
                                     <div class="filter__separate"></div>
 
-                                    <!-- Filter column 2 -->
                                     <div class="filter__col">
-                                        <label for="" class="form__label">Size/Weight</label>
+                                        <label for="" class="form__label">Trọng lượng</label>
                                         <div class="filter__form-group">
                                             <div class="form__select-wrap">
-                                                <div class="form__select" style="--width: 158px">
-                                                    500g
-                                                    <img
-                                                        src="./assets/icons/select-arrow.svg"
-                                                        alt=""
-                                                        class="form__select-arrow icon"
-                                                    />
-                                                </div>
-                                                <div class="form__select">
-                                                    Gram
-                                                    <img
-                                                        src="./assets/icons/select-arrow.svg"
-                                                        alt=""
-                                                        class="form__select-arrow icon"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="filter__form-group">
-                                            <div class="form__tags">
-                                                <button class="form__tag">Small</button>
-                                                <button class="form__tag">Medium</button>
-                                                <button class="form__tag">Large</button>
+                                                <select name="weight" class="form__select" style="--width: 158px;">
+                                                    <option value="">Tất cả</option>
+                                                    <option value="500g" <?php if($weight == '500g') echo 'selected'; ?>>500g</option>
+                                                    <option value="1kg"  <?php if($weight == '1kg') echo 'selected'; ?>>1kg</option>
+                                                    <option value="2kg"  <?php if($weight == '2kg') echo 'selected'; ?>>2kg</option>
+                                                    <option value="2kg"  <?php if($weight == '3kg') echo 'selected'; ?>>3kg</option>
+                                                    <option value="3kg"  <?php if($weight == '4kg') echo 'selected'; ?>>4kg</option>
+                                                    <option value="4kg"  <?php if($weight == '5kg') echo 'selected'; ?>>5kg</option>
+                                                    <option value="5kg"  <?php if($weight == '6kg') echo 'selected'; ?>>6kg</option>
+                                                    <option value="6kg"  <?php if($weight == '7kg') echo 'selected'; ?>>7kg</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="filter__separate"></div>
 
-                                    <!-- Filter column 3 -->
                                     <div class="filter__col">
-                                        <label for="" class="form__label">Brand</label>
+                                        <label for="" class="form__label">Thương hiệu</label>
                                         <div class="filter__form-group">
                                             <div class="filter__form-text-input">
                                                 <input
                                                     type="text"
-                                                    name=""
-                                                    id=""
-                                                    placeholder="Search brand name"
+                                                    name="brand_filter"
+                                                    value="<?php echo htmlspecialchars($brand_filter); ?>"
+                                                    placeholder="Nhập tên hãng..."
                                                     class="filter__form-input"
                                                 />
-                                                <img
-                                                    src="./assets/icons/search.svg"
-                                                    alt=""
-                                                    class="filter__form-input-icon icon"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div class="filter__form-group">
-                                            <div class="form__tags">
-                                                <button class="form__tag">Lavazza</button>
-                                                <button class="form__tag">Nescafe</button>
-                                                <button class="form__tag">Starbucks</button>
+                                                <img src="./assets/icons/search.svg" alt="" class="filter__form-input-icon icon" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="filter__row filter__footer">
                                     <button class="btn btn--text filter__cancel js-toggle" toggle-target="#home-filter">
-                                        Cancel
+                                        Huỷ bỏ
                                     </button>
-                                    <button
-                                        class="btn btn--primary filter__submit js-toggle"
-                                        toggle-target="#home-filter"
-                                    >
-                                        Show Result
+                                    <button type="submit" class="btn btn--primary filter__submit">
+                                        Hiển thị
                                     </button>
                                 </div>
                             </form>
@@ -236,247 +270,46 @@
                 </div>
 
                 <div class="row row-cols-5 row-cols-lg-2 row-cols-sm-1 g-3">
-                    <!-- Product card 1 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-1.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Coffee Beans - Espresso Arabica and Robusta Beans</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$47.00</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">4.3</span>
-                            </div>
-                        </article>
-                    </div>
+                    <?php if ($productList && $productList->num_rows > 0): ?>
+                        <?php while($row = $productList->fetch_assoc()): ?>
+                            <div class="col">
+                            <article class="product-card">
+                                <div class="product-card__img-wrap">
+                                    <a href="./product-detail.php?id=<?php echo $row['id']; ?>">
+                                        <img src="./assets/img/product/<?php echo $row['image']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-card__thumb" />
+                                    </a>
+                                    <button class="like-btn product-card__like-btn">
+                                        <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
+                                    </button>
+                                </div>
+                                
+                                <h3 class="product-card__title">
+                                    <a href="./product-detail.php?id=<?php echo $row['id']; ?>">
+                                        <?php echo htmlspecialchars($row['name']); ?>
+                                    </a>
+                                </h3>
 
-                    <!-- Product card 2 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-2.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Lavazza Coffee Blends - Try the Italian Espresso</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$53.00</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">3.4</span>
-                            </div>
-                        </article>
-                    </div>
+                                <p class="product-card__brand">
+                                    <?php echo htmlspecialchars($row['brand']); ?>
+                                </p>
 
-                    <!-- Product card 3 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-3.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn like-btn--liked product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Lavazza - Caffè Espresso Black Tin - Ground coffee</a>
-                            </h3>
-                            <p class="product-card__brand">Welikecoffee</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$99.99</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">5.0</span>
-                            </div>
-                        </article>
-                    </div>
+                                <p class="product-card__weight" style="font-size: 1.2rem; color: #777;">
+                                    Trọng lượng: <?php echo htmlspecialchars($row['weight_unit']); ?>
+                                </p>
 
-                    <!-- Product card 4 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-4.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
+                                <div class="product-card__row">
+                                    <span class="product-card__price">
+                                        <?php echo number_format($row['price'], 0, ',', '.'); ?> VNĐ
+                                    </span>
+                                    
+                                    <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
+                                    <span class="product-card__score"><?php echo number_format($row['average_score'], 1); ?></span>
+                                </div>
+                            </article>
                             </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Qualità Oro Mountain Grown - Espresso Coffee Beans</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$38.65</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">4.4</span>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Product card 5 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-1.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Coffee Beans - Espresso Arabica and Robusta Beans</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$47.00</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">4.3</span>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Product card 6 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-2.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Lavazza Coffee Blends - Try the Italian Espresso</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$53.00</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">3.4</span>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Product card 7 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-3.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn like-btn--liked product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Lavazza - Caffè Espresso Black Tin - Ground coffee</a>
-                            </h3>
-                            <p class="product-card__brand">Welikecoffee</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$99.99</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">5.0</span>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Product card 8 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-4.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Qualità Oro Mountain Grown - Espresso Coffee Beans</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$38.65</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">4.4</span>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Product card 9 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-1.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Coffee Beans - Espresso Arabica and Robusta Beans</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$47.00</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">4.3</span>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Product card 10 -->
-                    <div class="col">
-                        <article class="product-card">
-                            <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
-                                    <img src="./assets/img/product/item-2.png" alt="" class="product-card__thumb" />
-                                </a>
-                                <button class="like-btn product-card__like-btn">
-                                    <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    <img src="./assets/icons/heart-red.svg" alt="" class="like-btn__icon--liked" />
-                                </button>
-                            </div>
-                            <h3 class="product-card__title">
-                                <a href="./product-detail.php">Lavazza Coffee Blends - Try the Italian Espresso</a>
-                            </h3>
-                            <p class="product-card__brand">Lavazza</p>
-                            <div class="product-card__row">
-                                <span class="product-card__price">$53.00</span>
-                                <img src="./assets/icons/star.svg" alt="" class="product-card__star" />
-                                <span class="product-card__score">3.4</span>
-                            </div>
-                        </article>
-                    </div>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
                 </div>
-            </section>
         </main>
 
         <!-- Footer -->
