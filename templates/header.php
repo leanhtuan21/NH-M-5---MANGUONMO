@@ -8,7 +8,7 @@
         <!-- Logo -->
         <a href="./" class="logo top-bar__logo">
             <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img top-bar__logo-img" />
-            <h1 class="logo__title top-bar__logo-title">grocerymart</h1>
+            <h1 class="logo__title top-bar__logo-title">Coffee Shop</h1>
         </a>
 
         <!-- Navbar -->
@@ -32,7 +32,7 @@
             <ul class="navbar__list js-dropdown-list">
                 <li class="navbar__item">
                     <a href="#!" class="navbar__link">
-                        Departments
+                        Coffee
                         <img src="./assets/icons/arrow-down.svg" alt="" class="icon navbar__arrow" />
                     </a>
                     <div class="dropdown js-dropdown">
@@ -54,13 +54,13 @@
                                             />
                                         </div>
                                         <div class="menu-column__content">
-                                            <h2 class="menu-column__heading d-lg-none">All Departments</h2>
+                                            <h2 class="menu-column__heading d-lg-none">Tìm kiếm chung</h2>
                                             <ul class="menu-column__list js-menu-list">
                                                 <li class="menu-column__item">
                                                     <a href="#!" class="menu-column__link">
-                                                        Savings & Featured Shops
+                                                        Loại Coffee
                                                     </a>
-                                                    <!-- Sub menu for "Savings & Featured Shops" -->
+                                                    <!-- Sub menu for "Loại Coffee" -->
                                                     <div class="sub-menu">
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
@@ -72,45 +72,44 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
+                                                                        src="./assets/img/category/cate-13.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Fashion Deals</a>
+                                                                        <a href="#!"> Coffee rang hạt  </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Clothing
+                                                                            Hạt Robusta
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Shoes
+                                                                            Hạt Mix
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Accessories
+                                                                            Hạt Arabica
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Bags
+                                                                            Hạt Typica
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Jewelry
+                                                                            Hạt Bourbon
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-
                                                             <!-- Menu column 2 -->
                                                             <div class="menu-column">
                                                                 <div class="menu-column__icon">
@@ -120,56 +119,45 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
+                                                                        src="./assets/img/category/cate-14.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Electronics Discounts</a>
+                                                                        <a href="#!">Coffee viên nén</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Smartphones
+                                                                            Dolce Gusto pods
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Laptops
+                                                                            Nespresso Compatible Coffee Pods Mixed
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Headphones
+                                                                            K-Cups (Keurig)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Cameras
+                                                                            L'Or Espresso Sublime Rosé capsules
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Tablets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Speakers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wearable Tech
+                                                                            Purio Coffee
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -180,69 +168,86 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-1.2.svg"
+                                                                        src="./assets/img/category/cate-11.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Home & Living Specials</a>
+                                                                        <a href="#!">Coffee bột (xay sẵn)</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Furniture
+                                                                            Cà Phê Rang PREMIUM ROBUSTA
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Kitchenware
+                                                                            Thom Coffee Blend
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Decor
+                                                                            Cà Phê Bột Robusta
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Bedding
+                                                                            TRUNG NGUYÊN – Cà Phê Rang Xay Sáng Tạo 5 Arabica Ground Coffee
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Appliances
+                                                                            Early Morning Robusta Coffee
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Menu column 2 -->
+                                                            <div class="menu-column">
+                                                                <div class="menu-column__icon">
+                                                                    <img
+                                                                        src="./assets/img/category/cate-5.1.svg"
+                                                                        alt=""
+                                                                        class="menu-column__icon-1"
+                                                                    />
+                                                                    <img
+                                                                        src="./assets/img/category/cate-16.2.svg"
+                                                                        alt=""
+                                                                        class="menu-column__icon-2"
+                                                                    />
+                                                                </div>
+                                                                <div class="menu-column__content">
+                                                                    <h2 class="menu-column__heading">
+                                                                        <a href="#!">Coffee đặc sản</a>
+                                                                    </h2>
+                                                                    <ul class="menu-column__list">
+                                                                        <li class="menu-column__item">
+                                                                            <a href="#!" class="menu-column__link">
+                                                                            Ethiopia Specialty
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Lighting
+                                                                            Geisha (Gesha) – Panama
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Outdoor Furniture
+                                                                            Colombia Specialty
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Home Office
+                                                                            Brazil Specialty
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Bathroom
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Storage
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cleaning Supplies
+                                                                            Kenya AA
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -260,97 +265,39 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
+                                                                        src="./assets/img/category/cate-13.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Beauty Bargains</a>
+                                                                        <a href="#!">Coffee hoà tan </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Skincare
+                                                                            G7 3‑in‑1 Instant Coffee
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Makeup
+                                                                            Nescafé Taster’s Choice French Roast
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Haircare
+                                                                            Maxwell House Soluble Coffee
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Fragrances
+                                                                            Folgers Classic Roast Instant Coffee Crys
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Nail Care
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Beauty Tools
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Men's Grooming
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Sports & Outdoors Deals</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Fitness Equipment
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Gear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sportswear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Camping
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Biking
+                                                                            Taster’s Choice Instant Coffee
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -359,9 +306,10 @@
                                                         </div>
                                                     </div>
                                                 </li>
+
                                                 <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Electronics</a>
-                                                    <!-- Sub menu for "Electronics" -->
+                                                    <a href="#!" class="menu-column__link">Công cụ , dụng cụ pha Coffee</a>
+                                                    <!-- Sub menu for "Công cụ , dụng cụ pha Coffee" -->
                                                     <div class="sub-menu">
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
@@ -373,55 +321,29 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">TV & Video</a>
+                                                                        <a href="#!">Pha truyền thống </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Shop all TVs
+                                                                            Phin cà phê
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                TVs by Size
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Smart TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Roku TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Streaming
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                TV Mounts & Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                DVD & Blu-Ray Players
+                                                                            Ấm đun nước
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-
                                                             <!-- Menu column 2 -->
                                                             <div class="menu-column">
                                                                 <div class="menu-column__icon">
@@ -431,46 +353,87 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Wearable Technology</a>
+                                                                        <a href="#!">Pha thủ công (Hand Brew)</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Galaxy Watch
+                                                                            Dripper (phễu lọc)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Apple Watch
+                                                                            Giấy lọc cà phê
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Fitness Trackers
+                                                                            Bình rót cổ ngỗng (Gooseneck Kettle), Server / Bình đựng cà phê
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Menu column 3 -->
+                                                            <div class="menu-column">
+                                                                <div class="menu-column__icon">
+                                                                    <img
+                                                                        src="./assets/img/category/cate-6.1.svg"
+                                                                        alt=""
+                                                                        class="menu-column__icon-1"
+                                                                    />
+                                                                    <img
+                                                                        src="./assets/img/category/cate-7.2.svg"
+                                                                        alt=""
+                                                                        class="menu-column__icon-2"
+                                                                    />
+                                                                </div>
+                                                                <div class="menu-column__content">
+                                                                    <h2 class="menu-column__heading">
+                                                                        <a href="#!">Bảo quản và phụ kiện</a>
+                                                                    </h2>
+                                                                    <ul class="menu-column__list">
+                                                                        <li class="menu-column__item">
+                                                                            <a href="#!" class="menu-column__link">
+                                                                            Hũ / hộp đựng cà phê chuyên dụng
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Virtual Reality
+                                                                            Khay đựng / lọ chia liều (Dose Container)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Headphones
+                                                                            Ngăn bảo quản khô – mát
+                                                                            </a>
+                                                                        </li>
+                                                                        <li class="menu-column__item">
+                                                                            <a href="#!" class="menu-column__link">
+                                                                            Muỗng đong – thìa khuấy
+                                                                            </a>
+                                                                        </li>
+                                                                        <li class="menu-column__item">
+                                                                            <a href="#!" class="menu-column__link">
+                                                                            Ly – tách cà phê
+                                                                            </a>
+                                                                        </li>
+                                                                        <li class="menu-column__item">
+                                                                            <a href="#!" class="menu-column__link">
+                                                                            Thẻ ghi chú / nhãn dán
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -481,81 +444,50 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Computers</a>
+                                                                        <a href="#!">Xay và định lượng</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Shop All Computers
+                                                                            Máy xay cà phê điện
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Laptops
+                                                                            Cân điện tử
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                PC Gaming
+                                                                            Muỗng đong cà phê
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Monitors
+                                                                            Cốc đong nước
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Chromebook
+                                                                            Portafilter dosing cup (cốc đong bột)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Printers & Ink
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shop all TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Computer Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Desktops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tax Software
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Computer Software
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                PC Finder
+                                                                            Hộp đựng hạt
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -566,92 +498,44 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Savings</a>
+                                                                        <a href="#!">Dụng cụ hỗ trợ</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Tech Savings
+                                                                            Tamper (dụng cụ nén cà phê)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Overstock Savings
+                                                                            WDT Tool (kim phá vón cà phê)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Tech Rollbacks
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Cell Phones</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wireless Deals
+                                                                            Khăn lau pha chế
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                5G Phones
+                                                                            Bàn chải vệ sinh
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Prepaid Phones & Plans
+                                                                            Hộp gõ bã cà phê (Knock Box)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Refurbished Phones
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                iPhone Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cases & Screen Protectors
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Walmart Protection Plan
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Unlocked Phones
+                                                                            Nhiệt kế , Đồng hồ bấm giờ
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -660,11 +544,12 @@
                                                         </div>
                                                     </div>
                                                 </li>
+
                                                 <li class="menu-column__item">
                                                     <a href="#!" class="menu-column__link">
-                                                        Clothing, Shoes & Accessories
+                                                        Máy pha chế Coffee
                                                     </a>
-                                                    <!-- Sub menu for "Clothing, Shoes & Accessories" -->
+                                                    <!-- Sub menu for "Máy pha chế Coffee" -->
                                                     <div class="sub-menu">
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
@@ -676,45 +561,44 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Men's Clothing</a>
+                                                                        <a href="#!">Máy Espresso</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Casual Shirts
+                                                                            Máy Espresso thủ công
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Formal Suits
+                                                                            Máy Espresso tự động
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Jeans & Pants
+                                                                            Máy Single Boiler
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Outerwear
+                                                                            Máy Dual Boiler
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                T-Shirts
+                                                                            Máy Espresso có PID
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-
                                                             <!-- Menu column 2 -->
                                                             <div class="menu-column">
                                                                 <div class="menu-column__icon">
@@ -724,46 +608,40 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Women's Clothing</a>
+                                                                        <a href="#!">Máy viên nén</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Dresses
+                                                                            Máy nén cà phê tự động M‑Line Q (Gen 6) PUQPRESS
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Skirts
+                                                                            Starseeker Zero – Máy nén cà phê tự động
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Blouses & Tops
+                                                                            Dụng cụ phân bổ & nén cà phê Tamper OCD
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Handbags
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Coats & Jackets
+                                                                            Dụng cụ nén cà phê cao cấp Tamper 49mm
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -774,50 +652,39 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Footwear</a>
+                                                                        <a href="#!">Máy pha gia đình </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Men's Shoes
+                                                                            Philips 2200 series EP2220/10
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Women's Shoes
+                                                                            Melitta Caffeo Passione OT
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Kids' Shoes
+                                                                            Winci EM58 Espresso Machine
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Sneakers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Boots
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sandals
+                                                                            SMEG Espresso Machine EGF03
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-
                                                             <!-- Menu column 2 -->
                                                             <div class="menu-column">
                                                                 <div class="menu-column__icon">
@@ -827,51 +694,40 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Fashion Accessories</a>
+                                                                        <a href="#!">Máy pha cho quán Coffee</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Belts
+                                                                            Rancilio Classe 5 USB Automatic 2 Group
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Hats & Caps
+                                                                            Victoria Arduino Eagle One
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Scarves
+                                                                            Saeco AREA FOCUS Espresso Machine
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Gloves
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sunglasses
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Watches
+                                                                            Kalerm K95LT Automatic Coffee Machine
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -882,39 +738,29 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
+                                                                        src="./assets/img/category/cate-7.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Seasonal Specials</a>
+                                                                        <a href="#!">Máy pha tự động</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Winter Wear
+                                                                            Delonghi EC9155.MB Automatic Coffee Machine
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Summer Outfits
+                                                                            Panasonic Máy pha cà phê tự động
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Rain Gear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Holiday Collection
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Gift Sets
+                                                                            Delonghi ECP33.21 Espresso Machine
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -923,11 +769,12 @@
                                                         </div>
                                                     </div>
                                                 </li>
+
                                                 <li class="menu-column__item">
                                                     <a href="#!" class="menu-column__link">
-                                                        Home, Furniture & Appliances
+                                                    Bánh ngọt ăn kèm Coffee
                                                     </a>
-                                                    <!-- Sub menu for "Home, Furniture & Appliancess" -->
+                                                    <!-- Sub menu for "Bánh ngọt ăn kèm cà phê" -->
                                                     <div class="sub-menu">
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
@@ -939,95 +786,45 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
+                                                                        src="./assets/img/category/cate-8.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Living Room</a>
+                                                                        <a href="#!">Nhóm Bánh ngàn lớp và bơ </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Sofa Sets
+                                                                            Bánh sừng bò (Croissant)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Coffee Tables
+                                                                            Bánh ngàn lớp (Mille-feuille)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                TV Units
+                                                                            Bánh ngàn lớp nhân mứt hoa quả khô
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Book Shelves
+                                                                            Bánh hoa sen ngàn lớp
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Wall Decor
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Kitchen Appliances</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Microwave Ovens
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Dishwashers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Gas Stoves
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Refrigerators
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Blenders
+                                                                            Bánh Crepe Dâu tây ngàn lớp 
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Sub-Menu Column 3: Bedroom -->
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -1038,47 +835,45 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
+                                                                        src="./assets/img/category/cate-12.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Bedroom</a>
+                                                                        <a href="#!">Nhóm Bánh nướng </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Beds
+                                                                            Cookies (bánh quy)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Wardrobes
+                                                                            Bánh hạnh nhân nướng
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Dressing Tables
+                                                                            Shortbread
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Nightstands
+                                                                            Bánh táo nướng
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Mattresses
+                                                                            Pie nướng
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Sub-Menu Column 4: Home Decor -->
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -1089,87 +884,39 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
+                                                                        src="./assets/img/category/cate-10.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Home Decor</a>
+                                                                        <a href="#!">Nhóm Bánh kem và Bánh mềm</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Wall Art
+                                                                            Tiramisu
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Vases
+                                                                            Bánh su kem (Choux cream)
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Light Fixtures
+                                                                            Cupcake kem
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Curtains
+                                                                            Mousse cake
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Carpets
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Office Furniture</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Office Chairs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Desks
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cabinets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Meeting Tables
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bookcases
+                                                                            Cheesecake
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -1178,9 +925,10 @@
                                                         </div>
                                                     </div>
                                                 </li>
+
                                                 <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Toys & Video Games</a>
-                                                    <!-- Sub menu for "Toys & Video Games" -->
+                                                    <a href="#!" class="menu-column__link">Đối tượng sử dụng</a>
+                                                    <!-- Sub menu for "Đối tượng sử dụng" -->
                                                     <div class="sub-menu">
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
@@ -1192,45 +940,44 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
+                                                                        src="./assets/img/category/cate-19.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Action Figures</a>
+                                                                        <a href="#!">Nhân viên văn phòng - Học sinh/Sinh viên </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Superheroes
+                                                                            Latte
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Anime Figures
+                                                                            Cappuccino
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Movie Characters
+                                                                            Mocha
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Collectibles
+                                                                            Caramel latte
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Robots
+                                                                            Vanilla latte
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-
                                                             <!-- Menu column 2 -->
                                                             <div class="menu-column">
                                                                 <div class="menu-column__icon">
@@ -1240,47 +987,45 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
+                                                                        src="./assets/img/category/cate-19.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Video Games</a>
+                                                                        <a href="#!">Người sành coffee</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Console Games
+                                                                            Espresso
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                PC Games
+                                                                            Long Black
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Mobile Games
+                                                                            Micro-lot coffee
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Virtual Reality
+                                                                            Specialty Coffee
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Game Accessories
+                                                                            Nitro Cold Brew
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Sub-Menu Column 3: Educational Toys -->
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -1291,469 +1036,39 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
+                                                                        src="./assets/img/category/cate-19.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Educational Toys</a>
+                                                                        <a href="#!">Giới trẻ/Check in</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                STEM Kits
+                                                                            Latte nghệ thuật
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Puzzles
+                                                                            Caramel đá xay
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Books
+                                                                            Cold brew cam / chanh
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Art Supplies
+                                                                            Coffee smoothie
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Learning Tablets
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Outdoor Toys</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Ride-Ons
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Scooters
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bicycles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sports Gear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Swimming Pools
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Sub-Menu Column 5: Dolls & Plush -->
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Dolls & Plush</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Fashion Dolls
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Animal Plush
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Character Dolls
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Interactive Dolls
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Collectibles
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Home Improvement</a>
-                                                    <!-- Sub menu for "Home Improvement" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Bathroom Upgrades</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shower Heads
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vanity Units
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bath Tubs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tile Options
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bathroom Lighting
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cabinet Designs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Countertops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Kitchen Islands
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Backsplash Options
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Appliance Upgrades
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-1.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-1.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Flooring Solutions</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Hardwood Flooring
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tile Flooring
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Laminate Options
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Carpet Choices
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vinyl Flooring
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Outdoor Improvements</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Deck Designs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Patio Ideas
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Landscaping
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Garden Decor
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Lighting
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Paint & Wallpaper</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wall Paints
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Primers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wallpapers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Stencils
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Paint Brushes
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Lighting & Fixtures</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Ceiling Lights
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wall Lamps
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Lights
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Chandeliers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Table Lamps
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Baby</a>
-                                                    <!-- Sub menu for "Baby" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Baby Clothing</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Newborn Sets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Baby Dresses
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Rompers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shoes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Accessories
+                                                                            Bạc xỉu
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -1768,412 +1083,45 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
+                                                                        src="./assets/img/category/cate-19.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Feeding Essentials</a>
+                                                                        <a href="#!">Người lớn tuổi</a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Bottles
+                                                                            Cà phê phin đen nóng
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                High Chairs
+                                                                            Cà phê rang mộc
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Sterilizers
+                                                                            Cà phê đậu nành
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Bibs
+                                                                            Cà phê hoà tan không đường
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Sippy Cups
+                                                                            Arabica rang nhạt
                                                                             </a>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Diapering</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Diapers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wipes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Changing Tables
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Pails & Refills
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Creams & Ointments
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Nursery</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cribs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bedding Sets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Decor
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Monitors
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Storage
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Toys & Books</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Educational Toys
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Soft Toys
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Activity Toys
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Books
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Puzzles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Thermometers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Baby Gates
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Humidifiers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                First Aid
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vitamins & Supplements
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Household Essentials</a>
-                                                    <!-- Sub menu for "Household Essentials" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Fashion Deals</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Clothing
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shoes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bags
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Jewelry
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Electronics Discounts</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Smartphones
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Laptops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Headphones
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cameras
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tablets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Speakers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wearable Tech
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-1.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-1.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Home & Living Specials</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Furniture
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Kitchenware
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Decor
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bedding
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Appliances
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Lighting
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Furniture
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Home Office
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bathroom
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Storage
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cleaning Supplies
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
                                                         <div class="sub-menu__column">
                                                             <!-- Menu column 1 -->
                                                             <div class="menu-column">
@@ -2184,1715 +1132,39 @@
                                                                         class="menu-column__icon-1"
                                                                     />
                                                                     <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
+                                                                        src="./assets/img/category/cate-19.2.svg"
                                                                         alt=""
                                                                         class="menu-column__icon-2"
                                                                     />
                                                                 </div>
                                                                 <div class="menu-column__content">
                                                                     <h2 class="menu-column__heading">
-                                                                        <a href="#!">Beauty Bargains</a>
+                                                                        <a href="#!">Hiện đại và Năng động </a>
                                                                     </h2>
                                                                     <ul class="menu-column__list">
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Skincare
+                                                                            Cà phê capsule không đường
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Makeup
+                                                                            Cold brew trái cây nhẹ
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Haircare
+                                                                            Cold brew chai
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Fragrances
+                                                                            Espresso shot
                                                                             </a>
                                                                         </li>
                                                                         <li class="menu-column__item">
                                                                             <a href="#!" class="menu-column__link">
-                                                                                Nail Care
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Beauty Tools
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Men's Grooming
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Sports & Outdoors Deals</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Fitness Equipment
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Gear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sportswear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Camping
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Biking
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Personal Care</a>
-                                                    <!-- Sub menu for "Personal Care" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">TV & Video</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shop all TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                TVs by Size
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Smart TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Roku TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Streaming
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                TV Mounts & Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                DVD & Blu-Ray Players
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Wearable Technology</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Galaxy Watch
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Apple Watch
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Fitness Trackers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Virtual Reality
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Headphones
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Computers</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shop All Computers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Laptops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                PC Gaming
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Monitors
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Chromebook
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Printers & Ink
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shop all TVs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Computer Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Desktops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tax Software
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Computer Software
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                PC Finder
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Savings</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tech Savings
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Overstock Savings
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tech Rollbacks
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Cell Phones</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wireless Deals
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                5G Phones
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Prepaid Phones & Plans
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Refurbished Phones
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                iPhone Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cases & Screen Protectors
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Walmart Protection Plan
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Unlocked Phones
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Patio & Garden</a>
-                                                    <!-- Sub menu for "Patio & Garden" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Men's Clothing</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Casual Shirts
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Formal Suits
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Jeans & Pants
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outerwear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                T-Shirts
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Women's Clothing</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Dresses
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Skirts
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Blouses & Tops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Handbags
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Coats & Jackets
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Footwear</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Men's Shoes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Women's Shoes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Kids' Shoes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sneakers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Boots
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sandals
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Fashion Accessories</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Belts
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Hats & Caps
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Scarves
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Gloves
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sunglasses
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Watches
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Seasonal Specials</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Winter Wear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Summer Outfits
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Rain Gear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Holiday Collection
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Gift Sets
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Sports & Outdoors</a>
-                                                    <!-- Sub menu for "Sports & Outdoors" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Living Room</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sofa Sets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Coffee Tables
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                TV Units
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Book Shelves
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wall Decor
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Kitchen Appliances</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Microwave Ovens
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Dishwashers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Gas Stoves
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Refrigerators
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Blenders
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Bedroom</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Beds
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wardrobes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Dressing Tables
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Nightstands
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Mattresses
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Home Decor</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wall Art
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vases
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Light Fixtures
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Curtains
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Carpets
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Office Furniture</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Office Chairs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Desks
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cabinets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Meeting Tables
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bookcases
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Gift Cards</a>
-                                                    <!-- Sub menu for "Gift Cards" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Action Figures</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Superheroes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Anime Figures
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Movie Characters
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Collectibles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Robots
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Video Games</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Console Games
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                PC Games
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Mobile Games
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Virtual Reality
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Game Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Educational Toys</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                STEM Kits
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Puzzles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Books
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Art Supplies
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Learning Tablets
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Outdoor Toys</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Ride-Ons
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Scooters
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bicycles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sports Gear
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Swimming Pools
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Dolls & Plush</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Fashion Dolls
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Animal Plush
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Character Dolls
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Interactive Dolls
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Collectibles
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">
-                                                        Auto, Tires and Industrial
-                                                    </a>
-                                                    <!-- Sub menu for "Auto, Tires and Industrial" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Bathroom Upgrades</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shower Heads
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vanity Units
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bath Tubs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tile Options
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bathroom Lighting
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cabinet Designs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Countertops
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Kitchen Islands
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Backsplash Options
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Appliance Upgrades
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-1.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-1.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Flooring Solutions</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Hardwood Flooring
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Tile Flooring
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Laminate Options
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Carpet Choices
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vinyl Flooring
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Outdoor Improvements</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Deck Designs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Patio Ideas
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Landscaping
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Garden Decor
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Lighting
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Paint & Wallpaper</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wall Paints
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Primers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wallpapers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Stencils
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Paint Brushes
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Lighting & Fixtures</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Ceiling Lights
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wall Lamps
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Outdoor Lights
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Chandeliers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Table Lamps
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li class="menu-column__item">
-                                                    <a href="#!" class="menu-column__link">Movies, Music & Books</a>
-                                                    <!-- Sub menu for "Movies, Music & Books" -->
-                                                    <div class="sub-menu">
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-6.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Baby Clothing</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Newborn Sets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Baby Dresses
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Rompers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Shoes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Accessories
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-5.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Feeding Essentials</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bottles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                High Chairs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sterilizers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bibs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Sippy Cups
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-4.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Diapering</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Diapers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Wipes
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Changing Tables
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Pails & Refills
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Creams & Ointments
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Menu column 2 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-3.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Nursery</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Cribs
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Bedding Sets
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Decor
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Monitors
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Storage
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
-                                                            <div class="menu-column">
-                                                                <div class="menu-column__icon">
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.1.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-1"
-                                                                    />
-                                                                    <img
-                                                                        src="./assets/img/category/cate-2.2.svg"
-                                                                        alt=""
-                                                                        class="menu-column__icon-2"
-                                                                    />
-                                                                </div>
-                                                                <div class="menu-column__content">
-                                                                    <h2 class="menu-column__heading">
-                                                                        <a href="#!">Toys & Books</a>
-                                                                    </h2>
-                                                                    <ul class="menu-column__list">
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Educational Toys
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Soft Toys
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Activity Toys
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Books
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Puzzles
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Thermometers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Baby Gates
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Humidifiers
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                First Aid
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="menu-column__item">
-                                                                            <a href="#!" class="menu-column__link">
-                                                                                Vitamins & Supplements
+                                                                            Cà phê pha sẵn
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -3909,9 +1181,10 @@
                         </div>
                     </div>
                 </li>
+
                 <li class="navbar__item">
                     <a href="#!" class="navbar__link">
-                        Grocery
+                        Công thức pha chế
                         <img src="./assets/icons/arrow-down.svg" alt="" class="icon navbar__arrow" />
                     </a>
                     <div class="dropdown js-dropdown">
@@ -3928,29 +1201,25 @@
                                                     class="menu-column__icon-1"
                                                 />
                                                 <img
-                                                    src="./assets/img/category/cate-7.2.svg"
+                                                    src="./assets/img/category/cate-16.2.svg"
                                                     alt=""
                                                     class="menu-column__icon-2"
                                                 />
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Grocery</a>
+                                                    <a href="#!">Coffee sữa </a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 1 phin cà phê đen , 25–30ml sữa đặc</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Grilling Foods</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Spring Flavors</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Pha cà phê phin → khuấy sữa → đổ ra ly đá</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <!-- Menu column 2 -->
                                         <div class="menu-column">
                                             <div class="menu-column__icon">
@@ -3967,41 +1236,19 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Fresh Produce</a>
+                                                    <a href="#!">Iced Latte</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 1 shot espresso , 150ml sữa tươi lạnh , Đá viên .</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Celebrate Salad Month</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Healthy Living</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Fresh Flowers</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Chilled Dressing</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Fresh Fruit</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Salad Kits & Bowls</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Organic Produce</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Fresh Vegetables</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Pha một shot espresso -> sau đó đổ sữa tươi lạnh vào ly và thêm đá viên -> Khuấy nhẹ và thưởng thức.</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="sub-menu__column">
                                         <!-- Menu column 1 -->
                                         <div class="menu-column">
@@ -4019,37 +1266,18 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Bakery & Bread</a>
+                                                    <a href="#!">Dalgona Latte</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 2 muỗng cà phê hòa tan , 2 muỗng đường , 2 muỗng nước nóng , 150ml sữa tươi lạnh , Đá viên .  </a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">New in Bakery</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Sliced Bread</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Rolls & Buns</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Tortillas</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Breakfast Breads</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Pies</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Cookies & Brownies</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Đánh bông cà phê hòa tan, đường và nước nóng cho đến khi hỗn hợp mịn -> Đổ sữa tươi vào ly, thêm đá và múc lớp cà phê bông lên trên.</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <!-- Menu column 2 -->
                                         <div class="menu-column">
                                             <div class="menu-column__icon">
@@ -4066,23 +1294,19 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Frozen</a>
+                                                    <a href="#!">Capuchino</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Frozen Breakfast</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 1 shot cà phê đậm , 120ml sữa tươi không đường , Đường (tuỳ thích) , Bột cacao / bột quế (tuỳ chọn) .</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Frozen Potatoes</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Frozen Meals & Snacks</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Pha 1 shot cà phê đậm (espresso hoặc phin đặc) -> Hâm nóng sữa, đánh bọt mịn -> Rót vào ly theo tỉ lệ 1/3 cà phê – 1/3 sữa nóng – 1/3 bọt sữa -> Rắc cacao/quế (tuỳ thích) .</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="sub-menu__column">
                                         <!-- Menu column 1 -->
                                         <div class="menu-column">
@@ -4100,28 +1324,18 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Snacks</a>
+                                                    <a href="#!">Americano đá</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 1 shot espresso , 150ml nước lạnh , Đá viên</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Chips</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Popcorn & Pretzels</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Crackers</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Salsa & Dips</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Pha một shot espresso và thêm nước lạnh vào ly -> Sau đó cho thêm đá viên và thưởng thức.</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <!-- Menu column 2 -->
                                         <div class="menu-column">
                                             <div class="menu-column__icon">
@@ -4138,35 +1352,19 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Candy</a>
+                                                    <a href="#!">Coffe kem tươi</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 1 shot espresso , 2 muỗng kem tươi (whipped cream) , Đường tùy ý .</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Better for You</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Chocolate</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Sugar Free Candy</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Gum</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Mints</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">On-the-Go</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Pha một shot espresso, thêm kem tươi lên trên -> Bạn có thể thêm đường tùy theo sở thích.</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="sub-menu__column">
                                         <!-- Menu column 1 -->
                                         <div class="menu-column">
@@ -4184,25 +1382,18 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Cocktails & Mixes Coffee</a>
+                                                    <a href="#!">Matcha Shot Latte</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Ground Coffee</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 1 muỗng bột matcha , 1 shot espresso , 150ml sữa tươi , Đá viên .</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Whole Bean Coffee</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Coffee Pods</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Instant Coffee</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Pha bột matcha với nước nóng, sau đó đổ sữa tươi vào ly và thêm đá -> Rót espresso lên trên cùng.</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <!-- Menu column 2 -->
                                         <div class="menu-column">
                                             <div class="menu-column__icon">
@@ -4219,32 +1410,14 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Beverages</a>
+                                                    <a href="#!">Whipped Coffee</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Nguyên liệu : 2 muỗng cà phê hoà tan , 2 muỗng đường , 2 muỗng nước nóng , 200ml sữa tươi không đường , Đá viên .</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Water</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Soft Drinks</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Fruit Juice</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Sports Drinks</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Energy Drinks</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Tea</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Hot Chocolate & Cocoa</a>
+                                                        <a href="#!" class="menu-column__link">Cách pha : Đánh bông cà phê hòa tan, đường và nước nóng cho đến khi hỗn hợp trở nên mịn, bông xốp ->  đổ hỗn hợp bọt cà phê lên trên lớp sữa lạnh và đá viên.</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -4255,9 +1428,10 @@
                         </div>
                     </div>
                 </li>
+
                 <li class="navbar__item">
                     <a href="#!" class="navbar__link">
-                        Beauty
+                        Loại Coffee phổ biến
                         <img src="./assets/icons/arrow-down.svg" alt="" class="icon navbar__arrow" />
                     </a>
                     <div class="dropdown js-dropdown">
@@ -4274,84 +1448,34 @@
                                                     class="menu-column__icon-1"
                                                 />
                                                 <img
-                                                    src="./assets/img/category/cate-7.2.svg"
+                                                    src="./assets/img/category/cate-5.2.svg"
                                                     alt=""
                                                     class="menu-column__icon-2"
                                                 />
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Featured Shops</a>
+                                                    <a href="#!">Mocha</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
                                                         <a href="#!" class="menu-column__link">
-                                                            Pickup Today in Beauty
+                                                        Mocha Harrar
                                                         </a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">BeautySpaceNK</a>
+                                                        <a href="#!" class="menu-column__link">Mocha Yemen</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Equate Beauty</a>
+                                                        <a href="#!" class="menu-column__link">Mocha Yirgacheffe</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Beauty Deals</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Walmart Exclusives</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Luxury Beauty Deals</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">New Arrivals</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                        <!-- Menu column 2 -->
-                                        <div class="menu-column">
-                                            <div class="menu-column__icon">
-                                                <img
-                                                    src="./assets/img/category/cate-15.1.svg"
-                                                    alt=""
-                                                    class="menu-column__icon-1"
-                                                />
-                                                <img
-                                                    src="./assets/img/category/cate-15.2.svg"
-                                                    alt=""
-                                                    class="menu-column__icon-2"
-                                                />
-                                            </div>
-                                            <div class="menu-column__content">
-                                                <h2 class="menu-column__heading">
-                                                    <a href="#!">Trending in Beauty</a>
-                                                </h2>
-                                                <ul class="menu-column__list">
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link"
-                                                            >Trending Beauty Products</a
-                                                        >
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Celebrate Earth Day</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Prom-ready Beauty</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Summer Beauty</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Travel Size & Minis</a>
+                                                        <a href="#!" class="menu-column__link">Mocha Blend</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="sub-menu__column">
                                         <!-- Menu column 1 -->
                                         <div class="menu-column">
@@ -4369,70 +1493,25 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Featured Brands</a>
+                                                    <a href="#!">Bourbon</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Red Bourbon</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">New in Bakery</a>
+                                                        <a href="#!" class="menu-column__link">Yellow Bourbon</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Sliced Bread</a>
+                                                        <a href="#!" class="menu-column__link">Orange Bourbon</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Rolls & Buns</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Tortillas</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Breakfast Breads</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Pies</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Cookies & Brownies</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                        <!-- Menu column 2 -->
-                                        <div class="menu-column">
-                                            <div class="menu-column__icon">
-                                                <img
-                                                    src="./assets/img/category/cate-17.1.svg"
-                                                    alt=""
-                                                    class="menu-column__icon-1"
-                                                />
-                                                <img
-                                                    src="./assets/img/category/cate-17.2.svg"
-                                                    alt=""
-                                                    class="menu-column__icon-2"
-                                                />
-                                            </div>
-                                            <div class="menu-column__content">
-                                                <h2 class="menu-column__heading">
-                                                    <a href="#!">Communities to Support</a>
-                                                </h2>
-                                                <ul class="menu-column__list">
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Black Owned Beauty</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">LatinX Owned Beauty</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">AAPI Owned Beauty</a>
+                                                        <a href="#!" class="menu-column__link">Bourbon cổ</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="sub-menu__column">
                                         <!-- Menu column 1 -->
                                         <div class="menu-column">
@@ -4450,35 +1529,28 @@
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Premium Beauty</a>
+                                                    <a href="#!">Typica</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Blue Mountain Typica</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Hair Color</a>
+                                                        <a href="#!" class="menu-column__link">Java Typica</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Hair Care</a>
+                                                        <a href="#!" class="menu-column__link">Maragogipe (Typica đột biến)</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Skincare</a>
+                                                        <a href="#!" class="menu-column__link">Criollo (Typica cổ hiếm)</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Fragrance</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Makeup</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Beauty Tech & Tools</a>
+                                                        <a href="#!" class="menu-column__link">Sumatra Typica</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="sub-menu__column">
                                         <!-- Menu column 1 -->
                                         <div class="menu-column">
@@ -4489,45 +1561,30 @@
                                                     class="menu-column__icon-1"
                                                 />
                                                 <img
-                                                    src="./assets/img/category/cate-19.2.svg"
+                                                    src="./assets/img/category/cate-13.2.svg"
                                                     alt=""
                                                     class="menu-column__icon-2"
                                                 />
                                             </div>
                                             <div class="menu-column__content">
                                                 <h2 class="menu-column__heading">
-                                                    <a href="#!">Beauty</a>
+                                                    <a href="#!">Catimor</a>
                                                 </h2>
                                                 <ul class="menu-column__list">
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Shop All</a>
+                                                        <a href="#!" class="menu-column__link">Catimor truyền thống</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Men's Grooming</a>
+                                                        <a href="#!" class="menu-column__link">Catimor T-5175</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Bath & Body</a>
+                                                        <a href="#!" class="menu-column__link">Catimor T-8667</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Beauty Tech & Tools</a>
+                                                        <a href="#!" class="menu-column__link">Catimor T-5296</a>
                                                     </li>
                                                     <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Makeup</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Fragrance</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Nail Care</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Hair Care</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Hair Color</a>
-                                                    </li>
-                                                    <li class="menu-column__item">
-                                                        <a href="#!" class="menu-column__link">Skincare</a>
+                                                        <a href="#!" class="menu-column__link">Catimor H-528</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -4544,8 +1601,8 @@
 
         <!-- Actions -->
         <div class="top-act">
-            <a href="./sign-in.php" class="btn btn--text d-md-none">Sign In</a>
-            <a href="./sign-up.php" class="top-act__sign-up btn btn--primary">Sign Up</a>
+            <a href="./sign-in.php" class="btn btn--text d-md-none">Đăng Nhập </a>
+            <a href="./sign-up.php" class="top-act__sign-up btn btn--primary">Đăng Ký </a>
         </div>
     </div>
 </div>
