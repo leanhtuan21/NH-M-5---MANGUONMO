@@ -103,38 +103,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         .form__input { padding-right: 45px !important; }
         .form__input-icon-eye { position: absolute; right: 12px; padding: 10px; z-index: 2; cursor: pointer; width: 20px; }
         
-        /* Style cho Checkbox */
-        .form__checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            user-select: none;
-            margin: 15px 0;
-            font-size: 1.4rem;
-            color: #666;
-        }
-        .form__checkbox-input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .auth__intro-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-            border-radius: 10px;
-        }
-        .auth__intro:hover .auth__intro-img { transform: scale(1.1); }
-        .auth__intro { overflow: hidden; }
+        
     </style>
 </head>
 <body>
     <main class="auth">
         <div class="auth__intro">
-            <img src="https://thuytinhgiare.com/wp-content/uploads/2023/07/hinh-anh-ly-ca-phe-muoi.jpg" alt="" class="auth__intro-img" />
+            <img src="./assets/img/auth/intro.svg" alt="" class="auth__intro-img" />
+            <p class="auth__intro-text">
+                    Khám phá hương vị cà phê nguyên chất, sản phẩm thượng hạng và trải nghiệm mua sắm tuyệt vời nhất
+            </p>
         </div>
 
         <div id="auth-content" class="auth__content hide">
