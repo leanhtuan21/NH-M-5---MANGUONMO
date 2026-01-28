@@ -102,6 +102,14 @@ $conn->close();
 
                 <!-- Checkout content -->
                 <div class="checkout-container">
+                    <!-- Debug Info -->
+                    <div style="background: #fff3cd; padding: 15px; margin-bottom: 20px; border: 1px solid #ffc107; border-radius: 5px;">
+                        <strong style="color: #856404;">🔍 Thông tin tổng quan giỏ hàng:</strong>
+                        <br><br>
+                        <br>Tổng sản phẩm trong giỏ: <strong><?php echo count($cart_items); ?></strong>
+                        <!-- <br>Người dùng ID: <strong><?php echo $_SESSION['user_id'] ?? 'NOT SET'; ?></strong> -->
+                    </div>
+
                     <div class="row gy-xl-3">
                         <div class="col-8 col-xl-12">
                             <div class="cart-info">
@@ -147,8 +155,9 @@ $conn->close();
                                                                 Save
                                                             </button>
                                                             <button
-                                                                class="cart-item__ctrl-btn js-toggle"
-                                                                toggle-target="#delete-confirm"
+                                                                class="cart-item__ctrl-btn delete-cart-btn"
+                                                                data-cart-id="<?php echo $item['id']; ?>"
+                                                                type="button"
                                                             >
                                                                 <img src="./assets/icons/trash.svg" alt="" />
                                                                 Delete
@@ -246,22 +255,84 @@ $conn->close();
         </script>
 
         <!-- Modal: confirm remove shopping cart item -->
-        <div id="delete-confirm" class="modal modal--small hide">
-            <div class="modal__content">
-                <p class="modal__text">Bạn có muốn xóa sản phẩm này trong giỏ hàng?</p>
-                <div class="modal__bottom">
-                    <button class="btn btn--small btn--outline modal__btn js-toggle" toggle-target="#delete-confirm">
-                        Cancel
-                    </button>
-                    <button
-                        class="btn btn--small btn--danger btn--primary modal__btn btn--no-margin js-toggle"
-                        toggle-target="#delete-confirm"
-                    >
-                        Delete
-                    </button>
-                </div>
-            </div>
-            <div class="modal__overlay js-toggle" toggle-target="#delete-confirm"></div>
-        </div>
+        <!-- (Không sử dụng modal nữa - dùng confirm() dialog thay thế) -->
+
+        <script>
+            // ===== CHỨC NĂNG XÓA SẢN PHẨM TRONG GIỎ HÀNG =====
+            
+            // Lấy tất cả các nút xóa sản phẩm
+            const deleteButtons = document.querySelectorAll('.delete-cart-btn');
+            console.log('✅ Tìm thấy ' + deleteButtons.length + ' nút xóa');
+            
+            // Gắn sự kiện click cho từng nút xóa
+            deleteButtons.forEach((button) => {
+                button.addEventListener('click', function() {
+                    // Lấy ID của sản phẩm trong giỏ hàng
+                    const cartItemId = this.getAttribute('data-cart-id');
+                    console.log('👆 Click nút xóa, cart ID: ' + cartItemId);
+                    
+                    // Lấy tên sản phẩm để hiển thị trong thông báo
+                    const productName = this.closest('.cart-item').querySelector('.cart-item__title a').textContent;
+                    console.log('📦 Tên sản phẩm: ' + productName);
+                    
+                    // Hiển thị hộp thoại xác nhận
+                    const confirmDelete = confirm('❌ Bạn có muốn xóa sản phẩm này không?\n\n' + productName);
+                    
+                    if (confirmDelete) {
+                        console.log('✅ Người dùng xác nhận xóa, đang gửi request...');
+                        
+                        // Gửi request đến server để xóa khỏi database
+                        fetch('delete_cart_item.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: parseInt(cartItemId)
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('📥 Response từ server:', data);
+                            
+                            if (data.success) {
+                                // ✅ Xóa thành công từ database
+                                console.log('✅ Xóa từ database thành công');
+                                
+                                // Xóa phần tử sản phẩm khỏi giao diện ngay lập tức
+                                const cartItemElement = document.querySelector('[data-cart-id="' + cartItemId + '"]').closest('.cart-item');
+                                cartItemElement.style.opacity = '0'; // Làm mờ dần
+                                
+                                setTimeout(() => {
+                                    // Xóa hoàn toàn phần tử khỏi DOM sau 300ms
+                                    cartItemElement.remove();
+                                    console.log('🗑️ Đã xóa khỏi giao diện');
+                                    
+                                    // Hiển thị thông báo thành công
+                                    alert('✅ Xóa sản phẩm thành công!');
+                                    
+                                    // Reload trang để cập nhật tổng tiền
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 500);
+                                }, 300);
+                            } else {
+                                // ❌ Xóa thất bại
+                                console.error('❌ Lỗi từ server:', data.message);
+                                alert('❌ Lỗi: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            // ❌ Lỗi kết nối
+                            console.error('❌ Lỗi fetch:', error);
+                            alert('❌ Không thể kết nối với server!');
+                        });
+                    } else {
+                        // Người dùng nhấn "Không" hoặc "Hủy"
+                        console.log('❌ Người dùng hủy xóa');
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

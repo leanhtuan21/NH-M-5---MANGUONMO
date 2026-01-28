@@ -4556,6 +4556,7 @@
                         <img src="./assets/icons/heart.svg" alt="" class="icon top-act__icon" />
                         <span class="top-act__title">03</span>
                     </button>
+                   
 
                     <!-- Dropdown -->
                     <div class="act-dropdown">
@@ -4627,10 +4628,14 @@
                 <div class="top-act__separate"></div>
 
                 <div class="top-act__btn-wrap">
-                    <button class="top-act__btn">
+                    <!-- <button class="top-act__btn">
                         <img src="./assets/icons/buy.svg" alt="" class="icon top-act__icon" />
                         <span class="top-act__title">$65.42</span>
-                    </button>
+                    </button> -->
+                    <a href="./checkout.php" class="top-act__btn" style="text-decoration: none; display: flex; align-items: center;">
+    <img src="./assets/icons/buy.svg" alt="" class="icon top-act__icon">
+    <span class="top-act__title" style="color: inherit;">Cart</span> 
+</a>
 
                     <!-- Dropdown -->
                     <div class="act-dropdown">
