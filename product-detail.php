@@ -94,12 +94,6 @@ $gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0] : 100;
 $gia_theo_gram = $gia_goc * ($gram_chon / 100);
 // giá sau thuế
 $gia_sau_thue = $gia_theo_gram * (1 + $thue / 100);
-/* Ảnh mặc định */
-$image = !empty($product['image_url']) 
-    ? $product['image_url'] 
-    : 'default-product.png';
-/* Giá sau thuế */
-$total_price = $product['price'] * (1 + $product['tax_percent'] / 100);
 // Sản phẩm có nhiều ảnh
 $images = [];
 $stmt_img = mysqli_prepare($conn, "
