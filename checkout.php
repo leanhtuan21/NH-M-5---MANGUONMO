@@ -12,62 +12,12 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Nếu có cart trong session, lưu vào DB
-if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
-    // Kiểm tra xem user có order 'cart' chưa
-    $order_stmt = $conn->prepare("SELECT id FROM orders WHERE user_id = ? AND status = 'cart'");
-    $order_stmt->bind_param("i", $user_id);
-    $order_stmt->execute();
-    $order_result = $order_stmt->get_result();
-    if ($order_result->num_rows == 0) {
-        // Tạo order mới
-        $insert_order = $conn->prepare("INSERT INTO orders (user_id, total_amount, status) VALUES (?, 0, 'cart')");
-        $insert_order->bind_param("i", $user_id);
-        $insert_order->execute();
-        $order_id = $conn->insert_id;
-        $insert_order->close();
-    } else {
-        $order = $order_result->fetch_assoc();
-        $order_id = $order['id'];
-    }
-    $order_stmt->close();
-
-    // Lưu từng item từ session vào DB
-    foreach ($_SESSION['cart'] as $product_id => $item) {
-        // Kiểm tra sản phẩm đã có trong order_items chưa
-        $item_stmt = $conn->prepare("SELECT id, quantity FROM order_items WHERE order_id = ? AND product_id = ?");
-        $item_stmt->bind_param("ii", $order_id, $product_id);
-        $item_stmt->execute();
-        $item_result = $item_stmt->get_result();
-        if ($item_result->num_rows > 0) {
-            // Cập nhật quantity
-            $existing_item = $item_result->fetch_assoc();
-            $new_quantity = $existing_item['quantity'] + $item['quantity'];
-            $update_item = $conn->prepare("UPDATE order_items SET quantity = ? WHERE id = ?");
-            $update_item->bind_param("ii", $new_quantity, $existing_item['id']);
-            $update_item->execute();
-            $update_item->close();
-        } else {
-            // Thêm mới
-            $insert_item = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)");
-            $insert_item->bind_param("iiid", $order_id, $product_id, $item['quantity'], $item['price']);
-            $insert_item->execute();
-            $insert_item->close();
-        }
-        $item_stmt->close();
-    }
-
-    // Xóa session cart sau khi lưu
-    unset($_SESSION['cart']);
-}
-
-// Truy vấn lấy sản phẩm trong giỏ hàng (order với status 'cart') và ảnh của sản phẩm đó
-$sql = "SELECT oi.quantity, oi.price_at_purchase, p.name AS product_name, p.id AS product_id, pi.image_url 
-        FROM orders o 
-        JOIN order_items oi ON o.id = oi.order_id 
-        LEFT JOIN products p ON oi.product_id = p.id 
+// Lấy danh sách sản phẩm trong giỏ hàng của user từ bảng cart
+$sql = "SELECT c.id, c.quantity, c.price, c.product_name, p.id AS product_id, pi.image_url 
+        FROM cart c
+        LEFT JOIN products p ON c.product_name = p.name 
         LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1 
-        WHERE o.user_id = ? AND o.status = 'cart'";
+        WHERE c.user_id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -80,7 +30,7 @@ $total_quantity = 0;
 
 while ($row = $result->fetch_assoc()) {
     $cart_items[] = $row;
-    $subtotal += $row['price_at_purchase'] * $row['quantity'];
+    $subtotal += $row['price'] * $row['quantity'];
     $total_quantity += $row['quantity'];
 }
 
@@ -175,22 +125,22 @@ $conn->close();
                                                             </a>
                                                         </h3>
                                                         <p class="cart-item__price-wrap">
-                                                            $<?php echo number_format($item['price_at_purchase'], 2); ?> | <span class="cart-item__status">In Stock</span>
+                                                            $<?php echo number_format($item['price'], 2); ?> | <span class="cart-item__status">In Stock</span>
                                                         </p>
                                                         <div class="cart-item__ctrl cart-item__ctrl--md-block">
                                                             <div class="cart-item__input">
-                                                                <button class="cart-item__input-btn">
+                                                                <button class="cart-item__input-btn js-qty-change" data-id="<?php echo $item['id']; ?>" data-action="decrease">
                                                                     <img class="icon" src="./assets/icons/minus.svg" alt="" />
                                                                 </button>
-                                                                <span><?php echo $item['quantity']; ?></span>
-                                                                <button class="cart-item__input-btn">
+                                                                <span id="qty-<?php echo $item['id']; ?>"><?php echo $item['quantity']; ?></span>
+                                                                <button class="cart-item__input-btn js-qty-change" data-id="<?php echo $item['id']; ?>" data-action="increase">
                                                                     <img class="icon" src="./assets/icons/plus.svg" alt="" />
                                                                 </button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="cart-item__content-right">
-                                                        <p class="cart-item__total-price">$<?php echo number_format($item['price_at_purchase'] * $item['quantity'], 2); ?></p>
+                                                        <p class="cart-item__total-price">$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></p>
                                                         <div class="cart-item__ctrl">
                                                             <button class="cart-item__ctrl-btn">
                                                                 <img src="./assets/icons/heart-2.svg" alt="" />
@@ -298,7 +248,7 @@ $conn->close();
         <!-- Modal: confirm remove shopping cart item -->
         <div id="delete-confirm" class="modal modal--small hide">
             <div class="modal__content">
-                <p class="modal__text">Do you want to remove this item from shopping cart?</p>
+                <p class="modal__text">Bạn có muốn xóa sản phẩm này trong giỏ hàng?</p>
                 <div class="modal__bottom">
                     <button class="btn btn--small btn--outline modal__btn js-toggle" toggle-target="#delete-confirm">
                         Cancel

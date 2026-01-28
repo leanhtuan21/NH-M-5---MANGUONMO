@@ -225,27 +225,50 @@ $total_price = $product['price'] + $tax_amount;
                                                         <span class="prod-info__tax"><?php echo $product['tax_percent']; ?>%</span>
                                                     </div>
                                                     <p class="prod-info__total-price">$<?php echo number_format($total_price, 2); ?></p>
-                                                    <div class="prod-info__row">
-                                                        <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($product['name']); ?>">
-                                                        <input type="hidden" name="product_price" value="<?php echo $product['price']; ?>">
-                                                        <input type="hidden" name="product_quantity" value="1">
-                                                        <button type="submit" class="btn btn--primary prod-info__add-to-cart">
-                                                            Add to cart
-                                                        </button>
-                                                       
-                                                        <button class="like-btn prod-info__like-btn">
-                                                            <img
-                                                                src="./assets/icons/heart.svg"
-                                                                alt=""
-                                                                class="like-btn__icon icon"
-                                                            />
-                                                            <img
-                                                                src="./assets/icons/heart-red.svg"
-                                                                alt=""
-                                                                class="like-btn__icon--liked"
-                                                            />
-                                                        </button>
-                                                    </div>
+                                                    <div class="form__label">Quantity</div>
+                                                <div class="cart-item__input" style="width: 120px; margin-bottom: 20px;">
+                                                    <button class="cart-item__input-btn" type="button" onclick="decreaseQuantity()">
+                                                        <img class="icon" src="./assets/icons/minus.svg" alt="" />
+                                                    </button>
+                                                    <input type="number" name="product_quantity" id="quantityInput" value="1" min="1" class="form__input" style="text-align: center; width: 50px;">
+                                                    <button class="cart-item__input-btn" type="button" onclick="increaseQuantity()">
+                                                        <img class="icon" src="./assets/icons/plus.svg" alt="" />
+                                                    </button>
+                                                </div>
+
+                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                
+                                                <div class="prod-info__row">
+                                                    <button type="submit" class="btn btn--primary prod-info__add-to-cart">
+                                                        Add to cart
+                                                    </button>
+                                                   
+                                                    <button class="like-btn prod-info__like-btn" type="button">
+                                                        <img
+                                                            src="./assets/icons/heart.svg"
+                                                            alt=""
+                                                            class="like-btn__icon icon"
+                                                        />
+                                                        <img
+                                                            src="./assets/icons/heart-red.svg"
+                                                            alt=""
+                                                            class="like-btn__icon--liked"
+                                                        />
+                                                    </button>
+                                                </div>
+                                                
+                                                <script>
+                                                    function increaseQuantity() {
+                                                        const input = document.getElementById('quantityInput');
+                                                        input.value = parseInt(input.value) + 1;
+                                                    }
+                                                    function decreaseQuantity() {
+                                                        const input = document.getElementById('quantityInput');
+                                                        if (parseInt(input.value) > 1) {
+                                                            input.value = parseInt(input.value) - 1;
+                                                        }
+                                                    }
+                                                </script>
                                                 </div>
                                             </div>
                                         </div>
