@@ -13,9 +13,9 @@ $isSearching = !empty($keyword);
 $isFiltering = (!empty($min_price) || !empty($max_price) || !empty($weight) || !empty($brand_filter));
 
 // Câu lệnh SQL cơ bản (Luôn JOIN để lấy được ảnh từ bảng categories)
-$sql = "SELECT p.*, c.thumb AS image 
+$sql = "SELECT p.*, pi.image_url AS image 
         FROM products p 
-        LEFT JOIN categories c ON p.category_id = c.id 
+        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1
         WHERE 1=1";
 $params = [];
 $types = "";
@@ -279,7 +279,7 @@ if ($result->num_rows > 0) {
                             <article class="product-card">
                                 <div class="product-card__img-wrap">
                                     <a href="./product-detail.php?id=<?php echo $row['id']; ?>">
-                                        <img src="./assets/img/product/<?php echo $row['image']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-card__thumb" />
+                                        <img src="<?php echo $row['image']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-card__thumb" />
                                     </a>
                                     <button class="like-btn product-card__like-btn">
                                         <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
