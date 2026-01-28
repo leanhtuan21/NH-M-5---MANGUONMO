@@ -1,56 +1,54 @@
 <?php
 session_start();
 require_once 'db_connect.php';
-if (isset($_POST['add_to_cart'])) {
-    $product_id = (int)$_POST['product_id'];
-    $gram       = (int)$_POST['weight_unit'];
-    $quantity   = 1;
-    // LẤY GIÁ + THUẾ TỪ DB
-    $stmt = mysqli_prepare($conn, "
-        SELECT 
-            p.name,
-            p.price,
-            p.tax_percent,
-            pi.image_url
-        FROM products p
-        LEFT JOIN product_images pi 
-            ON p.id = pi.product_id AND pi.is_main = 1
-        WHERE p.id = ?
-    ");
-    mysqli_stmt_bind_param($stmt, "i", $product_id);
-    mysqli_stmt_execute($stmt);
-    $p = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
-
-    if (!$p) {
-        exit;
-    }
-
-    $gia_250g = (float)$p['price'];
-    $thue     = (int)$p['tax_percent'];
-
-    $gia = $gia_250g * ($gram / 250);
-    $gia_sau_thue = $gia * (1 + $thue / 100);
-
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
-
-    $key = $product_id . '_' . $gram;
-
-    if (isset($_SESSION['cart'][$key])) {
-        $_SESSION['cart'][$key]['quantity'] += 1;
-    } else {
-        $_SESSION['cart'][$key] = [
-            'product_id' => $product_id,
-            'name'       => $p['name'],
-            'image'      => $p['image_url'] ?? 'default-product.png',
-            'gram'       => $gram,
-            'price'      => $gia_sau_thue,
-            'quantity'   => 1
-        ];
-    }
-    // ❗ KHÔNG redirect
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
     exit;
+}
+/* ===XỬ LÝ AJAX WISHLIST=== */
+if (isset($_POST['ajax_wishlist'])) {
+    if (!isset($_SESSION['wishlist'])) {
+        $_SESSION['wishlist'] = [];
+    }
+    $product_id = (int)($_POST['product_id'] ?? 0);
+    $action = $_POST['action'] ?? '';
+    if ($product_id > 0) {
+        // ADD
+        if ($action === 'add' && !isset($_SESSION['wishlist'][$product_id])) {
+            $stmt = mysqli_prepare($conn, "
+                SELECT p.id, p.name, p.price, p.tax_percent, pi.image_url
+                FROM products p
+                LEFT JOIN product_images pi 
+                    ON p.id = pi.product_id AND pi.is_main = 1
+                WHERE p.id = ?
+            ");
+            mysqli_stmt_bind_param($stmt, "i", $product_id);
+            mysqli_stmt_execute($stmt);
+            $p = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+            if ($p) {
+                $price = $p['price'] * (1 + $p['tax_percent'] / 100);
+                $_SESSION['wishlist'][$product_id] = [
+                    'id'    => $p['id'],
+                    'name'  => $p['name'],
+                    'price' => $price,
+                    'image' => $p['image_url'] ?? 'default-product.png'
+                ];
+            }
+        }
+
+        // REMOVE
+        if ($action === 'remove') {
+            unset($_SESSION['wishlist'][$product_id]);
+        }
+    }
+    echo json_encode([
+    'status' => 'ok',
+    'count'  => count($_SESSION['wishlist']),
+    'items'  => array_values($_SESSION['wishlist']),
+    'liked'  => isset($_SESSION['wishlist'][$product_id])
+]);
+exit;
 }
 if (!isset($_GET['id'])) {
     die('Thiếu ID sản phẩm');
@@ -60,6 +58,7 @@ $product_id = (int) $_GET['id'];
 $sql = "
     SELECT 
         p.id,
+        p.category_id,
         p.name,
         p.price,
         p.tax_percent,
@@ -86,13 +85,13 @@ if (!empty($product['weight_unit'])) {
 }
 
 /* ===== TÍNH GIÁ & THUẾ SAU KHI CÓ PRODUCT ===== */
-// Giá gốc trong DB = giá 250g
-$gia_250g = (float)$product['price'];
+// Giá gốc trong DB = giá gốc
+$gia_goc = (float)$product['price'];
 $thue = (int)$product['tax_percent'];
 // gram mặc định = option đầu tiên
-$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0] : 250;
+$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0] : 100;
 // tính giá theo gram
-$gia_theo_gram = $gia_250g * ($gram_chon / 250);
+$gia_theo_gram = $gia_goc * ($gram_chon / 100);
 // giá sau thuế
 $gia_sau_thue = $gia_theo_gram * (1 + $thue / 100);
 /* Ảnh mặc định */
@@ -120,6 +119,32 @@ while ($row = mysqli_fetch_assoc($result_img)) {
 if (empty($images)) {
     $images[] = 'default-product.png';
 }
+/* ===== SẢN PHẨM TƯƠNG TỰ ===== */
+$sql_related = "
+    SELECT 
+        p.id,
+        p.name,
+        p.price,
+        p.average_score,
+        p.brand,
+        pi.image_url
+    FROM products p
+    LEFT JOIN product_images pi 
+        ON p.id = pi.product_id AND pi.is_main = 1
+    WHERE p.category_id = ?
+      AND p.id != ?
+    LIMIT 6
+";
+
+$stmt_related = mysqli_prepare($conn, $sql_related);
+mysqli_stmt_bind_param(
+    $stmt_related,
+    "ii",
+    $product['category_id'],
+    $product['id']
+);
+mysqli_stmt_execute($stmt_related);
+$relatedProducts = mysqli_stmt_get_result($stmt_related);
 
 ?>
 <!DOCTYPE html>
@@ -157,6 +182,14 @@ if (empty($images)) {
     .like-btn__icon--liked {
         display: none;
     }
+    /* ảnh */
+    .prod-preview__item {
+    display: none;
+}
+.prod-preview__item--current {
+    display: block;
+}
+
     </style>
     <head>
         <meta charset="UTF-8" />
@@ -233,20 +266,21 @@ if (empty($images)) {
                         <div class="col-5 col-xl-6 col-lg-12">
                             <div class="prod-preview">
                                 <div class="prod-preview__list">
-                                    <?php foreach ($images as $img): ?>
-                                        <div class="prod-preview__item">
+                                    <?php foreach ($images as $i => $img): ?>
+                                        <div class="prod-preview__item <?= $i === 0 ? 'prod-preview__item--current' : '' ?>">
                                             <img src="<?= htmlspecialchars($img) ?>" class="prod-preview__img">
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
                                 <div class="prod-preview__thumbs">
-                                    <?php foreach ($images as $i => $img): ?>
-                                        <img 
-                                            src="<?= htmlspecialchars($img) ?>"
-                                            class="prod-preview__thumb-img <?= $i === 0 ? 'prod-preview__thumb-img--current' : '' ?>"
-                                        >
-                                    <?php endforeach; ?>
-                                </div>
+                                <?php foreach ($images as $i => $img): ?>
+                                    <img 
+                                        src="<?= htmlspecialchars($img) ?>"
+                                        class="prod-preview__thumb-img <?= $i === 0 ? 'prod-preview__thumb-img--current' : '' ?>"
+                                        data-index="<?= $i ?>"
+                                    >
+                                <?php endforeach; ?>
+                            </div>
                             </div>
                         </div>
                         <div class="col-7 col-xl-6 col-lg-12">
@@ -313,13 +347,14 @@ if (empty($images)) {
                                                 <div class="prod-info__card">
                                                     <div class="prod-info__row">
                                                         <button 
-                                                            type="submit" 
+                                                            type="button" 
+                                                            id="addToCartBtn"
                                                             name="add_to_cart"
                                                             class="btn btn--primary prod-info__add-to-cart"
                                                         >
                                                             Add to cart
                                                         </button>
-                                                        <button type="button" class="like-btn prod-info__like-btn">
+                                                        <button type="button" class="like-btn <?= isset($_SESSION['wishlist'][$product['id']]) ? 'like-btn--liked' : '' ?>"data-product-id="<?= $product['id'] ?>">
                                                             <img
                                                                 src="./assets/icons/heart.svg"
                                                                 alt=""
@@ -515,260 +550,54 @@ if (empty($images)) {
                             </div>
                             <div class="prod-tab__content">
                                 <div class="prod-content">
-                                    <h2 class="prod-content__heading">Similar items you might like</h2>
-                                    <div
-                                        class="row row-cols-6 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-2"
-                                    >
-                                        <!-- Product card 1 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-1.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Coffee Beans - Espresso Arabica and Robusta Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$47.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.3</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                    <h2 class="prod-content__heading">Gợi ý sản phẩm tương tự</h2>
+                                    <div class="row row-cols-6 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-2">
+                                        <?php if (mysqli_num_rows($relatedProducts) == 0): ?>
+                                            <p>Không có sản phẩm tương tự</p>
+                                        <?php else: ?>
+                                            <?php while ($rp = mysqli_fetch_assoc($relatedProducts)): ?>
+                                                <div class="col">
+                                                    <article class="product-card">
+                                                        <div class="product-card__img-wrap">
+                                                            <a href="product-detail.php?id=<?= $rp['id'] ?>">
+                                                                <img
+                                                                    src="<?= $rp['image_url'] ?? 'default-product.png' ?>"
+                                                                    class="product-card__thumb"
+                                                                />
+                                                            </a>
 
-                                        <!-- Product card 2 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-2.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza Coffee Blends - Try the Italian Espresso</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$53.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">3.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                                            <button
+                                                                class="like-btn product-card__like-btn <?= isset($_SESSION['wishlist'][$rp['id']]) ? 'like-btn--liked' : '' ?>"
+                                                                data-product-id="<?= $rp['id'] ?>"
+                                                            >
+                                                                <img src="./assets/icons/heart.svg" class="like-btn__icon icon" />
+                                                                <img src="./assets/icons/heart-red.svg" class="like-btn__icon--liked" />
+                                                            </button>
+                                                        </div>
 
-                                        <!-- Product card 3 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-3.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn like-btn--liked product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza - Caffè Espresso Black Tin - Ground coffee</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Welikecoffee</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$99.99</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">5.0</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                                        <h3 class="product-card__title">
+                                                            <a href="product-detail.php?id=<?= $rp['id'] ?>">
+                                                                <?= htmlspecialchars($rp['name']) ?>
+                                                            </a>
+                                                        </h3>
 
-                                        <!-- Product card 4 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-4.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Qualità Oro Mountain Grown - Espresso Coffee Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$38.65</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
-                                        <!-- Product card 5 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-1.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Coffee Beans - Espresso Arabica and Robusta Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$47.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.3</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                                        <p class="product-card__brand">
+                                                            <?= htmlspecialchars($rp['brand']) ?>
+                                                        </p>
 
-                                        <!-- Product card 6 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-2.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
+                                                        <div class="product-card__row">
+                                                            <span class="product-card__price">
+                                                                <?= number_format($rp['price'], 0, ',', '.') ?> ₫
+                                                            </span>
+                                                            <img src="./assets/icons/star.svg" class="product-card__star" />
+                                                            <span class="product-card__score">
+                                                                <?= $rp['average_score'] ?>
+                                                            </span>
+                                                        </div>
+                                                    </article>
                                                 </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza Coffee Blends - Try the Italian Espresso</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$53.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">3.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                            <?php endwhile; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -784,27 +613,117 @@ if (empty($images)) {
         </script>
         <!-- Phần chọn gram nhảy giá -->
         <script>
-            const gia250 = <?= (float)$product['price'] ?>;
+            const gia100 = <?= (float)$product['price'] ?>;
             const thue = <?= (int)$product['tax_percent'] ?>;
             function dinhDangGia(vnd) {
                 return vnd.toLocaleString('vi-VN') + ' ₫';
             }
             document.getElementById('weightSelect').addEventListener('change', function () {
                 const gram = parseInt(this.value);
-                const gia = gia250 * (gram / 250);
+                const gia = gia100 * (gram / 100);
                 const giaSauThue = gia * (1 + thue / 100);
 
                 document.getElementById('gia-goc').innerText = dinhDangGia(gia);
                 document.getElementById('gia-sau-thue').innerText = dinhDangGia(giaSauThue);
             });
         </script>
-        <!-- Trái tim -->
+        <!-- Ảnh -->
         <script>
-            document.querySelectorAll('.like-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-            this.classList.toggle('like-btn--liked');
+            const thumbs = document.querySelectorAll('.prod-preview__thumb-img');
+            const bigImages = document.querySelectorAll('.prod-preview__item');
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', function () {
+                    const index = this.dataset.index;
+                    // reset ảnh lớn
+                    bigImages.forEach(img => img.classList.remove('prod-preview__item--current'));
+                    // reset thumbnail
+                    thumbs.forEach(t => t.classList.remove('prod-preview__thumb-img--current'));
+                    // set ảnh được chọn
+                    bigImages[index].classList.add('prod-preview__item--current');
+                    this.classList.add('prod-preview__thumb-img--current');
                 });
             });
         </script>
+        <!-- mục yêu thích -->
+<script>
+function initWishlist() {
+    document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
+        btn.addEventListener('click', function () {
+
+            const productId = this.dataset.productId;
+            const liked = this.classList.toggle('like-btn--liked');
+            const action = liked ? 'add' : 'remove';
+
+            const countEl = document.getElementById('wishlistCount');
+            const list = document.querySelector('.act-dropdown__list');
+
+            if (!countEl || !list) return;
+
+            fetch('product-detail.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status !== 'ok') return;
+
+                // update số lượng
+                countEl.innerText = String(data.count).padStart(2, '0');
+                const textCount = document.getElementById('wishlistCountText');
+                if (textCount) {
+                    textCount.textContent = data.count;
+                }
+                // render dropdown
+                list.innerHTML = '';
+                data.items.forEach(item => {
+                    list.insertAdjacentHTML('beforeend', `
+                        <div class="col">
+                            <article class="cart-preview-item">
+                                <div class="cart-preview-item__img-wrap">
+                                    <img src="${item.image}" class="cart-preview-item__thumb">
+                                </div>
+                                <h3 class="cart-preview-item__title">${item.name}</h3>
+                                <p class="cart-preview-item__price">
+                                    ${Number(item.price).toLocaleString('vi-VN')} ₫
+                                </p>
+                            </article>
+                        </div>
+                    `);
+                });
+            });
+        });
+    });
+}
+
+// ⏳ CHỜ HEADER LOAD XONG
+const wait = setInterval(() => {
+    if (
+        document.getElementById('wishlistCount') &&
+        document.querySelector('.act-dropdown__list')
+    ) {
+        clearInterval(wait);
+        initWishlist();
+    }
+}, 100);
+</script>
+<!-- giỏ hàng -->
+ <script>
+document.getElementById('addToCartBtn').addEventListener('click', function () {
+    const productId = <?= $product['id'] ?>;
+    const gram = document.getElementById('weightSelect').value;
+
+    fetch('product-detail.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `add_to_cart=1&product_id=${productId}&weight_unit=${gram}`
+    })
+    .then(() => {
+        // Sau khi thêm xong → load lại header để cập nhật giỏ hàng
+        load("#header", "./templates/header-logined.php");
+    });
+});
+</script>
+
     </body>
 </html>
