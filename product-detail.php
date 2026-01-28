@@ -639,85 +639,67 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
             });
         </script>
         <!-- mục yêu thích -->
-<script>
-function initWishlist() {
-    document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
-        btn.addEventListener('click', function () {
+    <script>
+    function initWishlist() {
+        document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
 
-            const productId = this.dataset.productId;
-            const liked = this.classList.toggle('like-btn--liked');
-            const action = liked ? 'add' : 'remove';
+                const productId = this.dataset.productId;
+                const liked = this.classList.toggle('like-btn--liked');
+                const action = liked ? 'add' : 'remove';
 
-            const countEl = document.getElementById('wishlistCount');
-            const list = document.querySelector('.act-dropdown__list');
+                const countEl = document.getElementById('wishlistCount');
+                const list = document.querySelector('.act-dropdown__list');
 
-            if (!countEl || !list) return;
+                if (!countEl || !list) return;
 
-            fetch('product-detail.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status !== 'ok') return;
+                fetch('product-detail.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status !== 'ok') return;
 
-                // update số lượng
-                countEl.innerText = String(data.count).padStart(2, '0');
-                const textCount = document.getElementById('wishlistCountText');
-                if (textCount) {
-                    textCount.textContent = data.count;
-                }
-                // render dropdown
-                list.innerHTML = '';
-                data.items.forEach(item => {
-                    list.insertAdjacentHTML('beforeend', `
-                        <div class="col">
-                            <article class="cart-preview-item">
-                                <div class="cart-preview-item__img-wrap">
-                                    <img src="${item.image}" class="cart-preview-item__thumb">
-                                </div>
-                                <h3 class="cart-preview-item__title">${item.name}</h3>
-                                <p class="cart-preview-item__price">
-                                    ${Number(item.price).toLocaleString('vi-VN')} ₫
-                                </p>
-                            </article>
-                        </div>
-                    `);
+                    // update số lượng
+                    countEl.innerText = String(data.count).padStart(2, '0');
+                    const textCount = document.getElementById('wishlistCountText');
+                    if (textCount) {
+                        textCount.textContent = data.count;
+                    }
+                    // render dropdown
+                    list.innerHTML = '';
+                    data.items.forEach(item => {
+                        list.insertAdjacentHTML('beforeend', `
+                            <div class="col">
+                                <article class="cart-preview-item">
+                                    <div class="cart-preview-item__img-wrap">
+                                        <img src="${item.image}" class="cart-preview-item__thumb">
+                                    </div>
+                                    <h3 class="cart-preview-item__title">${item.name}</h3>
+                                    <p class="cart-preview-item__price">
+                                        ${Number(item.price).toLocaleString('vi-VN')} ₫
+                                    </p>
+                                </article>
+                            </div>
+                        `);
+                    });
                 });
             });
         });
-    });
-}
-
-// ⏳ CHỜ HEADER LOAD XONG
-const wait = setInterval(() => {
-    if (
-        document.getElementById('wishlistCount') &&
-        document.querySelector('.act-dropdown__list')
-    ) {
-        clearInterval(wait);
-        initWishlist();
     }
-}, 100);
-</script>
-<!-- giỏ hàng -->
- <script>
-document.getElementById('addToCartBtn').addEventListener('click', function () {
-    const productId = <?= $product['id'] ?>;
-    const gram = document.getElementById('weightSelect').value;
 
-    fetch('product-detail.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `add_to_cart=1&product_id=${productId}&weight_unit=${gram}`
-    })
-    .then(() => {
-        // Sau khi thêm xong → load lại header để cập nhật giỏ hàng
-        load("#header", "./templates/header-logined.php");
-    });
-});
-</script>
-
+    // ⏳ CHỜ HEADER LOAD XONG
+    const wait = setInterval(() => {
+        if (
+            document.getElementById('wishlistCount') &&
+            document.querySelector('.act-dropdown__list')
+        ) {
+            clearInterval(wait);
+            initWishlist();
+        }
+    }, 100);
+    </script>
     </body>
 </html>
