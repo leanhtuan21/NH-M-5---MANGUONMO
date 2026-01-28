@@ -16,12 +16,12 @@ if ($email !== "") {
     $rs = mysqli_stmt_get_result($check);
 
     if (!mysqli_fetch_assoc($rs)) {
-        header("Location: forgot-password.php");
+        header("Location: reset-password-emailed.php");
         exit;
     }
     mysqli_stmt_close($check);
 } else {
-    header("Location: forgot-password.php");
+    header("Location: reset-password-emailed.php");
     exit;
 }
 
