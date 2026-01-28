@@ -2,11 +2,19 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 require_once __DIR__ . '/../db_connect.php';
 if (!isset($_SESSION['user_id'])) {
-    return;
+    header("Location: sign-in.php");
+    exit;
 }
-
+/* ====== ĐẾM SẢN PHẨM YÊU THÍCH ====== */
+$wishlist = $_SESSION['wishlist'] ?? [];
+$so_yeu_thich = count($wishlist);
+if (isset($_SESSION['wishlist']) && is_array($_SESSION['wishlist'])) {
+    $so_yeu_thich = count($_SESSION['wishlist']);
+}
+/* ========ảnh đại diện=========== */
 $user_id = (int)$_SESSION['user_id'];
 
 $sql = "SELECT full_name, email, avatar FROM users WHERE id = ?";
@@ -4575,11 +4583,13 @@ $avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
                 </button>
             </div>
 
-            <div class="top-act__group d-md-none">
-                <div class="top-act__btn-wrap">
-                    <button class="top-act__btn">
+            <div class="top-act__group d-md-none" >
+                <div class="top-act__btn-wrap" >
+                    <button class="top-act__btn" id="wishlistBtn">
                         <img src="./assets/icons/heart.svg" alt="" class="icon top-act__icon" />
-                        <span class="top-act__title">03</span>
+                        <span class="top-act__title" id="wishlistCount">
+                            <span><?= str_pad($so_yeu_thich, 2, '0', STR_PAD_LEFT) ?></span>
+                        </span>
                     </button>
 
                     <!-- Dropdown -->
@@ -4587,54 +4597,34 @@ $avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
                         <div class="act-dropdown__inner">
                             <img src="./assets/icons/arrow-up.png" alt="" class="act-dropdown__arrow" />
                             <div class="act-dropdown__top">
-                                <h2 class="act-dropdown__title">You have 3 item(s)</h2>
-                                <a href="./favourite.php" class="act-dropdown__view-all">See All</a>
+                                <h2 class="act-dropdown__title">
+                                    Bạn có <span id="wishlistCountText"><?= $so_yeu_thich ?></span> sản phẩm
+                                </h2>
+                                <a href="./favourite.php" class="act-dropdown__view-all">Tất cả</a>
                             </div>
                             <div class="row row-cols-3 gx-2 act-dropdown__list">
-                                <!-- Cart preview item 1 -->
-                                <div class="col">
-                                    <article class="cart-preview-item">
-                                        <div class="cart-preview-item__img-wrap">
-                                            <img
-                                                src="./assets/img/product/item-1.png"
-                                                alt=""
-                                                class="cart-preview-item__thumb"
-                                            />
+                                <?php if (empty($wishlist)): ?>
+                                    <p style="padding: 12px; font-size: 14px;">Chưa có sản phẩm yêu thích</p>
+                                <?php else: ?>
+                                    <?php foreach ($wishlist as $item): ?>
+                                        <div class="col">
+                                            <article class="cart-preview-item">
+                                                <div class="cart-preview-item__img-wrap">
+                                                    <img
+                                                        src="<?= htmlspecialchars($item['image']) ?>"
+                                                        class="cart-preview-item__thumb"
+                                                    />
+                                                </div>
+                                                <h3 class="cart-preview-item__title">
+                                                    <?= htmlspecialchars($item['name']) ?>
+                                                </h3>
+                                                <p class="cart-preview-item__price">
+                                                    <?= number_format($item['price'], 0, ',', '.') ?> ₫
+                                                </p>
+                                            </article>
                                         </div>
-                                        <h3 class="cart-preview-item__title">Lavazza Coffee Blends</h3>
-                                        <p class="cart-preview-item__price">$329.00</p>
-                                    </article>
-                                </div>
-
-                                <!-- Cart preview item 2 -->
-                                <div class="col">
-                                    <article class="cart-preview-item">
-                                        <div class="cart-preview-item__img-wrap">
-                                            <img
-                                                src="./assets/img/product/item-2.png"
-                                                alt=""
-                                                class="cart-preview-item__thumb"
-                                            />
-                                        </div>
-                                        <h3 class="cart-preview-item__title">Coffee Beans Espresso</h3>
-                                        <p class="cart-preview-item__price">$39.99</p>
-                                    </article>
-                                </div>
-
-                                <!-- Cart preview item 3 -->
-                                <div class="col">
-                                    <article class="cart-preview-item">
-                                        <div class="cart-preview-item__img-wrap">
-                                            <img
-                                                src="./assets/img/product/item-3.png"
-                                                alt=""
-                                                class="cart-preview-item__thumb"
-                                            />
-                                        </div>
-                                        <h3 class="cart-preview-item__title">Qualità Oro Mountain</h3>
-                                        <p class="cart-preview-item__price">$47.00</p>
-                                    </article>
-                                </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                             <div class="act-dropdown__separate"></div>
                             <div class="act-dropdown__checkout">
@@ -4721,11 +4711,11 @@ $avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
                                     <span class="act-dropdown__value">Free</span>
                                 </div>
                                 <div class="act-dropdown__row">
-                                    <span class="act-dropdown__label">Shipping</span>
+                                    <span class="act-dropdown__label">Vận chuyển</span>
                                     <span class="act-dropdown__value">$10.00</span>
                                 </div>
                                 <div class="act-dropdown__row act-dropdown__row--bold">
-                                    <span class="act-dropdown__label">Total Price</span>
+                                    <span class="act-dropdown__label">Tổng giá</span>
                                     <span class="act-dropdown__value">$425.99</span>
                                 </div>
                             </div>
@@ -4796,7 +4786,7 @@ $avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
                                 <a href="#!" class="user-menu__link">Settings</a>
                             </li>
                             <li class="user-menu__separate">
-                                <a href="./sign-in.php" class="user-menu__link">Logout</a>
+                                <a href="./logout.php" class="user-menu__link">Logout</a>
                             </li>
                         </ul>
                     </div>
