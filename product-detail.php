@@ -51,6 +51,9 @@ $total_price = $product['price'] + $tax_amount;
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
         <title><?php echo htmlspecialchars($product['name']); ?> - Grocery Mart</title>
 
         <!-- Favicon -->
@@ -69,6 +72,9 @@ $total_price = $product['price'] + $tax_amount;
 
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
+        <script>
+            console.log("scripts.js loaded, load function:", typeof load);
+        </script>
     </head>
     <body>
         <!-- Header -->
@@ -80,6 +86,15 @@ $total_price = $product['price'] + $tax_amount;
         <!-- MAIN -->
         <main class="product-page">
             <div class="container">
+                <!-- Debug info (Xóa sau khi test xong) -->
+                <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc; font-size: 12px;">
+                    <strong>Debug Info:</strong> Session user_id = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'; ?>
+                    <br>isLoggedIn var = <span id="loggedInStatus">checking...</span>
+                </div>
+                <script>
+                    document.getElementById('loggedInStatus').textContent = (<?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) ? 'true' : 'false';
+                </script>
+                
                 <?php if ($message): ?>
                 <div class="alert alert-success">
                     <?php echo $message; ?>
@@ -147,7 +162,7 @@ $total_price = $product['price'] + $tax_amount;
                             </div>
                         </div>
                         <div class="col-7 col-xl-6 col-lg-12">
-                            <form action="add_to_product.php" method="POST" class="form">
+                            <form action="javascript:void(0)" method="POST" class="form" onsubmit="handleAddToCart(event)">
                                 <section class="prod-info">
                                     <h1 class="prod-info__heading">
                                         <?php echo htmlspecialchars($product['name']); ?>
@@ -319,6 +334,86 @@ $total_price = $product['price'] + $tax_amount;
         <footer id="footer" class="footer"></footer>
         <script>
             load("#footer", "./templates/footer.php");
+        </script>
+
+        <!-- Login Modal -->
+        <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+            <div style="background: white; padding: 40px; border-radius: 10px; text-align: center; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                <h2 style="margin-bottom: 20px; color: #333; font-size: 24px; font-weight: bold;">Vui lòng đăng nhập</h2>
+                <p style="margin-bottom: 30px; color: #666; font-size: 16px;">Bạn cần đăng nhập tài khoản để mua hàng</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="redirectToLogin()" style="background: #ed4337; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;">
+                        Đăng nhập
+                    </button>
+                    <button onclick="closeLoginModal()" style="background: #f0f0f0; color: #333; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;">
+                        Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function handleAddToCart(event) {
+                event.preventDefault();
+                
+                // Kiểm tra giá trị thực tế trong Console (F12)
+                var isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+                console.log("Trạng thái đăng nhập:", isLoggedIn);
+                console.log("Kiểm tra modal:", document.getElementById('loginModal'));
+                
+                if (!isLoggedIn) {
+                    var modal = document.getElementById('loginModal');
+                    if (modal) {
+                        console.log("Modal tìm thấy, hiển thị modal...");
+                        modal.style.display = 'flex';
+                    } else {
+                        console.error("Không tìm thấy ID loginModal trong HTML");
+                    }
+                    return false;
+                }
+                
+                console.log("User đã đăng nhập, submit form...");
+                
+                // Nếu đã đăng nhập, submit form
+                var form = event.target;
+                var formData = new FormData(form);
+                
+                fetch('add_to_product.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log("Phản hồi từ server:", data);
+                    // Redirect to checkout after successful addition
+                    window.location.href = 'checkout.php';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+
+            function closeLoginModal() {
+                var modal = document.getElementById('loginModal');
+                modal.style.display = 'none';
+            }
+
+            function redirectToLogin() {
+                window.location.href = './sign-in.php';
+            }
+
+            // Đóng modal khi click ngoài modal
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log("DOMContentLoaded triggered");
+                var modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.addEventListener('click', function(event) {
+                        if (event.target === this) {
+                            closeLoginModal();
+                        }
+                    });
+                }
+            });
         </script>
     </body>
 </html>

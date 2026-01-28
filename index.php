@@ -262,7 +262,7 @@
                             <div class="col">
                         <article class="product-card">
                             <div class="product-card__img-wrap">
-                                <a href="./product-detail.php">
+                                <a href="./product-detail.php?id='.$row['id'].'">
                                     <img src="'.$row['image_url'].'" alt="" class="product-card__thumb" />
                                 </a>
                                 <button class="like-btn product-card__like-btn">
@@ -271,7 +271,7 @@
                                 </button>
                             </div>
                             <h3 class="product-card__title">
-                                <a href="./product-detail.php">'.$row['name'].'</a>
+                                <a href="./product-detail.php?id='.$row['id'].'">'.$row['name'].'</a>
                             </h3>
                             <p class="product-card__brand">Lavazza</p>
                             <div class="product-card__row">
