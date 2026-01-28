@@ -333,6 +333,66 @@ $conn->close();
                     }
                 });
             });
+
+            // ===== CHỨC NĂNG TĂNG/GIẢM SỐ LƯỢNG SẢN PHẨM =====
+            
+            // Lấy tất cả các nút tăng/giảm số lượng
+            const qtyButtons = document.querySelectorAll('.js-qty-change');
+            console.log('✅ Tìm thấy ' + qtyButtons.length + ' nút tăng/giảm');
+            
+            // Gắn sự kiện click cho từng nút tăng/giảm
+            qtyButtons.forEach((button) => {
+                button.addEventListener('click', function() {
+                    // Lấy ID của sản phẩm trong giỏ hàng
+                    const cartItemId = this.getAttribute('data-id');
+                    // Lấy hành động (increase hoặc decrease)
+                    const action = this.getAttribute('data-action');
+                    
+                    console.log('👆 Click nút ' + action + ', cart ID: ' + cartItemId);
+                    
+                    // Gửi request đến server để cập nhật số lượng
+                    fetch('update_cart_quantity.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: parseInt(cartItemId),
+                            action: action
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('📥 Response từ server:', data);
+                        
+                        if (data.success) {
+                            // ✅ Cập nhật thành công từ database
+                            console.log('✅ Cập nhật số lượng thành công');
+                            
+                            // Cập nhật số lượng trên giao diện
+                            const qtyElement = document.getElementById('qty-' + cartItemId);
+                            if (qtyElement) {
+                                qtyElement.textContent = data.new_quantity;
+                                console.log('✏️ Cập nhật số lượng hiển thị: ' + data.new_quantity);
+                            }
+                            
+                            // Reload trang để cập nhật tổng tiền
+                            setTimeout(() => {
+                                location.reload();
+                            }, 500);
+                        } else {
+                            // ❌ Cập nhật thất bại
+                            console.error('❌ Lỗi từ server:', data.message);
+                            alert('❌ Lỗi: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        // ❌ Lỗi kết nối
+                        console.error('❌ Lỗi fetch:', error);
+                        alert('❌ Không thể kết nối với server!');
+                    });
+                });
+            });
         </script>
     </body>
 </html>
