@@ -1,3 +1,50 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+/* ===== XỬ LÝ BỎ YÊU THÍCH ===== */
+if (isset($_GET['remove_wishlist'])) {
+    $remove_id = (int)$_GET['remove_wishlist'];
+    if (!empty($_SESSION['wishlist'])) {
+        foreach ($_SESSION['wishlist'] as $key => $item) {
+            if ($item['id'] == $remove_id) {
+                unset($_SESSION['wishlist'][$key]);
+                break;
+            }
+        }
+        // reset index mảng
+        $_SESSION['wishlist'] = array_values($_SESSION['wishlist']);
+    }
+    header("Location: favourite.php");
+    exit;
+}
+$wishlist = $_SESSION['wishlist'] ?? [];
+if (!empty($wishlist)) {
+    $ids = array_column($wishlist, 'id');
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $types = str_repeat('i', count($ids));
+    $sql = "
+        SELECT id, brand
+        FROM products
+        WHERE id IN ($placeholders)
+    ";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, $types, ...$ids);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $brandMap = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $brandMap[$row['id']] = $row['brand'];
+    }
+    foreach ($wishlist as &$item) {
+        $item['brand'] = $brandMap[$item['id']] ?? '';
+    }
+    unset($item);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -62,8 +109,10 @@
                     <div class="row gy-xl-3">
                         <div class="col-12">
                             <div class="cart-info">
-                                <h1 class="cart-info__heading">Favourite List</h1>
-                                <p class="cart-info__desc">3 items</p>
+                                <h1 class="cart-info__heading">Danh sách sản phẩm yêu thích</h1>
+                                <p class="cart-info__desc">
+                                    <?= count($wishlist) ?> sản phẩm
+                                </p>
                                 <div class="cart-info__check-all">
                                     <label class="cart-info__checkbox">
                                         <input
@@ -74,246 +123,83 @@
                                     </label>
                                 </div>
                                 <div class="cart-info__list">
-                                    <!-- Cart item 1 -->
+                                    <?php if (empty($wishlist)): ?>
+                                        <p>Chưa có sản phẩm yêu thích</p>
+                                    <?php else: ?>
+                                    <?php foreach ($wishlist as $item): ?>
                                     <article class="cart-item">
                                         <label class="cart-info__checkbox">
-                                            <input
-                                                type="checkbox"
-                                                name="shipping-adress"
-                                                class="cart-info__checkbox-input"
-                                                checked
-                                            />
+                                            <input type="checkbox" class="cart-info__checkbox-input"/>
                                         </label>
-                                        <a href="./product-detail.php">
-                                            <img
-                                                src="./assets/img/product/item-1.png"
-                                                alt=""
-                                                class="cart-item__thumb"
-                                            />
-                                        </a>
-                                        <div class="cart-item__content">
-                                            <div class="cart-item__content-left">
-                                                <h3 class="cart-item__title">
-                                                    <a href="./product-detail.php">
-                                                        Coffee Beans - Espresso Arabica and Robusta Beans
-                                                    </a>
-                                                </h3>
-                                                <p class="cart-item__price-wrap">
-                                                    $47.00 | <span class="cart-item__status">In Stock</span>
-                                                </p>
-                                                <div class="cart-item__ctrl-wrap">
-                                                    <div class="cart-item__ctrl cart-item__ctrl--md-block">
-                                                        <div class="cart-item__input">
-                                                            LavAzza
-                                                            <img
-                                                                class="icon"
-                                                                src="./assets/icons/arrow-down-2.svg"
-                                                                alt=""
-                                                            />
-                                                        </div>
-                                                        <div class="cart-item__input">
-                                                            <button class="cart-item__input-btn">
-                                                                <img
-                                                                    class="icon"
-                                                                    src="./assets/icons/minus.svg"
-                                                                    alt=""
-                                                                />
-                                                            </button>
-                                                            <span>1</span>
-                                                            <button class="cart-item__input-btn">
-                                                                <img
-                                                                    class="icon"
-                                                                    src="./assets/icons/plus.svg"
-                                                                    alt=""
-                                                                />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="cart-item__ctrl">
-                                                        <button class="cart-item__ctrl-btn">
-                                                            <img src="./assets/icons/heart-2.svg" alt="" />
-                                                            Save
-                                                        </button>
-                                                        <button
-                                                            class="cart-item__ctrl-btn js-toggle"
-                                                            toggle-target="#delete-confirm"
-                                                        >
-                                                            <img src="./assets/icons/trash.svg" alt="" />
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="cart-item__content-right">
-                                                <p class="cart-item__total-price">$47.00</p>
-                                                <button class="cart-item__checkout-btn btn btn--primary btn--rounded">
-                                                    Check Out
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </article>
 
-                                    <!-- Cart item 2 -->
-                                    <article class="cart-item">
-                                        <label class="cart-info__checkbox">
-                                            <input
-                                                type="checkbox"
-                                                name="shipping-adress"
-                                                class="cart-info__checkbox-input"
-                                                checked
-                                            />
-                                        </label>
-                                        <a href="./product-detail.php">
+                                        <a href="./product-detail.php?id=<?= $item['id'] ?>">
                                             <img
-                                                src="./assets/img/product/item-2.png"
-                                                alt=""
+                                                src="<?= $item['image'] ?>"
                                                 class="cart-item__thumb"
                                             />
                                         </a>
-                                        <div class="cart-item__content">
-                                            <div class="cart-item__content-left">
-                                                <h3 class="cart-item__title">
-                                                    <a href="./product-detail.php">
-                                                        Lavazza Coffee Blends - Try the Italian Espresso
-                                                    </a>
-                                                </h3>
-                                                <p class="cart-item__price-wrap">
-                                                    $53.00 | <span class="cart-item__status">In Stock</span>
-                                                </p>
-                                                <div class="cart-item__ctrl-wrap">
-                                                    <div class="cart-item__ctrl cart-item__ctrl--md-block">
-                                                        <div class="cart-item__input">
-                                                            LavAzza
-                                                            <img
-                                                                class="icon"
-                                                                src="./assets/icons/arrow-down-2.svg"
-                                                                alt=""
-                                                            />
-                                                        </div>
-                                                        <div class="cart-item__input">
-                                                            <button class="cart-item__input-btn">
-                                                                <img
-                                                                    class="icon"
-                                                                    src="./assets/icons/minus.svg"
-                                                                    alt=""
-                                                                />
-                                                            </button>
-                                                            <span>1</span>
-                                                            <button class="cart-item__input-btn">
-                                                                <img
-                                                                    class="icon"
-                                                                    src="./assets/icons/plus.svg"
-                                                                    alt=""
-                                                                />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="cart-item__ctrl">
-                                                        <button class="cart-item__ctrl-btn">
-                                                            <img src="./assets/icons/heart-2.svg" alt="" />
-                                                            Save
-                                                        </button>
-                                                        <button
-                                                            class="cart-item__ctrl-btn js-toggle"
-                                                            toggle-target="#delete-confirm"
-                                                        >
-                                                            <img src="./assets/icons/trash.svg" alt="" />
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="cart-item__content-right">
-                                                <p class="cart-item__total-price">$106.00</p>
-                                                <button class="cart-item__checkout-btn btn btn--primary btn--rounded">
-                                                    Check Out
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </article>
 
-                                    <!-- Cart item 3 -->
-                                    <article class="cart-item">
-                                        <label class="cart-info__checkbox">
-                                            <input
-                                                type="checkbox"
-                                                name="shipping-adress"
-                                                class="cart-info__checkbox-input"
-                                            />
-                                        </label>
-                                        <a href="./product-detail.php">
-                                            <img
-                                                src="./assets/img/product/item-3.png"
-                                                alt=""
-                                                class="cart-item__thumb"
-                                            />
-                                        </a>
                                         <div class="cart-item__content">
                                             <div class="cart-item__content-left">
                                                 <h3 class="cart-item__title">
-                                                    <a href="./product-detail.php">
-                                                        Qualità Oro Mountain Grown - Espresso Coffee Beans
+                                                    <a href="./product-detail.php?id=<?= $item['id'] ?>">
+                                                        <?= htmlspecialchars($item['name']) ?>
                                                     </a>
                                                 </h3>
                                                 <p class="cart-item__price-wrap">
-                                                    $38.65 | <span class="cart-item__status">In Stock</span>
+                                                    <?= number_format($item['price'], 0, ',', '.') ?> ₫
+                                                    <span class="cart-item__status">In Stock</span>
                                                 </p>
+                                                <!-- GIỮ NGUYÊN CTRL -->
                                                 <div class="cart-item__ctrl-wrap">
                                                     <div class="cart-item__ctrl cart-item__ctrl--md-block">
                                                         <div class="cart-item__input">
-                                                            LavAzza
-                                                            <img
-                                                                class="icon"
-                                                                src="./assets/icons/arrow-down-2.svg"
-                                                                alt=""
-                                                            />
+                                                            <?= htmlspecialchars($item['brand']) ?>
                                                         </div>
+
                                                         <div class="cart-item__input">
                                                             <button class="cart-item__input-btn">
-                                                                <img
-                                                                    class="icon"
-                                                                    src="./assets/icons/minus.svg"
-                                                                    alt=""
-                                                                />
+                                                                <img class="icon" src="./assets/icons/minus.svg" />
                                                             </button>
                                                             <span>1</span>
                                                             <button class="cart-item__input-btn">
-                                                                <img
-                                                                    class="icon"
-                                                                    src="./assets/icons/plus.svg"
-                                                                    alt=""
-                                                                />
+                                                                <img class="icon" src="./assets/icons/plus.svg" />
                                                             </button>
                                                         </div>
                                                     </div>
                                                     <div class="cart-item__ctrl">
-                                                        <button class="cart-item__ctrl-btn">
-                                                            <img src="./assets/icons/heart-2.svg" alt="" />
-                                                            Save
-                                                        </button>
-                                                        <button
-                                                            class="cart-item__ctrl-btn js-toggle"
-                                                            toggle-target="#delete-confirm"
+                                                        <a
+                                                            href="?remove_wishlist=<?= $item['id'] ?>"
+                                                            class="cart-item__ctrl-btn"
+                                                            title="Bỏ khỏi yêu thích"
                                                         >
-                                                            <img src="./assets/icons/trash.svg" alt="" />
-                                                            Delete
-                                                        </button>
+                                                            <img
+                                                                src="./assets/icons/heart-red.svg"
+                                                                class="heart-icon"
+                                                                alt="Yêu thích"
+                                                            />
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="cart-item__content-right">
-                                                <p class="cart-item__total-price">$38.65</p>
+                                                <p class="cart-item__total-price">
+                                                    <?= number_format($item['price'], 0, ',', '.') ?> ₫
+                                                </p>
+                                                <!-- CHECK OUT GIỮ NGUYÊN -->
                                                 <button class="cart-item__checkout-btn btn btn--primary btn--rounded">
                                                     Check Out
                                                 </button>
                                             </div>
                                         </div>
                                     </article>
+                                    <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="cart-info__bottom">
                                     <div class="cart-info__row cart-info__row-md--block">
                                         <div class="cart-info__continue">
-                                            <a href="./" class="cart-info__continue-link">
+                                            <a href="./index-logined.php" class="cart-info__continue-link">
                                                 <img
                                                     class="cart-info__continue-icon icon"
                                                     src="./assets/icons/arrow-down-2.svg"
@@ -361,5 +247,65 @@
             </div>
             <div class="modal__overlay js-toggle" toggle-target="#delete-confirm"></div>
         </div>
+        <!-- tính tiền với số lượng -->
+        <script>
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".cart-item__input-btn");
+        if (!btn) return;
+        const cartItem = btn.closest(".cart-item");
+        const qtySpan = btn.parentElement.querySelector("span");
+        if (!qtySpan) return;
+        let qty = parseInt(qtySpan.textContent);
+        const isPlus = btn.querySelector('img[src*="plus"]');
+        const isMinus = btn.querySelector('img[src*="minus"]');
+        if (isPlus) qty++;
+        if (isMinus && qty > 1) qty--;
+        qtySpan.textContent = qty;
+        // cập nhật tổng tiền bên phải
+        const priceText = cartItem
+            .querySelector(".cart-item__price-wrap")
+            .innerText.replace(/[^\d]/g, "");
+        const price = parseInt(priceText);
+        const total = price * qty;
+        cartItem.querySelector(".cart-item__total-price").textContent = total.toLocaleString("vi-VN") + " ₫";
+    });
+    </script>
+    <script>
+    document.addEventListener("change", function (e) {
+        // checkbox chọn tất cả
+        if (e.target.closest(".cart-info__check-all input")) {
+            const checked = e.target.checked;
+            document
+                .querySelectorAll(".cart-item .cart-info__checkbox-input")
+                .forEach(cb => cb.checked = checked);
+        }
+    });
+    </script>
+    <!--yêu thích -->
+   <script>
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".cart-item__ctrl-btn");
+        if (!btn) return;
+        // Chỉ xử lý nút có icon tim
+        const heartImg = btn.querySelector("img[src*='heart']");
+        if (!heartImg) return;
+        const cartItem = btn.closest(".cart-item");
+        if (!cartItem) return;
+        // hiệu ứng rung (đã có trong main.css)
+        heartImg.classList.add("shake");
+        setTimeout(() => heartImg.classList.remove("shake"), 400);
+        // === XOÁ KHỎI YÊU THÍCH ===
+        const id = btn.href?.split("remove_wishlist=")[1];
+        if (!id) return;
+        fetch("?remove_wishlist=" + id)
+            .then(() => {
+                cartItem.remove();
+                // cập nhật số lượng
+                const count = document.querySelectorAll(".cart-item").length;
+                document.querySelector(".cart-info__desc").textContent =
+                    count + " sản phẩm";
+            });
+    });
+    </script>
     </body>
 </html>
