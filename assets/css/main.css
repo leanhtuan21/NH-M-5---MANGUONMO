@@ -4605,5 +4605,15 @@ html {
   justify-content: flex-end;
   margin-top: 30px;
 }
+/* Trái tim */
+@keyframes shake {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.2); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+.shake {
+    animation: shake 0.4s ease;
+}
 
 /*# sourceMappingURL=main.css.map */
