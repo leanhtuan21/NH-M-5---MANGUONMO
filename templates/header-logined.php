@@ -1868,10 +1868,10 @@ require_once __DIR__ . '/../db_connect.php';
                                 <a href="#!" class="user-menu__link">Settings</a>
                             </li>
                             <li class="user-menu__separate">
-                                <a href="./sign-in.php" class="user-menu__link">Logout</a>
+                                <a href="./logout.php" class="user-menu__link">Logout</a>
                             </li>
                         </ul>
-                    </div>
+                    </div>s
                 </div>
             </div>
         </div>
