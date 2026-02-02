@@ -2,11 +2,25 @@
 session_start();
 require_once 'db_connect.php';
 
-/* Chưa đăng nhập thì đá về login */
+//Xử lý logout
 if (!isset($_SESSION['user_id'])) {
     header("Location: sign-in.php");
     exit;
 }
+// Hiển thị thông báo nếu có tại index-logined.php
+if (isset($_SESSION['message'])) {
+    $msg = addslashes($_SESSION['message']);
+    echo "<script>
+        if (confirm('$msg')) {
+            // OK: Tiếp tục sử dụng
+        } else {
+            // Cancel: Gọi file logout để hủy session rồi mới về index
+            window.location.href = 'logout.php?redirect=index.php';
+        }
+    </script>";
+    unset($_SESSION['message']);
+}
+
 // Lấy dữ liệu từ URL và làm sạch khoảng trắng thừa ở hai đầu
 $keyword      = trim($_GET['keyword'] ?? '');
 $min_price    = $_GET['min_price'] ?? '';
@@ -28,7 +42,7 @@ $types = "";
 
 // 1. XỬ LÝ TÌM KIẾM (Loại bỏ hoàn toàn khoảng trắng để so khớp linh hoạt)
 if ($isSearching) {
-    // REPLACE(p.name, ' ', '') giúp "Trung Nguyên" thành "TrungNguyên" trong DB khi so sánh
+    // REPLACE(p.name, ' ', '') 
     $sql .= " AND (REPLACE(p.name, ' ', '') LIKE ? OR REPLACE(p.brand, ' ', '') LIKE ?)";
     
     // Loại bỏ khoảng trắng của từ khóa người dùng nhập vào
@@ -338,28 +352,6 @@ if ($result->num_rows > 0) {
                     searchBox.querySelector(".search-input").focus();
                 }
             });
-            // 1. Khi trang tải xong, đẩy một trạng thái "giả" vào lịch sử duyệt web.
-    // Điều này khiến trình duyệt nghĩ rằng có một trang trước đó để quay lại,
-    // nhưng thực chất vẫn là URL hiện tại.
-    window.history.pushState(null, null, window.location.href);
-
-// 2. Lắng nghe sự kiện "popstate" (Sự kiện này chạy khi bấm nút Back hoặc Forward)
-window.addEventListener('popstate', function (event) {
-    
-    // Nội dung thông báo
-    const message = "Bạn đang đăng nhập. Bạn có muốn ĐĂNG XUẤT để quay về trang đăng nhập không?";
-
-    // Hiển thị hộp thoại xác nhận (OK / Cancel)
-    if (confirm(message)) {
-        // Nếu chọn OK (Đồng ý thoát):
-        // Chuyển hướng đến file logout.php để xóa session an toàn
-        window.location.href = "logout.php"; 
-    } else {
-        // Nếu chọn Cancel (Ở lại):
-        // Ta lại đẩy tiếp một trạng thái vào lịch sử để "gài" lại bẫy cho lần bấm sau
-        window.history.pushState(null, null, window.location.href);
-    }
-});
         </script>
     </body>
 </html>
