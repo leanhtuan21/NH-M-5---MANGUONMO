@@ -8,22 +8,28 @@ if (!isset($_SESSION['user_id'])) {
 /* ===== XỬ LÝ BỎ YÊU THÍCH ===== */
 if (isset($_GET['remove_wishlist'])) {
     $remove_id = (int)$_GET['remove_wishlist'];
-    if (!empty($_SESSION['wishlist'])) {
-        foreach ($_SESSION['wishlist'] as $key => $item) {
-            if ($item['id'] == $remove_id) {
-                unset($_SESSION['wishlist'][$key]);
-                break;
-            }
-        }
-        // reset index mảng
-        $_SESSION['wishlist'] = array_values($_SESSION['wishlist']);
-    }
+    $uid = $_SESSION['user_id'];
+if (!empty($_SESSION['wishlist'][$uid])) {
+    unset($_SESSION['wishlist'][$uid][$remove_id]);
+}
+
     header("Location: favourite.php");
     exit;
 }
-$wishlist = $_SESSION['wishlist'] ?? [];
+$uid = $_SESSION['user_id'];
+
+/* ==== FIX WISHLIST CŨ SAI KIỂU ==== */
+if (isset($_SESSION['wishlist'][$uid])) {
+    foreach ($_SESSION['wishlist'][$uid] as $key => $val) {
+        // nếu item KHÔNG phải mảng → xoá
+        if (!is_array($val)) {
+            unset($_SESSION['wishlist'][$uid][$key]);
+        }
+    }
+}
+$wishlist = $_SESSION['wishlist'][$uid] ?? [];
 if (!empty($wishlist)) {
-    $ids = array_column($wishlist, 'id');
+    $ids = array_keys($wishlist);
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
     $types = str_repeat('i', count($ids));
     $sql = "
@@ -39,9 +45,11 @@ if (!empty($wishlist)) {
     while ($row = mysqli_fetch_assoc($result)) {
         $brandMap[$row['id']] = $row['brand'];
     }
-    foreach ($wishlist as &$item) {
-        $item['brand'] = $brandMap[$item['id']] ?? '';
+    foreach ($wishlist as $pid => $item) {
+    if (is_array($item)) {
+        $wishlist[$pid]['brand'] = $brandMap[$pid] ?? '';
     }
+}
     unset($item);
 }
 ?>
@@ -93,7 +101,7 @@ if (!empty($wishlist)) {
                 <div class="checkout-container">
                     <ul class="breadcrumbs checkout-page__breadcrumbs">
                         <li>
-                            <a href="./" class="breadcrumbs__link">
+                            <a href="./index-logined.php" class="breadcrumbs__link">
                                 Home
                                 <img src="./assets/icons/arrow-right.svg" alt="" />
                             </a>
