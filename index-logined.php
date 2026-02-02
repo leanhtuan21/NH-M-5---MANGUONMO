@@ -1,3 +1,21 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+// Xử lý logout
+if (!isset($_SESSION['user_id'])) {
+    header("Location: sign-in.php");
+    exit;
+}
+
+// Logout có kiểm soát
+if (isset($_SESSION['force_logout'])) {
+    unset($_SESSION['force_logout']);
+    header("Location: logout.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
