@@ -5,6 +5,12 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 /* === KẾT NỐI VỚI FILE CSDL === */
 require_once __DIR__ . "/db_connect.php";
 
+// Nếu ĐÃ login thì mới đá về index
+if (isset($_SESSION['user_id'])) {
+    header("Location: index-logined.php");
+    exit;
+}
+
 /* === LẤY EMAIL ĐÃ GHI NHỚ (ĐỂ ĐIỀN VÀO INPUT === */
 if (isset($_COOKIE['remember_email'])) {
     $remembered_email = $_COOKIE['remember_email'];
