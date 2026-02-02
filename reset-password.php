@@ -5,69 +5,80 @@ require_once __DIR__ . "/db_connect.php";
 $message = "";
 $message_type = "";
 
-/* ===== EMAIL LẤY TỪ URL ===== */
-$email = trim($_GET['email'] ?? '');
+// Giới hạn
+$max_attempts = 3;
+$lock_time = 30;
 
-/* ===== I. CHẶN TRUY CẬP TRỰC TIẾP ===== */
-if ($email !== "") {
-    $check = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ?");
-    mysqli_stmt_bind_param($check, "s", $email);
-    mysqli_stmt_execute($check);
-    $rs = mysqli_stmt_get_result($check);
-
-    if (!mysqli_fetch_assoc($rs)) {
-        header("Location: reset-password-emailed.php");
-        exit;
-    }
-    mysqli_stmt_close($check);
-} else {
+/* ===== CHẶN TRUY CẬP TRỰC TIẾP ===== */
+if (!isset($_SESSION['reset_email']) || $_SESSION['reset_email'] === "") {
     header("Location: reset-password-emailed.php");
     exit;
 }
 
-/* ===== II. XỬ LÝ POST ===== */
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+$email = $_SESSION['reset_email'];
 
-    $password = trim($_POST["password"] ?? "");
-    $confirm_password = trim($_POST["confirm_password"] ?? "");
+/* ===== XỬ LÝ POST ===== */
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['verify_owner'])) {
 
-    if ($password === "" || $confirm_password === "") {
-        $message = "Vui lòng nhập đầy đủ mật khẩu.";
+    // Nếu đang bị khóa
+    if (isset($_SESSION['lock_until']) && time() < $_SESSION['lock_until']) {
+
+        $remaining = $_SESSION['lock_until'] - time();
+        $message = "Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau $remaining giây.";
         $message_type = "error";
-    }
-    elseif (
-        strlen($password) < 6 ||
-        !preg_match('/[A-Z]/', $password) ||
-        !preg_match('/[a-z]/', $password) ||
-        !preg_match('/[0-9]/', $password) ||
-        !preg_match('/[\W]/', $password)
-    ) {
-        $message = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.";
-        $message_type = "error";
-    }
-    elseif ($password !== $confirm_password) {
-        $message = "Xác nhận mật khẩu không khớp.";
-        $message_type = "error";
-    }
-    else {
-        $hashed_password = md5($password);
 
-        $stmt = mysqli_prepare(
-            $conn,
-            "UPDATE users SET password = ? WHERE email = ?"
-        );
-        mysqli_stmt_bind_param($stmt, "ss", $hashed_password, $email);
-        mysqli_stmt_execute($stmt);
+    } else {
 
-        if (mysqli_stmt_errno($stmt) === 0 && mysqli_stmt_affected_rows($stmt) > 0) {
-            header("Location: sign-in.php");
-            exit;
-        } else {
-            $message = "Không thể cập nhật mật khẩu. Vui lòng thử lại.";
+        $ans1 = trim($_POST['security_answer_1'] ?? '');
+        $ans2 = trim($_POST['security_answer_2'] ?? '');
+
+        if ($ans1 === "" || $ans2 === "") {
+
+            $message = "Vui lòng trả lời đầy đủ các câu hỏi xác minh.";
             $message_type = "error";
-        }
 
-        mysqli_stmt_close($stmt);
+        } else {
+
+            $stmt = mysqli_prepare(
+                $conn,
+                "SELECT id FROM users
+                 WHERE email = ?
+                 AND security_answer_1 = ?
+                 AND security_answer_2 = ?
+                 LIMIT 1"
+            );
+            mysqli_stmt_bind_param($stmt, "sss", $email, $ans1, $ans2);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+
+            if (mysqli_fetch_assoc($result)) {
+
+                // ĐÚNG → cho sang new-password
+                unset($_SESSION['verify_attempts'], $_SESSION['lock_until']);
+                $_SESSION['allow_new_password'] = true;
+
+                header("Location: new-password.php");
+                exit;
+
+            } else {
+
+                // SAI → tăng số lần thử
+                $_SESSION['verify_attempts'] = ($_SESSION['verify_attempts'] ?? 0) + 1;
+
+                if ($_SESSION['verify_attempts'] >= $max_attempts) {
+                    $_SESSION['lock_until'] = time() + $lock_time;
+                    $remaining = $lock_time;
+                    $message = "Sai quá $max_attempts lần. Bạn bị khóa trong $lock_time giây.";
+                } else {
+                    $remaining_tries = $max_attempts - $_SESSION['verify_attempts'];
+                    $message = "Thông tin xác minh không chính xác. Còn $remaining_tries lần thử.";
+                }
+
+                $message_type = "error";
+            }
+
+            mysqli_stmt_close($stmt);
+        }
     }
 }
 ?>
@@ -76,121 +87,76 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đặt lại mật khẩu | Grocery Mart</title>
+    <title>Xác minh tài khoản | Grocery Mart</title>
 
     <link rel="stylesheet" href="./assets/fonts/stylesheet.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
     <script src="./assets/js/scripts.js"></script>
 </head>
 <body>
+
 <main class="auth">
     <div class="auth__intro d-md-none">
-        <img src="./assets/img/auth/reset-password.png" alt="" class="auth__intro-img" />
+        <img src="./assets/img/auth/forgot-password.png" class="auth__intro-img" />
     </div>
 
     <div class="auth__content">
         <div class="auth__content-inner">
             <a href="./" class="logo">
-                <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img" />
+                <img src="./assets/icons/logo.svg" class="logo__img" />
                 <h2 class="logo__title">Grocerymart</h2>
             </a>
 
-            <h1 class="auth__heading">Đặt lại mật khẩu</h1>
+            <h1 class="auth__heading">Xác minh tài khoản</h1>
 
             <p class="auth__desc">
-                Vui lòng tạo mật khẩu mới cho tài khoản của bạn.
-                Mật khẩu mới sẽ được sử dụng cho các lần đăng nhập tiếp theo.
+                Trả lời câu hỏi bảo mật để xác nhận bạn là chủ tài khoản.
             </p>
 
-            <?php if (!empty($message)): ?>
+            <?php if ($message !== ""): ?>
                 <div
-                    style="
-                        margin: 16px 0 20px;
-                        padding: 12px 16px;
-                        border-radius: 8px;
-                        text-align: center;
-                        font-size: 14px;
-                        line-height: 1.5;
-                        border: 1px solid <?= $message_type === 'error' ? '#f5c2c7' : '#abefc6' ?>;
-                        background-color: <?= $message_type === 'error' ? '#fdecea' : '#ecfdf3' ?>;
-                        color: <?= $message_type === 'error' ? '#b42318' : '#027a48' ?>;
-                    "
-                >
+                    style="margin:16px 0;padding:12px 16px;border-radius:8px;text-align:center;
+                    border:1px solid <?= $message_type === 'error' ? '#f5c2c7' : '#abefc6' ?>;
+                    background-color:<?= $message_type === 'error' ? '#fdecea' : '#ecfdf3' ?>;
+                    color:<?= $message_type === 'error' ? '#b42318' : '#027a47' ?>;">
                     <?= htmlspecialchars($message) ?>
                 </div>
             <?php endif; ?>
 
-
-            <form action="" method="POST" class="form auth__form">
-                <div class="form__group">
-                    <div class="form__text-input">
-                        <input
-                            type="email"
-                            value="<?= htmlspecialchars($email) ?>"
-                            placeholder="Email tài khoản"
-                            class="form__input"
-                            readonly
-                        />
-                        <img src="./assets/icons/message.svg" class="form__input-icon" />
-                    </div>
-                </div>
+            <form method="POST" class="form auth__form">
+                <input type="hidden" name="verify_owner" value="1">
 
                 <div class="form__group">
                     <div class="form__text-input">
                         <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            placeholder="Mật khẩu mới"
+                            type="text"
+                            name="security_answer_1"
+                            placeholder="Sở thích của bạn là gì?"
                             class="form__input"
                             required
                         />
-                        <img
-                            src="./assets/icons/lock.svg"
-                            class="form__input-icon js-toggle-password"
-                            data-target="password"
-                            style="cursor: pointer;"
-                        />
                     </div>
                 </div>
 
                 <div class="form__group">
                     <div class="form__text-input">
                         <input
-                            type="password"
-                            name="confirm_password"
-                            id="confirm_password"
-                            placeholder="Xác nhận mật khẩu mới"
+                            type="text"
+                            name="security_answer_2"
+                            placeholder="Năng khiếu của bạn là gì?"
                             class="form__input"
                             required
                         />
-                        <img
-                            src="./assets/icons/lock.svg"
-                            class="form__input-icon js-toggle-password"
-                            data-target="confirm_password"
-                            style="cursor: pointer;"
-                        />
                     </div>
                 </div>
-
-                <!-- Ẩn hiện mật khẩu -->
-                <script>
-                    document.querySelectorAll('.js-toggle-password').forEach(icon => {
-                        icon.addEventListener('click', () => {
-                            const input = document.getElementById(icon.dataset.target);
-                            if (!input) return;
-                            input.type = input.type === 'password' ? 'text' : 'password';
-                        });
-                    });
-                </script>
 
                 <div class="form__group auth__btn-group">
                     <button
                         type="submit"
                         class="btn btn--primary auth__btn"
-                        onclick="this.disabled=true; this.form.submit();"
+                        id="btn-verify"
                     >
-                        Cập nhật mật khẩu
+                        Xác minh chính chủ
                     </button>
                 </div>
             </form>
@@ -204,8 +170,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
 </main>
 
+<?php if (isset($remaining) && $remaining > 0): ?>
 <script>
-    window.dispatchEvent(new Event("template-loaded"));
+let seconds = <?= (int)$remaining ?>;
+let desc = document.querySelector('.auth__desc');
+let btn = document.getElementById('btn-verify');
+if (btn) btn.disabled = true;
+
+let timer = setInterval(() => {
+    seconds--;
+    if (seconds <= 0) {
+        clearInterval(timer);
+        if (desc) desc.innerText = "Bạn có thể thử lại ngay bây giờ.";
+        if (btn) btn.disabled = false;
+    } else {
+        if (desc) desc.innerText =
+            "Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau " + seconds + " giây.";
+    }
+}, 1000);
 </script>
+<?php endif; ?>
+
+<script>window.dispatchEvent(new Event("template-loaded"));</script>
 </body>
 </html>
