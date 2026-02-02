@@ -95,14 +95,14 @@ if ($result->num_rows > 0) {
 }
 /* ===XỬ LÝ AJAX WISHLIST=== */
 if (isset($_POST['ajax_wishlist'])) {
-    if (!isset($_SESSION['wishlist'])) {
-        $_SESSION['wishlist'] = [];
+    if (!isset($_SESSION['wishlist'][$_SESSION['user_id']])) {
+        $_SESSION['wishlist'][$_SESSION['user_id']] = [];
     }
     $product_id = (int)($_POST['product_id'] ?? 0);
     $action = $_POST['action'] ?? '';
     if ($product_id > 0) {
         // ADD
-        if ($action === 'add' && !isset($_SESSION['wishlist'][$product_id])) {
+        if ($action === 'add' && !isset($_SESSION['wishlist'][$_SESSION['user_id']][$product_id])) {
             $stmt = mysqli_prepare($conn, "
                 SELECT p.id, p.name, p.price, p.tax_percent, pi.image_url
                 FROM products p
@@ -116,27 +116,28 @@ if (isset($_POST['ajax_wishlist'])) {
 
             if ($p) {
                 $price = $p['price'] * (1 + $p['tax_percent'] / 100);
-                $_SESSION['wishlist'][$product_id] = [
-                    'id'    => $p['id'],
-                    'name'  => $p['name'],
-                    'price' => $price,
-                    'image' => $p['image_url'] ?? 'default-product.png'
-                ];
+                $_SESSION['wishlist'][$_SESSION['user_id']][$product_id] = [
+    'id'    => $p['id'],
+    'name'  => $p['name'],
+    'price' => $price,
+    'image' => $p['image_url'] ?? 'default-product.png'
+];
             }
         }
 
         // REMOVE
         if ($action === 'remove') {
-            unset($_SESSION['wishlist'][$product_id]);
+            unset($_SESSION['wishlist'][$_SESSION['user_id']][$product_id]);
         }
     }
-    echo json_encode([
-    'status' => 'ok',
-    'count'  => count($_SESSION['wishlist']),
-    'items'  => array_values($_SESSION['wishlist']),
-    'liked'  => isset($_SESSION['wishlist'][$product_id])
-]);
+        echo json_encode([
+        'status' => 'ok',
+        'count'  => count($_SESSION['wishlist'][$_SESSION['user_id']]),
+        'items'  => array_values($_SESSION['wishlist'][$_SESSION['user_id']]),
+        'liked'  => isset($_SESSION['wishlist'][$_SESSION['user_id']][$product_id])
+    ]);
 exit;
+
 }
 ?>
 <!DOCTYPE html>
@@ -332,7 +333,7 @@ exit;
                                     <a href="./product-detail.php?id=<?php echo $row['id']; ?>">
                                         <img src="<?php echo $row['image']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-card__thumb" />
                                     </a>
-                                    <button type="button" class="like-btn product-card__like-btn <?= isset($_SESSION['wishlist'][$row['id']]) ? 'like-btn--liked' : '' ?>" data-product-id="<?= $row['id'] ?>" >
+                                    <button type="button" class="like-btn product-card__like-btn <?= isset($_SESSION['wishlist'][$_SESSION['user_id']][$row['id']]) ? 'like-btn--liked' : '' ?>" data-product-id="<?= $row['id'] ?>" >
                                         <img
                                             src="./assets/icons/heart.svg"
                                             alt=""
