@@ -8,6 +8,14 @@ $max_price    = $_GET['max_price'] ?? '';
 $weight       = $_GET['weight'] ?? '';
 $brand_filter = trim($_GET['brand_filter'] ?? '');
 
+/* Kiểm tra trạng thái đăng nhập */
+if (isset($_SESSION['user_id']) && (!isset($_SESSION['is_logged_out']) || $_SESSION['is_logged_out'] === false)) {
+    // Người dùng đã đăng nhập và chưa đăng xuất
+    $_SESSION['message'] = "Bạn muốn tiếp tục sử dụng tài khoản này không?";
+    header("Location: index-logined.php");
+    exit;
+}
+
 // Flags kiểm tra trạng thái
 $isSearching = !empty($keyword);
 $isFiltering = (!empty($min_price) || !empty($max_price) || !empty($weight) || !empty($brand_filter));
@@ -22,7 +30,7 @@ $types = "";
 
 // 1. XỬ LÝ TÌM KIẾM (Loại bỏ hoàn toàn khoảng trắng để so khớp linh hoạt)
 if ($isSearching) {
-    // REPLACE(p.name, ' ', '') giúp "Trung Nguyên" thành "TrungNguyên" trong DB khi so sánh
+    // REPLACE(p.name, ' ', '') 
     $sql .= " AND (REPLACE(p.name, ' ', '') LIKE ? OR REPLACE(p.brand, ' ', '') LIKE ?)";
     
     // Loại bỏ khoảng trắng của từ khóa người dùng nhập vào
@@ -278,9 +286,6 @@ if ($result->num_rows > 0) {
                                     <a href="./product-detail.php?id=<?php echo $row['id']; ?>">
                                         <img src="./assets/img/product/<?php echo $row['image']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-card__thumb" />
                                     </a>
-                                    <button class="like-btn product-card__like-btn">
-                                        <img src="./assets/icons/heart.svg" alt="" class="like-btn__icon icon" />
-                                    </button>
                                 </div>
                                 
                                 <h3 class="product-card__title">
