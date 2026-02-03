@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../db_connect.php';
     //ẢNH ĐẠI DIỆN 
     $email = $_SESSION['email'] ?? null;
-
     $avatar = 'avatar-3.png';
     $user_name = 'User';
 
@@ -38,7 +37,7 @@ require_once __DIR__ . '/../db_connect.php';
         </button>
 
         <!-- Logo -->
-        <a href="./" class="logo top-bar__logo">
+        <a href="index-logined.php" class="logo top-bar__logo">
             <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img top-bar__logo-img" />
             <h1 class="logo__title top-bar__logo-title">Coffee Shop</h1>
         </a>
@@ -95,7 +94,7 @@ require_once __DIR__ . '/../db_connect.php';
                                                     <!-- Sub menu for "Loại Coffee" -->
                                                     <div class="sub-menu">
                                                         <div class="sub-menu__column">
-                                                            <!-- Menu column 1 -->
+                                                            <!-- Menu column 1 -->/
                                                             <div class="menu-column">
                                                                 <div class="menu-column__icon">
                                                                     <img
@@ -1871,7 +1870,7 @@ require_once __DIR__ . '/../db_connect.php';
                                 <a href="./logout.php" class="user-menu__link">Logout</a>
                             </li>
                         </ul>
-                    </div>s
+                    </div>
                 </div>
             </div>
         </div>
