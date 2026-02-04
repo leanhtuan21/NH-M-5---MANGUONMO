@@ -1,60 +1,86 @@
 <?php
 session_start();
 require_once 'db_connect.php';
+/* === AJAX WISHLIST (CSDL) === */
+if (isset($_POST['ajax_wishlist'])) {
+    require_once 'db_connect.php';
+    header('Content-Type: application/json');
+
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['status' => 'not_login']);
+        exit;
+    }
+
+    $uid = (int)$_SESSION['user_id'];
+    $product_id = (int)($_POST['product_id'] ?? 0);
+    $action = $_POST['action'] ?? '';
+
+    if ($product_id <= 0) {
+        echo json_encode(['status' => 'invalid']);
+        exit;
+    }
+
+    if ($action === 'add') {
+        $stmt = mysqli_prepare($conn,
+            "INSERT IGNORE INTO wishlists (user_id, product_id) VALUES (?, ?)"
+        );
+        mysqli_stmt_bind_param($stmt, "ii", $uid, $product_id);
+        mysqli_stmt_execute($stmt);
+    }
+
+    if ($action === 'remove') {
+        $stmt = mysqli_prepare($conn,
+            "DELETE FROM wishlists WHERE user_id = ? AND product_id = ?"
+        );
+        mysqli_stmt_bind_param($stmt, "ii", $uid, $product_id);
+        mysqli_stmt_execute($stmt);
+    }
+
+    /* kiểm tra lại trạng thái thật trong DB */
+    $check = mysqli_prepare($conn,
+        "SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ? LIMIT 1"
+    );
+    mysqli_stmt_bind_param($check, "ii", $uid, $product_id);
+    mysqli_stmt_execute($check);
+    mysqli_stmt_store_result($check);
+
+    $liked = mysqli_stmt_num_rows($check) > 0;
+
+    /* đếm tổng wishlist */
+    $countRes = mysqli_query($conn,
+        "SELECT COUNT(*) AS total FROM wishlists WHERE user_id = $uid"
+    );
+    $count = mysqli_fetch_assoc($countRes)['total'];
+
+    echo json_encode([
+        'status' => 'ok',
+        'liked'  => $liked,
+        'count'  => $count
+    ]);
+    exit;
+}
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
-}
-/* ===XỬ LÝ AJAX WISHLIST=== */
-$uid = $_SESSION['user_id'];
-if (isset($_POST['ajax_wishlist'])) {
-    if (!isset($_SESSION['wishlist'][$uid])) {
-        $_SESSION['wishlist'][$uid] = [];
-    }
-    $product_id = (int)($_POST['product_id'] ?? 0);
-    $action = $_POST['action'] ?? '';
-    if ($product_id > 0) {
-        // ADD
-        if ($action === 'add' && !isset($_SESSION['wishlist'][$uid][$product_id])) {
-            $stmt = mysqli_prepare($conn, "
-                SELECT p.id, p.name, p.price, p.tax_percent, pi.image_url
-                FROM products p
-                LEFT JOIN product_images pi 
-                    ON p.id = pi.product_id AND pi.is_main = 1
-                WHERE p.id = ?
-            ");
-            mysqli_stmt_bind_param($stmt, "i", $product_id);
-            mysqli_stmt_execute($stmt);
-            $p = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
-
-            if ($p) {
-                $price = $p['price'] * (1 + $p['tax_percent'] / 100);
-                $_SESSION['wishlist'][$uid][$product_id] = [
-                    'id'    => $p['id'],
-                    'name'  => $p['name'],
-                    'price' => $price,
-                    'image' => $p['image_url'] ?? 'default-product.png'
-                ];
-            }
-        }
-
-        // REMOVE
-        if ($action === 'remove') {
-            unset($_SESSION['wishlist'][$uid][$product_id]);
-        }
-    }
-    echo json_encode([
-    'status' => 'ok',
-    'count'  => count($_SESSION['wishlist'][$uid]),
-    'items'  => array_values($_SESSION['wishlist'][$uid]),
-    'liked'  => isset($_SESSION['wishlist'][$uid][$product_id])
-]);
-exit;
 }
 if (!isset($_GET['id'])) {
     die('Thiếu ID sản phẩm');
 }
 $product_id = (int) $_GET['id'];
+$uid = $_SESSION['user_id'];
+ //kiểm tra nút đã thích chưa
+$isLiked = false;
+$check = mysqli_prepare($conn,
+    "SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ? LIMIT 1"
+);
+mysqli_stmt_bind_param($check, "ii", $uid, $product_id);
+mysqli_stmt_execute($check);
+mysqli_stmt_store_result($check);
+
+if (mysqli_stmt_num_rows($check) > 0) {
+    $isLiked = true;
+}
 /* Lấy thông tin sản phẩm */
 $sql = "
     SELECT 
@@ -349,7 +375,10 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                                         >
                                                             Add to cart
                                                         </button>
-                                                        <button type="button" class="like-btn <?= isset($_SESSION['wishlist'][$_SESSION['user_id']][$product['id']]) ? 'like-btn--liked' : '' ?>"data-product-id="<?= $product['id'] ?>">
+                                                        <button type="button"
+    class="like-btn <?= $isLiked ? 'like-btn--liked' : '' ?>"
+    data-product-id="<?= $product['id'] ?>">
+
                                                             <img
                                                                 src="./assets/icons/heart.svg"
                                                                 alt=""
@@ -562,7 +591,7 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                                             </a>
 
                                                             <button
-                                                                class="like-btn product-card__like-btn <?= isset($_SESSION['wishlist'][$rp['id']]) ? 'like-btn--liked' : '' ?>"
+                                                                class="like-btn product-card__like-btn"
                                                                 data-product-id="<?= $rp['id'] ?>"
                                                             >
                                                                 <img src="./assets/icons/heart.svg" class="like-btn__icon icon" />
@@ -643,51 +672,37 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
     <script>
     function initWishlist() {
         document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
-            btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                const productId = this.dataset.productId;
-                const liked = this.classList.toggle('like-btn--liked');
-                const action = liked ? 'add' : 'remove';
+            const productId = this.dataset.productId;
+            const isLikedNow = this.classList.contains('like-btn--liked');
+            const action = isLikedNow ? 'remove' : 'add';
 
-                const countEl = document.getElementById('wishlistCount');
-                const list = document.querySelector('.act-dropdown__list');
+            fetch('product-detail.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
+            })
+            .then(res => res.json())
+            .then(data => {
+            if (data.status !== 'ok') return;
 
-                if (!countEl || !list) return;
+            if (data.liked) {
+                this.classList.add('like-btn--liked');
+            } else {
+                this.classList.remove('like-btn--liked');
+            }
+            load("#header", "./templates/header-logined.php")
+            // update số tim
+            document.getElementById('wishlistCount').innerText =
+                String(data.count).padStart(2, '0');
 
-                fetch('product-detail.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status !== 'ok') return;
-
-                    // update số lượng
-                    countEl.innerText = String(data.count).padStart(2, '0');
-                    const textCount = document.getElementById('wishlistCountText');
-                    if (textCount) {
-                        textCount.textContent = data.count;
-                    }
-                    // render dropdown
-                    list.innerHTML = '';
-                    data.items.forEach(item => {
-                        list.insertAdjacentHTML('beforeend', `
-                            <div class="col">
-                                <article class="cart-preview-item">
-                                    <div class="cart-preview-item__img-wrap">
-                                        <img src="${item.image}" class="cart-preview-item__thumb">
-                                    </div>
-                                    <h3 class="cart-preview-item__title">${item.name}</h3>
-                                    <p class="cart-preview-item__price">
-                                        ${Number(item.price).toLocaleString('vi-VN')} ₫
-                                    </p>
-                                </article>
-                            </div>
-                        `);
-                    });
-                });
-            });
+            const textCount = document.getElementById('wishlistCountText');
+            if (textCount) textCount.textContent = data.count;
+        });
+        });
         });
     }
 
