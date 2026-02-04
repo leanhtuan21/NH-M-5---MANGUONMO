@@ -5,52 +5,45 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
 }
-/* ===== XỬ LÝ BỎ YÊU THÍCH ===== */
 if (isset($_GET['remove_wishlist'])) {
-    $remove_id = (int)$_GET['remove_wishlist'];
-    $uid = $_SESSION['user_id'];
-if (!empty($_SESSION['wishlist'][$uid])) {
-    unset($_SESSION['wishlist'][$uid][$remove_id]);
-}
+    $pid = (int)$_GET['remove_wishlist'];
+    $uid = (int)$_SESSION['user_id'];
 
-    header("Location: favourite.php");
+    $sql = "DELETE FROM wishlists WHERE user_id = ? AND product_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "ii", $uid, $pid);
+    mysqli_stmt_execute($stmt);
+
+    // Nếu gọi bằng fetch thì không redirect
+    if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+        header("Location: favourite.php");
+    }
     exit;
 }
-$uid = $_SESSION['user_id'];
+//Yêu thích
+$uid = (int)$_SESSION['user_id'];
+$sql = "
+    SELECT 
+        p.id,
+        p.name,
+        p.price,
+        pi.image_url AS image,
+        p.brand
+    FROM wishlists w
+    JOIN products p ON w.product_id = p.id
+    LEFT JOIN product_images pi 
+        ON pi.product_id = p.id AND pi.is_main = 1
+    WHERE w.user_id = ?
+";
 
-/* ==== FIX WISHLIST CŨ SAI KIỂU ==== */
-if (isset($_SESSION['wishlist'][$uid])) {
-    foreach ($_SESSION['wishlist'][$uid] as $key => $val) {
-        // nếu item KHÔNG phải mảng → xoá
-        if (!is_array($val)) {
-            unset($_SESSION['wishlist'][$uid][$key]);
-        }
-    }
-}
-$wishlist = $_SESSION['wishlist'][$uid] ?? [];
-if (!empty($wishlist)) {
-    $ids = array_keys($wishlist);
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $types = str_repeat('i', count($ids));
-    $sql = "
-        SELECT id, brand
-        FROM products
-        WHERE id IN ($placeholders)
-    ";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, $types, ...$ids);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $brandMap = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $brandMap[$row['id']] = $row['brand'];
-    }
-    foreach ($wishlist as $pid => $item) {
-    if (is_array($item)) {
-        $wishlist[$pid]['brand'] = $brandMap[$pid] ?? '';
-    }
-}
-    unset($item);
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $uid);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$wishlist = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $wishlist[] = $row;
 }
 ?>
 <!DOCTYPE html>
@@ -164,11 +157,11 @@ if (!empty($wishlist)) {
                                                         </div>
                                                     </div>
                                                     <div class="cart-item__ctrl">
-                                                        <a
-                                                            href="?remove_wishlist=<?= $item['id'] ?>"
-                                                            class="cart-item__ctrl-btn"
-                                                            title="Bỏ khỏi yêu thích"
-                                                        >
+                                                        <a href="#"
+   class="cart-item__ctrl-btn"
+   data-id="<?= $item['id'] ?>"
+   title="Bỏ khỏi yêu thích">
+
                                                             <img
                                                                 src="./assets/icons/heart-red.svg"
                                                                 class="heart-icon"
@@ -279,29 +272,39 @@ if (!empty($wishlist)) {
     </script>
     <!--yêu thích -->
    <script>
-    document.addEventListener("click", function (e) {
-        const btn = e.target.closest(".cart-item__ctrl-btn");
-        if (!btn) return;
-        // Chỉ xử lý nút có icon tim
-        const heartImg = btn.querySelector("img[src*='heart']");
-        if (!heartImg) return;
-        const cartItem = btn.closest(".cart-item");
-        if (!cartItem) return;
-        // hiệu ứng rung (đã có trong main.css)
-        heartImg.classList.add("shake");
-        setTimeout(() => heartImg.classList.remove("shake"), 400);
-        // === XOÁ KHỎI YÊU THÍCH ===
-        const id = btn.href?.split("remove_wishlist=")[1];
-        if (!id) return;
-        fetch("?remove_wishlist=" + id)
-            .then(() => {
-                cartItem.remove();
-                // cập nhật số lượng
-                const count = document.querySelectorAll(".cart-item").length;
-                document.querySelector(".cart-info__desc").textContent =
-                    count + " sản phẩm";
-            });
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".cart-item__ctrl-btn");
+    if (!btn) return;
+
+    e.preventDefault();
+
+    const id = btn.dataset.id;
+    const cartItem = btn.closest(".cart-item");
+    const heartImg = btn.querySelector("img");
+
+    if (!id) return;
+
+    heartImg.classList.add("shake");
+    setTimeout(() => heartImg.classList.remove("shake"), 400);
+
+    fetch("favourite.php?remove_wishlist=" + id, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(() => {
+        cartItem.remove();
+
+        const count = document.querySelectorAll(".cart-item").length;
+        document.querySelector(".cart-info__desc").textContent =
+            count + " sản phẩm";
+
+        if (count === 0) {
+            document.querySelector(".cart-info__list").innerHTML =
+                "<p>Chưa có sản phẩm yêu thích</p>";
+        }
+        load("#header", "./templates/header-logined.php");
     });
-    </script>
+});
+</script>
+
     </body>
 </html>
