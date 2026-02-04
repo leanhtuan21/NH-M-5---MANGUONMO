@@ -4,6 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../db_connect.php';
+/* ====== ĐẾM SẢN PHẨM YÊU THÍCH ====== */
+$uid = $_SESSION['user_id'];
+$wishlist = $_SESSION['wishlist'][$uid] ?? [];
+$so_yeu_thich = count($wishlist);
+
     //ẢNH ĐẠI DIỆN 
     $email = $_SESSION['email'] ?? null;
     $avatar = 'avatar-3.png';
