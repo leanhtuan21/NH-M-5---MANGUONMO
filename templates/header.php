@@ -6,7 +6,7 @@
         </button>
 
         <!-- Logo -->
-        <a href="./" class="logo top-bar__logo">
+        <a href="./index.php" class="logo top-bar__logo">
             <img src="./assets/icons/logo.svg" alt="grocerymart" class="logo__img top-bar__logo-img" />
             <h1 class="logo__title top-bar__logo-title">Coffee Shop</h1>
         </a>

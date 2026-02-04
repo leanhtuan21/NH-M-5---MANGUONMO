@@ -1,9 +1,60 @@
+<?php
+session_start();
+include 'db_connect.php';
+
+$message = '';
+if (isset($_GET['added']) && $_GET['added'] == '1') {
+    $message = 'Sản phẩm đã được thêm vào giỏ hàng!';
+}
+
+$product = null;
+$images = [];
+
+if (isset($_GET['id'])) {
+    $product_id = (int)$_GET['id'];
+
+    // Query thông tin sản phẩm
+    $sql = "SELECT * FROM products WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+    $stmt->close();
+
+    // Query ảnh sản phẩm
+    $img_sql = "SELECT image_url FROM product_images WHERE product_id = ? ORDER BY is_main DESC";
+    $img_stmt = $conn->prepare($img_sql);
+    $img_stmt->bind_param("i", $product_id);
+    $img_stmt->execute();
+    $img_result = $img_stmt->get_result();
+    while ($img = $img_result->fetch_assoc()) {
+        $images[] = $img['image_url'];
+    }
+    $img_stmt->close();
+}
+
+$conn->close();
+
+if (!$product) {
+    echo "Sản phẩm không tồn tại.";
+    exit();
+}
+
+// Tính giá sau thuế
+$tax_amount = $product['price'] * ($product['tax_percent'] / 100);
+$total_price = $product['price'] + $tax_amount;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Grocery Mart</title>
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        <title><?php echo htmlspecialchars($product['name']); ?> - Grocery Mart</title>
 
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
@@ -21,6 +72,9 @@
 
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
+        <script>
+            console.log("scripts.js loaded, load function:", typeof load);
+        </script>
     </head>
     <body>
         <!-- Header -->
@@ -32,6 +86,21 @@
         <!-- MAIN -->
         <main class="product-page">
             <div class="container">
+                <!-- Debug info (Xóa sau khi test xong) -->
+                <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc; font-size: 12px;">
+                    <strong>Debug Info:</strong> Session user_id = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'; ?>
+                    <br>isLoggedIn var = <span id="loggedInStatus">checking...</span>
+                </div>
+                <script>
+                    document.getElementById('loggedInStatus').textContent = (<?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) ? 'true' : 'false';
+                </script>
+                
+                <?php if ($message): ?>
+                <div class="alert alert-success">
+                    <?php echo $message; ?>
+                </div>
+                <?php endif; ?>
+
                 <!-- Search bar -->
                 <div class="product-container">
                     <div class="search-bar d-none d-md-flex">
@@ -64,7 +133,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#!" class="breadcrumbs__link breadcrumbs__link--current">LavAzza</a>
+                            <a href="#!" class="breadcrumbs__link breadcrumbs__link--current"><?php echo htmlspecialchars($product['brand']); ?></a>
                         </li>
                     </ul>
                 </div>
@@ -75,48 +144,40 @@
                         <div class="col-5 col-xl-6 col-lg-12">
                             <div class="prod-preview">
                                 <div class="prod-preview__list">
+                                    <?php foreach ($images as $image): ?>
                                     <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-1.png" alt="" class="prod-preview__img" />
+                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="" class="prod-preview__img" />
                                     </div>
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-2.png" alt="" class="prod-preview__img" />
-                                    </div>
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-3.png" alt="" class="prod-preview__img" />
-                                    </div>
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-4.png" alt="" class="prod-preview__img" />
-                                    </div>
+                                    <?php endforeach; ?>
                                 </div>
                                 <div class="prod-preview__thumbs">
+                                    <?php foreach ($images as $index => $image): ?>
                                     <img
-                                        src="./assets/img/product/item-1.png"
+                                        src="<?php echo htmlspecialchars($image); ?>"
                                         alt=""
-                                        class="prod-preview__thumb-img prod-preview__thumb-img--current"
+                                        class="prod-preview__thumb-img <?php echo $index == 0 ? 'prod-preview__thumb-img--current' : ''; ?>"
                                     />
-                                    <img src="./assets/img/product/item-2.png" alt="" class="prod-preview__thumb-img" />
-                                    <img src="./assets/img/product/item-3.png" alt="" class="prod-preview__thumb-img" />
-                                    <img src="./assets/img/product/item-4.png" alt="" class="prod-preview__thumb-img" />
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
                         <div class="col-7 col-xl-6 col-lg-12">
-                            <form action="" class="form">
+                            <form action="javascript:void(0)" method="POST" class="form" onsubmit="handleAddToCart(event)">
                                 <section class="prod-info">
                                     <h1 class="prod-info__heading">
-                                        Coffee Beans - Espresso Arabica and Robusta Beans
+                                        <?php echo htmlspecialchars($product['name']); ?>
                                     </h1>
                                     <div class="row">
                                         <div class="col-5 col-xxl-6 col-xl-12">
                                             <div class="prod-prop">
                                                 <img src="./assets/icons/star.svg" alt="" class="prod-prop__icon" />
-                                                <h4 class="prod-prop__title">(3.5) 1100 reviews</h4>
+                                                <h4 class="prod-prop__title">(<?php echo number_format($product['average_score'], 1); ?>) reviews</h4>
                                             </div>
                                             <label for="" class="form__label prod-info__label">Size/Weight</label>
                                             <div class="filter__form-group">
                                                 <div class="form__select-wrap">
                                                     <div class="form__select" style="--width: 146px">
-                                                        500g
+                                                        <?php echo htmlspecialchars($product['weight_unit']); ?>
                                                         <img
                                                             src="./assets/icons/select-arrow.svg"
                                                             alt=""
@@ -175,27 +236,54 @@
                                                 </div>
                                                 <div class="prod-info__card">
                                                     <div class="prod-info__row">
-                                                        <span class="prod-info__price">$500.00</span>
-                                                        <span class="prod-info__tax">10%</span>
+                                                        <span class="prod-info__price">$<?php echo number_format($product['price'], 2); ?></span>
+                                                        <span class="prod-info__tax"><?php echo $product['tax_percent']; ?>%</span>
                                                     </div>
-                                                    <p class="prod-info__total-price">$540.00</p>
-                                                    <div class="prod-info__row">
-                                                        <button class="btn btn--primary prod-info__add-to-cart">
-                                                            Add to cart
-                                                        </button>
-                                                        <button class="like-btn prod-info__like-btn">
-                                                            <img
-                                                                src="./assets/icons/heart.svg"
-                                                                alt=""
-                                                                class="like-btn__icon icon"
-                                                            />
-                                                            <img
-                                                                src="./assets/icons/heart-red.svg"
-                                                                alt=""
-                                                                class="like-btn__icon--liked"
-                                                            />
-                                                        </button>
-                                                    </div>
+                                                    <p class="prod-info__total-price">$<?php echo number_format($total_price, 2); ?></p>
+                                                    <div class="form__label">Quantity</div>
+                                                <div class="cart-item__input" style="width: 120px; margin-bottom: 20px;">
+                                                    <button class="cart-item__input-btn" type="button" onclick="decreaseQuantity()">
+                                                        <img class="icon" src="./assets/icons/minus.svg" alt="" />
+                                                    </button>
+                                                    <input type="number" name="product_quantity" id="quantityInput" value="1" min="1" class="form__input" style="text-align: center; width: 50px;">
+                                                    <button class="cart-item__input-btn" type="button" onclick="increaseQuantity()">
+                                                        <img class="icon" src="./assets/icons/plus.svg" alt="" />
+                                                    </button>
+                                                </div>
+
+                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                
+                                                <div class="prod-info__row">
+                                                    <button type="submit" class="btn btn--primary prod-info__add-to-cart">
+                                                        Add to cart
+                                                    </button>
+                                                   
+                                                    <button class="like-btn prod-info__like-btn" type="button">
+                                                        <img
+                                                            src="./assets/icons/heart.svg"
+                                                            alt=""
+                                                            class="like-btn__icon icon"
+                                                        />
+                                                        <img
+                                                            src="./assets/icons/heart-red.svg"
+                                                            alt=""
+                                                            class="like-btn__icon--liked"
+                                                        />
+                                                    </button>
+                                                </div>
+                                                
+                                                <script>
+                                                    function increaseQuantity() {
+                                                        const input = document.getElementById('quantityInput');
+                                                        input.value = parseInt(input.value) + 1;
+                                                    }
+                                                    function decreaseQuantity() {
+                                                        const input = document.getElementById('quantityInput');
+                                                        if (parseInt(input.value) > 1) {
+                                                            input.value = parseInt(input.value) - 1;
+                                                        }
+                                                    }
+                                                </script>
                                                 </div>
                                             </div>
                                         </div>
@@ -211,7 +299,7 @@
                     <div class="prod-tab js-tabs">
                         <ul class="prod-tab__list">
                             <li class="prod-tab__item prod-tab__item--current">Description</li>
-                            <li class="prod-tab__item">Review (1100)</li>
+                            <li class="prod-tab__item">Review</li>
                             <li class="prod-tab__item">Similar</li>
                         </ul>
                         <div class="prod-tab__contents">
@@ -219,99 +307,7 @@
                                 <div class="row">
                                     <div class="col-8 col-xl-10 col-lg-12">
                                         <div class="text-content prod-tab__text-content">
-                                            <h2>Lorem ipsum dolor sit amet.</h2>
-                                            <p>
-                                                Lorem ipsum dolor sit amet <a href="#!">consectetur</a> adipisicing
-                                                elit. Aliquid, cupiditate. Modi, quidem, ullam sint dolorum recusandae
-                                                voluptates dignissimos similique animi assumenda
-                                                <a href="#!">praesentium</a> et! Illum dolorem est rem voluptas nam!
-                                                Voluptatem.
-                                            </p>
-                                            <h3>Lorem ipsum dolor sit amet.</h3>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                <img src="./assets/img/product/item-1.png" alt="" />
-                                                <em>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</em>
-                                            </p>
-                                            <blockquote>
-                                                <p>
-                                                    Lorem ipsum dolor sit amet <em>consectetur</em>
-                                                    <u>adipisicing</u> elit. Aliquid, cupiditate. Modi, quidem, ullam
-                                                    sint dolorum recusandae voluptates dignissimos similique animi
-                                                    assumenda praesentium et! Illum dolorem est rem voluptas nam!
-                                                    Voluptatem.
-                                                </p>
-                                            </blockquote>
-                                            <h3>Lorem ipsum dolor sit amet.</h3>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-
-                                            <hr />
-
-                                            <h2>Lorem ipsum dolor sit amet.</h2>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                <img src="./assets/img/product/item-1.png" alt="" />
-                                                <em>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</em>
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-
-                                            <hr />
-
-                                            <h2>Lorem ipsum dolor sit amet.</h2>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                <img src="./assets/img/product/item-1.png" alt="" />
-                                                <em>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</em>
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
+                                            <?php echo nl2br(htmlspecialchars($product['description'])); ?>
                                         </div>
                                     </div>
                                 </div>
@@ -319,414 +315,13 @@
                             <div class="prod-tab__content">
                                 <div class="prod-content">
                                     <h2 class="prod-content__heading">What our customers are saying</h2>
-                                    <div class="row row-cols-3 gx-lg-2 row-cols-md-1 gy-md-3">
-                                        <!-- Review card 1 -->
-                                        <div class="col">
-                                            <div class="review-card">
-                                                <div class="review-card__content">
-                                                    <img
-                                                        src="./assets/img/avatar/avatar-1.png"
-                                                        alt=""
-                                                        class="review-card__avatar"
-                                                    />
-                                                    <div class="review-card__info">
-                                                        <h4 class="review-card__title">Jakir Hussen</h4>
-                                                        <p class="review-card__desc">
-                                                            Great product, I love this Coffee Beans
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="review-card__rating">
-                                                    <div class="review-card__star-list">
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star-half.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star-blank.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                    </div>
-                                                    <span class="review-card__rating-title">(3.5) Review</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Review card 2 -->
-                                        <div class="col">
-                                            <div class="review-card">
-                                                <div class="review-card__content">
-                                                    <img
-                                                        src="./assets/img/avatar/avatar-2.png"
-                                                        alt=""
-                                                        class="review-card__avatar"
-                                                    />
-                                                    <div class="review-card__info">
-                                                        <h4 class="review-card__title">Jubed Ahmed</h4>
-                                                        <p class="review-card__desc">
-                                                            Awesome Coffee, I love this Coffee Beans
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="review-card__rating">
-                                                    <div class="review-card__star-list">
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star-half.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star-blank.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                    </div>
-                                                    <span class="review-card__rating-title">(3.5) Review</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Review card 3 -->
-                                        <div class="col">
-                                            <div class="review-card">
-                                                <div class="review-card__content">
-                                                    <img
-                                                        src="./assets/img/avatar/avatar-3.png"
-                                                        alt=""
-                                                        class="review-card__avatar"
-                                                    />
-                                                    <div class="review-card__info">
-                                                        <h4 class="review-card__title">Delwar Hussain</h4>
-                                                        <p class="review-card__desc">
-                                                            Great product, I like this Coffee Beans
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="review-card__rating">
-                                                    <div class="review-card__star-list">
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star-half.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/star-blank.svg"
-                                                            alt=""
-                                                            class="review-card__star"
-                                                        />
-                                                    </div>
-                                                    <span class="review-card__rating-title">(3.5) Review</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Reviews can be added later -->
                                 </div>
                             </div>
                             <div class="prod-tab__content">
                                 <div class="prod-content">
                                     <h2 class="prod-content__heading">Similar items you might like</h2>
-                                    <div
-                                        class="row row-cols-6 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-2"
-                                    >
-                                        <!-- Product card 1 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-1.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Coffee Beans - Espresso Arabica and Robusta Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$47.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.3</span>
-                                                </div>
-                                            </article>
-                                        </div>
-
-                                        <!-- Product card 2 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-2.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza Coffee Blends - Try the Italian Espresso</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$53.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">3.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
-
-                                        <!-- Product card 3 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-3.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn like-btn--liked product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza - Caffè Espresso Black Tin - Ground coffee</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Welikecoffee</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$99.99</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">5.0</span>
-                                                </div>
-                                            </article>
-                                        </div>
-
-                                        <!-- Product card 4 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-4.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Qualità Oro Mountain Grown - Espresso Coffee Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$38.65</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
-
-                                        <!-- Product card 5 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-1.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Coffee Beans - Espresso Arabica and Robusta Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$47.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.3</span>
-                                                </div>
-                                            </article>
-                                        </div>
-
-                                        <!-- Product card 6 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-2.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza Coffee Blends - Try the Italian Espresso</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$53.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">3.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
-                                    </div>
+                                    <!-- Similar products can be added later -->
                                 </div>
                             </div>
                         </div>
@@ -739,6 +334,86 @@
         <footer id="footer" class="footer"></footer>
         <script>
             load("#footer", "./templates/footer.php");
+        </script>
+
+        <!-- Login Modal -->
+        <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+            <div style="background: white; padding: 40px; border-radius: 10px; text-align: center; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                <h2 style="margin-bottom: 20px; color: #333; font-size: 24px; font-weight: bold;">Vui lòng đăng nhập</h2>
+                <p style="margin-bottom: 30px; color: #666; font-size: 16px;">Bạn cần đăng nhập tài khoản để mua hàng</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="redirectToLogin()" style="background: #ed4337; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;">
+                        Đăng nhập
+                    </button>
+                    <button onclick="closeLoginModal()" style="background: #f0f0f0; color: #333; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;">
+                        Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function handleAddToCart(event) {
+                event.preventDefault();
+                
+                // Kiểm tra giá trị thực tế trong Console (F12)
+                var isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+                console.log("Trạng thái đăng nhập:", isLoggedIn);
+                console.log("Kiểm tra modal:", document.getElementById('loginModal'));
+                
+                if (!isLoggedIn) {
+                    var modal = document.getElementById('loginModal');
+                    if (modal) {
+                        console.log("Modal tìm thấy, hiển thị modal...");
+                        modal.style.display = 'flex';
+                    } else {
+                        console.error("Không tìm thấy ID loginModal trong HTML");
+                    }
+                    return false;
+                }
+                
+                console.log("User đã đăng nhập, submit form...");
+                
+                // Nếu đã đăng nhập, submit form
+                var form = event.target;
+                var formData = new FormData(form);
+                
+                fetch('add_to_product.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log("Phản hồi từ server:", data);
+                    // Redirect to checkout after successful addition
+                    window.location.href = 'checkout.php';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+
+            function closeLoginModal() {
+                var modal = document.getElementById('loginModal');
+                modal.style.display = 'none';
+            }
+
+            function redirectToLogin() {
+                window.location.href = './sign-in.php';
+            }
+
+            // Đóng modal khi click ngoài modal
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log("DOMContentLoaded triggered");
+                var modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.addEventListener('click', function(event) {
+                        if (event.target === this) {
+                            closeLoginModal();
+                        }
+                    });
+                }
+            });
         </script>
     </body>
 </html>

@@ -9,8 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once __DIR__ . "/db_connect.php";
 
     $full_name = trim($_POST['full_name'] ?? ''); 
-    $full_name_value = $full_name;
-    
+    $full_name_value = $full_name;  
     $email = trim($_POST['email'] ?? '');
     $email_value = $email; 
 
@@ -28,11 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Email không đúng định dạng";
     }
-    // 2.1 Kiểm tra email phải chứa số
+    //Kiểm tra email phải chứa số
     elseif (!preg_match('/[0-9]/', $email)) {
         $error = "Email phải chứa ít nhất 1 chữ số";
     }
-    
     // 3. Kiểm tra độ mạnh mật khẩu
     elseif (
         strlen($password) < 6 ||
@@ -43,12 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ) {
         $error = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt";
     }
-
     // 4. Kiểm tra xác nhận mật khẩu
     elseif ($password !== $confirm_password) {
         $error = "Mật khẩu xác nhận không khớp";
     }
-
     else {
         // 5. Kiểm tra email đã tồn tại
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
@@ -95,15 +91,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="./assets/css/main.css" />
 
     <style>
-
         .alert { padding: 12px; border-radius: 8px; font-size: 1.4rem; font-weight: 500; margin-bottom: 20px; text-align: center; }
         .alert-danger { background-color: #ffe5e5; color: #d32f2f; border: 1px solid #ffcccc; }
         .alert-success { background-color: #e5ffe5; color: #2e7d32; border: 1px solid #ccffcc; }
         .form__text-input { position: relative; display: flex; align-items: center; }
         .form__input { padding-right: 45px !important; }
         .form__input-icon-eye { position: absolute; right: 12px; padding: 10px; z-index: 2; cursor: pointer; width: 20px; }
-        
-        
     </style>
 </head>
 <body>
@@ -175,7 +168,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </main>
 
     <script>
-
         document.querySelectorAll('.js-toggle-password').forEach(item => {
             item.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');

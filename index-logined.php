@@ -2,37 +2,42 @@
 session_start();
 require_once 'db_connect.php';
 
-//Xử lý logout
+$limit = 10; // Số sản phẩm hiển thị trên 1 trang
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+// --------------------------------------
+
+// Xử lý logout
 if (!isset($_SESSION['user_id'])) {
     header("Location: sign-in.php");
     exit;
 }
-// Hiển thị thông báo nếu có tại index-logined.php
+
+// Hiển thị thông báo session
 if (isset($_SESSION['message'])) {
     $msg = addslashes($_SESSION['message']);
     echo "<script>
         if (confirm('$msg')) {
-            // OK: Tiếp tục sử dụng
+            // OK
         } else {
-            // Cancel: Gọi file logout để hủy session rồi mới về index
             window.location.href = 'logout.php?redirect=index.php';
         }
     </script>";
     unset($_SESSION['message']);
 }
 
-// Lấy dữ liệu từ URL và làm sạch khoảng trắng thừa ở hai đầu
+// Lấy dữ liệu từ URL
 $keyword      = trim($_GET['keyword'] ?? '');
 $min_price    = $_GET['min_price'] ?? '';
 $max_price    = $_GET['max_price'] ?? '';
 $weight       = $_GET['weight'] ?? '';
 $brand_filter = trim($_GET['brand_filter'] ?? '');
 
-// Flags kiểm tra trạng thái
 $isSearching = !empty($keyword);
 $isFiltering = (!empty($min_price) || !empty($max_price) || !empty($weight) || !empty($brand_filter));
 
-// Câu lệnh SQL cơ bản (Luôn JOIN để lấy được ảnh từ bảng categories)
+// Khởi tạo SQL cơ bản
 $sql = "SELECT p.*, pi.image_url AS image 
         FROM products p 
         LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1
@@ -40,12 +45,9 @@ $sql = "SELECT p.*, pi.image_url AS image
 $params = [];
 $types = "";
 
-// 1. XỬ LÝ TÌM KIẾM (Loại bỏ hoàn toàn khoảng trắng để so khớp linh hoạt)
+// 1. XỬ LÝ TÌM KIẾM
 if ($isSearching) {
-    // REPLACE(p.name, ' ', '') 
     $sql .= " AND (REPLACE(p.name, ' ', '') LIKE ? OR REPLACE(p.brand, ' ', '') LIKE ?)";
-    
-    // Loại bỏ khoảng trắng của từ khóa người dùng nhập vào
     $clean_keyword = "%" . str_replace(' ', '', $keyword) . "%";
     $params[] = $clean_keyword; 
     $params[] = $clean_keyword;
@@ -72,7 +74,30 @@ if (!empty($brand_filter)) {
     $types .= "s";
 }
 
-// Thực thi truy vấn chính
+// --- BƯỚC QUAN TRỌNG: TÍNH TỔNG SỐ TRANG ($total_page) ---
+// Tạo câu query đếm dựa trên câu query lọc hiện tại
+$sql_count = str_replace("SELECT p.*, pi.image_url AS image", "SELECT COUNT(*) as total", $sql);
+
+// Thực thi đếm
+$stmt_count = $conn->prepare($sql_count);
+if (!empty($params)) {
+    $stmt_count->bind_param($types, ...$params);
+}
+$stmt_count->execute();
+$count_result = $stmt_count->get_result();
+$row_count = $count_result->fetch_assoc();
+$total_records = $row_count['total']; // Tổng số sản phẩm tìm thấy
+$total_page = ceil($total_records / $limit); // Tính ra biến $total_page mà panigation.php cần
+$stmt_count->close();
+// --------------------------------------------------------
+
+// 3. THÊM LIMIT VÀ OFFSET VÀO QUERY CHÍNH ĐỂ LẤY DỮ LIỆU TRANG HIỆN TẠI
+$sql .= " LIMIT ? OFFSET ?";
+$params[] = $limit;
+$params[] = $offset;
+$types .= "ii"; // Thêm 2 tham số integer cho limit và offset
+
+// Thực thi truy vấn chính lấy sản phẩm
 $stmt = $conn->prepare($sql);
 if (!empty($params)) {
     $stmt->bind_param($types, ...$params);
@@ -80,22 +105,23 @@ if (!empty($params)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-// 3. XỬ LÝ KẾT QUẢ VÀ THÔNG BÁO
+// 4. XỬ LÝ THÔNG BÁO
 $message = "";
 if ($result->num_rows > 0) {
     $productList = $result;
     
     if ($isSearching && $isFiltering) {
-        $message = "Tìm thấy " . $result->num_rows . " sản phẩm cho từ khóa <strong>'" . htmlspecialchars($keyword) . "'</strong> kèm bộ lọc";
+        $message = "Tìm thấy " . $total_records . " sản phẩm cho từ khóa <strong>'" . htmlspecialchars($keyword) . "'</strong> kèm bộ lọc";
     } elseif ($isSearching) {
-        $message = "Kết quả tìm kiếm cho: <strong>'" . htmlspecialchars($keyword) . "'</strong> (" . $result->num_rows . " sản phẩm)";
+        $message = "Kết quả tìm kiếm cho: <strong>'" . htmlspecialchars($keyword) . "'</strong> (" . $total_records . " sản phẩm)";
     } elseif ($isFiltering) {
-        $message = "Tìm thấy " . $result->num_rows . " sản phẩm theo bộ lọc";
+        $message = "Tìm thấy " . $total_records . " sản phẩm theo bộ lọc";
     } else {
         $message = "Tất cả sản phẩm";
     }
 } else {
-    // Trường hợp KHÔNG có kết quả: Gợi ý sản phẩm ngẫu nhiên (Vẫn phải JOIN để lấy ảnh)
+    // Không có kết quả thì gợi ý ngẫu nhiên (Lúc này $total_page sẽ = 0 hoặc 1 tùy logic, ta set lại = 0 để ẩn phân trang)
+    $total_page = 0; 
     $productList = $conn->query("SELECT p.*, c.thumb AS image 
                                  FROM products p 
                                  LEFT JOIN categories c ON p.category_id = c.id 
@@ -128,6 +154,7 @@ if ($result->num_rows > 0) {
 
         <!-- Styles -->
         <link rel="stylesheet" href="./assets/css/main.css" />
+        <link rel="stylesheet" href="./assets/css/panagition.css" />
 
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
@@ -247,14 +274,11 @@ if ($result->num_rows > 0) {
                                             <div class="form__select-wrap">
                                                 <select name="weight" class="form__select" style="--width: 158px;">
                                                     <option value="">Tất cả</option>
+                                                    <option value="100g" <?php if($weight == '100g') echo 'selected'; ?>>100g</option>
                                                     <option value="500g" <?php if($weight == '500g') echo 'selected'; ?>>500g</option>
                                                     <option value="1kg"  <?php if($weight == '1kg') echo 'selected'; ?>>1kg</option>
                                                     <option value="2kg"  <?php if($weight == '2kg') echo 'selected'; ?>>2kg</option>
-                                                    <option value="2kg"  <?php if($weight == '3kg') echo 'selected'; ?>>3kg</option>
-                                                    <option value="3kg"  <?php if($weight == '4kg') echo 'selected'; ?>>4kg</option>
-                                                    <option value="4kg"  <?php if($weight == '5kg') echo 'selected'; ?>>5kg</option>
-                                                    <option value="5kg"  <?php if($weight == '6kg') echo 'selected'; ?>>6kg</option>
-                                                    <option value="6kg"  <?php if($weight == '7kg') echo 'selected'; ?>>7kg</option>
+                                                    <option value="3kg"  <?php if($weight == '3kg') echo 'selected'; ?>>3kg</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -332,6 +356,9 @@ if ($result->num_rows > 0) {
                             </div>
                         <?php endwhile; ?>
                     <?php endif; ?>
+                </div>
+                <div class="mt-4 d-flex justify-content-center">
+                    <?php include "./panigation.php"; ?>
                 </div>
         </main>
 

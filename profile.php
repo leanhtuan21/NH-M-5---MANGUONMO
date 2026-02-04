@@ -3,17 +3,19 @@ session_start();
 require_once 'db_connect.php';
 
 /* Chưa đăng nhập thì đá về login */
-if (!isset($_SESSION['email'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: sign-in.php");
     exit;
 }
 
-$email = $_SESSION['email'];
+$user_id = $_SESSION['user_id'];
 
-/* Lấy thông tin user */
-$sql = "SELECT email, phone, address, avatar FROM users WHERE email = ?";
+/* Lấy thông tin user theo ID */
+$sql = "SELECT id, full_name, email, phone, address, avatar 
+        FROM users 
+        WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
@@ -22,7 +24,7 @@ if (!$user) {
     echo "Không tìm thấy người dùng";
     exit;
 }
-
+$avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
 // Ảnh đại diện
 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
 
@@ -40,11 +42,12 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
 
             // cập nhật DB
-            $sql = "UPDATE users SET avatar = ? WHERE email = ?";
+            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "ss", $avatar_name, $email);
+            mysqli_stmt_bind_param($stmt, "si", $avatar_name, $user_id);
             mysqli_stmt_execute($stmt);
-
+            // CẬP NHẬT SESSION
+            $_SESSION['avatar'] = $avatar_name;
             header("Location: profile.php");
             exit;
         }
@@ -76,6 +79,33 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         <!-- Scripts -->
         <script src="./assets/js/scripts.js"></script>
     </head>
+        <style>
+        .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    /* ảnh avatar */
+    .profile-user__avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    /* dấu cộng nằm trong ảnh */
+    .avatar-plus {
+        position: absolute;
+        inset: 0; /* phủ toàn ảnh */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: #000;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+    }
+    </style>
     <body>
         <!-- Header -->
         <header id="header" class="header"></header>

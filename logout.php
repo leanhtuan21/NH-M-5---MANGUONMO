@@ -1,6 +1,5 @@
 <?php
     session_start();
-
     // 1. Xóa hết biến session và hủy phiên
     session_unset();
     session_destroy();
