@@ -1,4 +1,5 @@
 <?php
+// PHẢI ĐẶT session_start() Ở ĐẦU TIÊN, KHÔNG CÓ BẤT KỲ CHỮ NÀO PHÍA TRƯỚC
 session_start();
 include 'db_connect.php';
 
@@ -34,11 +35,11 @@ if (isset($_GET['id'])) {
     $img_stmt->close();
 }
 
+// KHÔNG ĐÓNG $conn Ở ĐÂY NẾU BÊN DƯỚI CÒN DÙNG (NHƯNG Ở ĐÂY BẠN CHỈ DÙNG BIẾN ĐÃ LẤY RA NÊN ĐÓNG LÀ OK)
 $conn->close();
 
 if (!$product) {
-    echo "Sản phẩm không tồn tại.";
-    exit();
+    die("Sản phẩm không tồn tại.");
 }
 
 // Tính giá sau thuế
@@ -86,15 +87,6 @@ $total_price = $product['price'] + $tax_amount;
         <!-- MAIN -->
         <main class="product-page">
             <div class="container">
-                <!-- Debug info (Xóa sau khi test xong) -->
-                <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc; font-size: 12px;">
-                    <strong>Debug Info:</strong> Session user_id = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'; ?>
-                    <br>isLoggedIn var = <span id="loggedInStatus">checking...</span>
-                </div>
-                <script>
-                    document.getElementById('loggedInStatus').textContent = (<?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) ? 'true' : 'false';
-                </script>
-                
                 <?php if ($message): ?>
                 <div class="alert alert-success">
                     <?php echo $message; ?>
@@ -307,7 +299,7 @@ $total_price = $product['price'] + $tax_amount;
                                 <div class="row">
                                     <div class="col-8 col-xl-10 col-lg-12">
                                         <div class="text-content prod-tab__text-content">
-                                            <?php echo nl2br(htmlspecialchars($product['description'])); ?>
+                                        <?php echo nl2br(htmlspecialchars($product['description'] ?? '')); ?>
                                         </div>
                                     </div>
                                 </div>
