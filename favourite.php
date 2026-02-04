@@ -121,25 +121,13 @@ if (!empty($wishlist)) {
                                 <p class="cart-info__desc">
                                     <?= count($wishlist) ?> sản phẩm
                                 </p>
-                                <div class="cart-info__check-all">
-                                    <label class="cart-info__checkbox">
-                                        <input
-                                            type="checkbox"
-                                            name="shipping-adress"
-                                            class="cart-info__checkbox-input"
-                                        />
-                                    </label>
-                                </div>
+                                <div class="cart-info__check-all"></div>
                                 <div class="cart-info__list">
                                     <?php if (empty($wishlist)): ?>
                                         <p>Chưa có sản phẩm yêu thích</p>
                                     <?php else: ?>
                                     <?php foreach ($wishlist as $item): ?>
                                     <article class="cart-item">
-                                        <label class="cart-info__checkbox">
-                                            <input type="checkbox" class="cart-info__checkbox-input"/>
-                                        </label>
-
                                         <a href="./product-detail.php?id=<?= $item['id'] ?>">
                                             <img
                                                 src="<?= $item['image'] ?>"
