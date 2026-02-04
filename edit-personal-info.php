@@ -1,81 +1,79 @@
 <?php
-    session_start();
-    require_once 'db_connect.php';
+session_start();
+require_once 'db_connect.php';
 
-    if (!isset($_SESSION['user_id'])) {
-        header("Location: sign-in.php");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: sign-in.php");
+    exit;
+}
+$user_id = $_SESSION['user_id'];
+$email = $_SESSION['email'];
+$full_name = $_SESSION['user_name'];
+
+/* 3. Lấy thông tin user từ CSDL */
+$sql = "SELECT id, full_name, email, phone, address, avatar
+        FROM users
+        WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
+$avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
+/* 5. Gán dữ liệu ra form */
+$full_name = $user['full_name'] ?? '';
+$phone     = $user['phone'] ?? '';
+$address   = $user['address'] ?? '';
+/* 6. Xử lý cập nhật */
+if (isset($_POST['update_profile'])) {
+    $phone = trim($_POST['phone'] ?? '');
+    // kiểm tra số điện thoại: đúng 10 chữ số
+    if (!preg_match('/^0\d{9}$/', $phone)) {
+        echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0');</script>";
         exit;
     }
-    $user_id = $_SESSION['user_id'];
-    $email = $_SESSION['email'];
-    $full_name = $_SESSION['user_name'];
-
-/*Lấy thông tin user từ CSDL */
-    $sql = "SELECT id, full_name, email, phone, address, avatar
-            FROM users
-            WHERE id = ?";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    $address   = trim($_POST['address'] ?? '');
+    $sql_update = "UPDATE users 
+                    SET phone = ?, address = ?
+                    WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $sql_update);
+    mysqli_stmt_bind_param($stmt, "ssi", $phone, $address, $user_id);
     mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $user = mysqli_fetch_assoc($result);
-    $avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
-/*Gán dữ liệu ra form */
-    $full_name = $user['full_name'] ?? '';
-    $phone     = $user['phone'] ?? '';
-    $address   = $user['address'] ?? '';
-/*Xử lý cập nhật */
-    if (isset($_POST['update_profile'])) {
-        $full_name = trim($_POST['full_name'] ?? '');
-        $phone = trim($_POST['phone'] ?? '');
-        // kiểm tra số điện thoại: đúng 10 chữ số
-        if (!preg_match('/^[0-9]{10}$/', $phone)) {
-            echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số');</script>";
-            exit;
-        }
-        $address   = trim($_POST['address'] ?? '');
-        $sql_update = "UPDATE users 
-                    SET full_name = ?, phone = ?, address = ? 
-                    WHERE email = ?";
-        $stmt = mysqli_prepare($conn, $sql_update);
-        mysqli_stmt_bind_param($stmt, "ssss", $full_name, $phone, $address, $email);
-        mysqli_stmt_execute($stmt);
-        // cập nhật lại session để header hiển thị đúng tên
-        $_SESSION['user_name'] = $full_name;
-        header("Location: profile.php");
+    // cập nhật lại session để header hiển thị đúng tên
+    header("Location: profile.php");
+    exit;
+}
+// Ảnh đại diện
+if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
+
+    $allow_ext = ['jpg', 'jpeg', 'png', 'webp'];
+    $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+    if ($_FILES['avatar']['size'] > 2 * 1024 * 1024) {
+        echo "<script>alert('Ảnh tối đa 2MB');</script>";
         exit;
     }
-/*Ảnh đại diện*/
-    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
+    if (!in_array($ext, $allow_ext)) {
+        echo "<script>alert('Chỉ chấp nhận JPG, PNG, WEBP');</script>";
+    } else {
 
-        $allow_ext = ['jpg', 'jpeg', 'png', 'webp'];
-        $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-        if ($_FILES['avatar']['size'] > 2 * 1024 * 1024) {
-            echo "<script>alert('Ảnh tối đa 2MB');</script>";
+        $avatar_name = 'avatar_' . time() . '.' . $ext;
+        $upload_dir = __DIR__ . '/assets/img/avatar/';
+        $upload_path = $upload_dir . $avatar_name;
+
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
+
+            // cập nhật DB
+            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "si", $avatar_name, $user_id);
+            mysqli_stmt_execute($stmt);
+            // CẬP NHẬT SESSION
+            $_SESSION['avatar'] = $avatar_name;
+            header("Location: profile.php");
             exit;
         }
-        if (!in_array($ext, $allow_ext)) {
-            echo "<script>alert('Chỉ chấp nhận JPG, PNG, WEBP');</script>";
-        } else {
-
-            $avatar_name = 'avatar_' . time() . '.' . $ext;
-            $upload_dir = __DIR__ . '/assets/img/avatar/';
-            $upload_path = $upload_dir . $avatar_name;
-
-            if (move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_path)) {
-
-                // cập nhật DB
-                $sql = "UPDATE users SET avatar = ? WHERE id = ?";
-                $stmt = mysqli_prepare($conn, $sql);
-                mysqli_stmt_bind_param($stmt, "si", $avatar_name, $user_id);
-                mysqli_stmt_execute($stmt);
-                // CẬP NHẬT SESSION
-                $_SESSION['avatar'] = $avatar_name;
-                header("Location: profile.php");
-                exit;
-            }
-        }
     }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -176,10 +174,10 @@
                                         >
                                     </form>
                                     <h1 class="header-user__name">
-                                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                        <?= htmlspecialchars($user['full_name']) ?>
                                     </h1>
                                     <p class="header-user__email">
-                                        <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                        <?= htmlspecialchars($user['email']) ?>
                                     </p>
                                 </div>
 
@@ -193,14 +191,6 @@
                                                     <img src="./assets/icons/profile.svg" alt="" class="icon" />
                                                 </span>
                                                 Thông tin cá nhân
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/message-2.svg" alt="" class="icon" />
-                                                </span>
-                                                Quyền riêng tư & liên hệ
                                             </a>
                                         </li>
                                     </ul>
@@ -219,39 +209,15 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="#!" class="profile-menu__link">
+                                            <a href="favourite.php" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/heart.svg" alt="" class="icon" />
                                                 </span>
                                                 Danh sách yêu thích
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/gift-2.svg" alt="" class="icon" />
-                                                </span>
-                                                Quà tặng
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
-
-                                <!-- Menu 3 -->
-                                <div class="profile-menu">
-                                    <h3 class="profile-menu__title">Gói & đăng ký</h3>
-                                    <ul class="profile-menu__list">
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/shield.svg" alt="" class="icon" />
-                                                </span>
-                                                Gói bảo vệ
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
                                 <!-- Menu 4 -->
                                 <div class="profile-menu">
                                     <h3 class="profile-menu__title">Hỗ trợ khách hàng</h3>
@@ -303,7 +269,7 @@
                                                         <input
                                                             type="text"
                                                             name="full_name"
-                                                            value="<?= htmlspecialchars($full_name) ?>"
+                                                            value="<?= htmlspecialchars($user['full_name']) ?>"
                                                             id="full-name"
                                                             placeholder="Nhập họ và tên"
                                                             class="form__input"

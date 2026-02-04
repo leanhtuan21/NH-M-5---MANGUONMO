@@ -132,31 +132,32 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                         <div class="col-3 col-xl-4 col-lg-5 col-md-12">
                             <aside class="profile__sidebar">
                                 <!-- User -->
-                                <?php
-                                    $avatar = !empty($user['avatar']) ? $user['avatar'] : 'default.png';
-                                ?>
                                 <div class="profile-user">
-                                    <label for="upload-avatar" class="avatar-wrapper">
-                                        <img src="./assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
-                                            class="profile-user__avatar"
-                                            alt="Avatar">
-                                        <span class="avatar-edit">
-                                            <img src="./assets/icons/camera.svg" alt="">
-                                        </span>
-                                    </label>
                                     <form method="POST" enctype="multipart/form-data">
-                                        <input type="file"
+                                        <label for="upload-avatar" class="avatar-wrapper">
+                                            <img
+                                                src="./assets/img/avatar/<?= htmlspecialchars($user['avatar'] ) ?>"
+                                                class="profile-user__avatar"
+                                                alt="Avatar"
+                                                onerror="this.src='./assets/img/avatar/avatar-3.png'"
+                                            >
+                                            <span class="avatar-plus">+</span>
+                                        </label>
+
+                                        <input
+                                            type="file"
                                             id="upload-avatar"
                                             name="avatar"
                                             accept="image/*"
+                                            hidden
                                             onchange="this.form.submit()"
-                                            hidden>
+                                        >
                                     </form>
                                     <h1 class="header-user__name">
-                                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                                        <?= htmlspecialchars($user['full_name']) ?>
                                     </h1>
                                     <p class="header-user__email">
-                                        <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
+                                        <?= htmlspecialchars($user['email']) ?>
                                     </p>
                                 </div>
                                 <!-- Menu 1 -->
@@ -169,14 +170,6 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                     <img src="./assets/icons/profile.svg" alt="" class="icon" />
                                                 </span>
                                                 Thông tin cá nhân
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/message-2.svg" alt="" class="icon" />
-                                                </span>
-                                                Quyền riêng tư & liên hệ
                                             </a>
                                         </li>
                                     </ul>
@@ -195,39 +188,15 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="#!" class="profile-menu__link">
+                                            <a href="favourite.php" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/heart.svg" alt="" class="icon" />
                                                 </span>
                                                 Danh sách yêu thích
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/gift-2.svg" alt="" class="icon" />
-                                                </span>
-                                                Quà tặng
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
-
-                                <!-- Menu 3 -->
-                                <div class="profile-menu">
-                                    <h3 class="profile-menu__title">Gói & đăng ký</h3>
-                                    <ul class="profile-menu__list">
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/shield.svg" alt="" class="icon" />
-                                                </span>
-                                                Gói bảo vệ
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
                                 <!-- Menu 4 -->
                                 <div class="profile-menu">
                                     <h3 class="profile-menu__title">Hỗ trợ khách hàng</h3>
