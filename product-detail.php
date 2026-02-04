@@ -1,5 +1,191 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+/* ===XỬ LÝ AJAX WISHLIST=== */
+$uid = $_SESSION['user_id'];
+if (isset($_POST['ajax_wishlist'])) {
+    if (!isset($_SESSION['wishlist'][$uid])) {
+        $_SESSION['wishlist'][$uid] = [];
+    }
+    $product_id = (int)($_POST['product_id'] ?? 0);
+    $action = $_POST['action'] ?? '';
+    if ($product_id > 0) {
+        // ADD
+        if ($action === 'add' && !isset($_SESSION['wishlist'][$uid][$product_id])) {
+            $stmt = mysqli_prepare($conn, "
+                SELECT p.id, p.name, p.price, p.tax_percent, pi.image_url
+                FROM products p
+                LEFT JOIN product_images pi 
+                    ON p.id = pi.product_id AND pi.is_main = 1
+                WHERE p.id = ?
+            ");
+            mysqli_stmt_bind_param($stmt, "i", $product_id);
+            mysqli_stmt_execute($stmt);
+            $p = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+            if ($p) {
+                $price = $p['price'] * (1 + $p['tax_percent'] / 100);
+                $_SESSION['wishlist'][$uid][$product_id] = [
+                    'id'    => $p['id'],
+                    'name'  => $p['name'],
+                    'price' => $price,
+                    'image' => $p['image_url'] ?? 'default-product.png'
+                ];
+            }
+        }
+
+        // REMOVE
+        if ($action === 'remove') {
+            unset($_SESSION['wishlist'][$uid][$product_id]);
+        }
+    }
+    echo json_encode([
+    'status' => 'ok',
+    'count'  => count($_SESSION['wishlist'][$uid]),
+    'items'  => array_values($_SESSION['wishlist'][$uid]),
+    'liked'  => isset($_SESSION['wishlist'][$uid][$product_id])
+]);
+exit;
+}
+if (!isset($_GET['id'])) {
+    die('Thiếu ID sản phẩm');
+}
+$product_id = (int) $_GET['id'];
+/* Lấy thông tin sản phẩm */
+$sql = "
+    SELECT 
+        p.id,
+        p.category_id,
+        p.name,
+        p.price,
+        p.tax_percent,
+        p.average_score,
+        p.stock_quantity,
+        p.description,
+        p.weight_unit,
+        pi.image_url
+    FROM products p
+    LEFT JOIN product_images pi 
+        ON p.id = pi.product_id AND pi.is_main = 1
+    WHERE p.id = ?
+";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $product_id);
+mysqli_stmt_execute($stmt);
+$product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+if (!$product) {
+    die('Sản phẩm không tồn tại');
+}
+$ds_khoi_luong = [];
+if (!empty($product['weight_unit'])) {
+    $ds_khoi_luong = array_map('trim', explode(',', $product['weight_unit']));
+}
+
+/* ===== TÍNH GIÁ & THUẾ SAU KHI CÓ PRODUCT ===== */
+// Giá gốc trong DB = giá gốc
+$gia_goc = (float)$product['price'];
+$thue = (int)$product['tax_percent'];
+// gram mặc định = option đầu tiên
+$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0] : 100;
+// tính giá theo gram
+$gia_theo_gram = $gia_goc * ($gram_chon / 100);
+// giá sau thuế
+$gia_sau_thue = $gia_theo_gram * (1 + $thue / 100);
+// Sản phẩm có nhiều ảnh
+$images = [];
+$stmt_img = mysqli_prepare($conn, "
+    SELECT image_url 
+    FROM product_images 
+    WHERE product_id = ?
+    ORDER BY is_main DESC
+");
+mysqli_stmt_bind_param($stmt_img, "i", $product_id);
+mysqli_stmt_execute($stmt_img);
+$result_img = mysqli_stmt_get_result($stmt_img);
+
+while ($row = mysqli_fetch_assoc($result_img)) {
+    $images[] = $row['image_url'];
+}
+
+if (empty($images)) {
+    $images[] = 'default-product.png';
+}
+/* ===== SẢN PHẨM TƯƠNG TỰ ===== */
+$sql_related = "
+    SELECT 
+        p.id,
+        p.name,
+        p.price,
+        p.average_score,
+        p.brand,
+        pi.image_url
+    FROM products p
+    LEFT JOIN product_images pi 
+        ON p.id = pi.product_id AND pi.is_main = 1
+    WHERE p.category_id = ?
+      AND p.id != ?
+    LIMIT 6
+";
+
+$stmt_related = mysqli_prepare($conn, $sql_related);
+mysqli_stmt_bind_param(
+    $stmt_related,
+    "ii",
+    $product['category_id'],
+    $product['id']
+);
+mysqli_stmt_execute($stmt_related);
+$relatedProducts = mysqli_stmt_get_result($stmt_related);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
+    <style>
+    /* Ép dòng giá xuống cột */
+    .prod-info__row:has(#gia-goc) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    /* Style giá */
+    .prod-info__price {
+        font-size: 32px;
+        font-weight: 700;
+        color: #e53935;
+    }
+    .prod-info__tax {
+        font-size: 14px;
+        color: #2e7d32;
+        background: #e8f5e9;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .prod-info__total-price {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .like-btn--liked .like-btn__icon {
+        display: none;
+    }
+    .like-btn--liked .like-btn__icon--liked {
+        display: inline-block;
+    }
+    .like-btn__icon--liked {
+        display: none;
+    }
+    /* ảnh */
+    .prod-preview__item {
+    display: none;
+}
+.prod-preview__item--current {
+    display: block;
+}
+
+    </style>
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -75,82 +261,73 @@
                         <div class="col-5 col-xl-6 col-lg-12">
                             <div class="prod-preview">
                                 <div class="prod-preview__list">
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-1.png" alt="" class="prod-preview__img" />
-                                    </div>
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-2.png" alt="" class="prod-preview__img" />
-                                    </div>
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-3.png" alt="" class="prod-preview__img" />
-                                    </div>
-                                    <div class="prod-preview__item">
-                                        <img src="./assets/img/product/item-4.png" alt="" class="prod-preview__img" />
-                                    </div>
+                                    <?php foreach ($images as $i => $img): ?>
+                                        <div class="prod-preview__item <?= $i === 0 ? 'prod-preview__item--current' : '' ?>">
+                                            <img src="<?= htmlspecialchars($img) ?>" class="prod-preview__img">
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                                 <div class="prod-preview__thumbs">
-                                    <img
-                                        src="./assets/img/product/item-1.png"
-                                        alt=""
-                                        class="prod-preview__thumb-img prod-preview__thumb-img--current"
-                                    />
-                                    <img src="./assets/img/product/item-2.png" alt="" class="prod-preview__thumb-img" />
-                                    <img src="./assets/img/product/item-3.png" alt="" class="prod-preview__thumb-img" />
-                                    <img src="./assets/img/product/item-4.png" alt="" class="prod-preview__thumb-img" />
-                                </div>
+                                <?php foreach ($images as $i => $img): ?>
+                                    <img 
+                                        src="<?= htmlspecialchars($img) ?>"
+                                        class="prod-preview__thumb-img <?= $i === 0 ? 'prod-preview__thumb-img--current' : '' ?>"
+                                        data-index="<?= $i ?>"
+                                    >
+                                <?php endforeach; ?>
+                            </div>
                             </div>
                         </div>
                         <div class="col-7 col-xl-6 col-lg-12">
-                            <form action="" class="form">
+                            <form method="POST" class="form" action="product-detail.php?id=<?= $product['id'] ?>" >
+                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                                 <section class="prod-info">
                                     <h1 class="prod-info__heading">
-                                        Coffee Beans - Espresso Arabica and Robusta Beans
+                                        <?= htmlspecialchars($product['name']) ?>
                                     </h1>
+                                    <div class="prod-info__row">
+                                        <div class="prod-info__total-price" id="gia-sau-thue">
+                                            <?= number_format($gia_sau_thue, 0, ',', '.') ?> ₫
+                                        </div>
+                                        <div class="prod-info__price" id="gia-goc">
+                                            <?= number_format($gia_theo_gram, 0, ',', '.') ?> ₫
+                                        </div>
+                                        <div class="prod-info__tax">
+                                            Thuế VAT: <?= $thue ?>%
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-5 col-xxl-6 col-xl-12">
                                             <div class="prod-prop">
                                                 <img src="./assets/icons/star.svg" alt="" class="prod-prop__icon" />
-                                                <h4 class="prod-prop__title">(3.5) 1100 reviews</h4>
+                                                <h4 class="prod-prop__title">
+                                                    (<?= $product['average_score'] ?>) Reviews
+                                                </h4>
                                             </div>
-                                            <label for="" class="form__label prod-info__label">Size/Weight</label>
+                                            <label for="" class="form__label prod-info__label">Khối lượng</label>
                                             <div class="filter__form-group">
                                                 <div class="form__select-wrap">
                                                     <div class="form__select" style="--width: 146px">
-                                                        500g
-                                                        <img
-                                                            src="./assets/icons/select-arrow.svg"
-                                                            alt=""
-                                                            class="form__select-arrow icon"
-                                                        />
-                                                    </div>
-                                                    <div class="form__select">
-                                                        Gram
-                                                        <img
-                                                            src="./assets/icons/select-arrow.svg"
-                                                            alt=""
-                                                            class="form__select-arrow icon"
-                                                        />
+                                                        <select name="weight_unit" id="weightSelect" class="prod-prop__title">
+                                                            <?php foreach ($ds_khoi_luong as $khoi_luong): ?>
+                                                                <option value="<?= $khoi_luong ?>">
+                                                                    <?= $khoi_luong >= 1000 
+                                                                        ? ($khoi_luong / 1000) . 'kg' 
+                                                                        : $khoi_luong . 'g' 
+                                                                    ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <label class="form__label prod-info__label">Số lượng</label>
                                             <div class="filter__form-group">
-                                                <div class="form__tags">
-                                                    <button class="form__tag prod-info__tag">Small</button>
-                                                    <button class="form__tag prod-info__tag">Medium</button>
-                                                    <button class="form__tag prod-info__tag">Large</button>
-                                                </div>
+                                                <small>Còn <?= $product['stock_quantity'] ?> sản phẩm</small>
                                             </div>
                                         </div>
                                         <div class="col-7 col-xxl-6 col-xl-12">
                                             <div class="prod-props">
-                                                <div class="prod-prop">
-                                                    <img
-                                                        src="./assets/icons/document.svg"
-                                                        alt=""
-                                                        class="prod-prop__icon icon"
-                                                    />
-                                                    <h4 class="prod-prop__title">Compare</h4>
-                                                </div>
                                                 <div class="prod-prop">
                                                     <img
                                                         src="./assets/icons/buy.svg"
@@ -158,32 +335,21 @@
                                                         class="prod-prop__icon icon"
                                                     />
                                                     <div>
-                                                        <h4 class="prod-prop__title">Delivery</h4>
-                                                        <p class="prod-prop__desc">From $6 for 1-3 days</p>
-                                                    </div>
-                                                </div>
-                                                <div class="prod-prop">
-                                                    <img
-                                                        src="./assets/icons/bag.svg"
-                                                        alt=""
-                                                        class="prod-prop__icon icon"
-                                                    />
-                                                    <div>
-                                                        <h4 class="prod-prop__title">Pickup</h4>
-                                                        <p class="prod-prop__desc">Out of 2 store, today</p>
+                                                        <h4 class="prod-prop__title">Vận chuyển</h4>
+                                                        <p class="prod-prop__desc">Thời gian vận chuyển sẽ từ 3 - 6 ngày</p>
                                                     </div>
                                                 </div>
                                                 <div class="prod-info__card">
                                                     <div class="prod-info__row">
-                                                        <span class="prod-info__price">$500.00</span>
-                                                        <span class="prod-info__tax">10%</span>
-                                                    </div>
-                                                    <p class="prod-info__total-price">$540.00</p>
-                                                    <div class="prod-info__row">
-                                                        <button class="btn btn--primary prod-info__add-to-cart">
+                                                        <button 
+                                                            type="button" 
+                                                            id="addToCartBtn"
+                                                            name="add_to_cart"
+                                                            class="btn btn--primary prod-info__add-to-cart"
+                                                        >
                                                             Add to cart
                                                         </button>
-                                                        <button class="like-btn prod-info__like-btn">
+                                                        <button type="button" class="like-btn <?= isset($_SESSION['wishlist'][$_SESSION['user_id']][$product['id']]) ? 'like-btn--liked' : '' ?>"data-product-id="<?= $product['id'] ?>">
                                                             <img
                                                                 src="./assets/icons/heart.svg"
                                                                 alt=""
@@ -210,108 +376,16 @@
                 <div class="product-container">
                     <div class="prod-tab js-tabs">
                         <ul class="prod-tab__list">
-                            <li class="prod-tab__item prod-tab__item--current">Description</li>
-                            <li class="prod-tab__item">Review (1100)</li>
-                            <li class="prod-tab__item">Similar</li>
+                            <li class="prod-tab__item prod-tab__item--current">Miêu tả</li>
+                            <li class="prod-tab__item">Đánh giá</li>
+                            <li class="prod-tab__item">Sản phẩm tương tự</li>
                         </ul>
                         <div class="prod-tab__contents">
                             <div class="prod-tab__content prod-tab__content--current">
                                 <div class="row">
                                     <div class="col-8 col-xl-10 col-lg-12">
                                         <div class="text-content prod-tab__text-content">
-                                            <h2>Lorem ipsum dolor sit amet.</h2>
-                                            <p>
-                                                Lorem ipsum dolor sit amet <a href="#!">consectetur</a> adipisicing
-                                                elit. Aliquid, cupiditate. Modi, quidem, ullam sint dolorum recusandae
-                                                voluptates dignissimos similique animi assumenda
-                                                <a href="#!">praesentium</a> et! Illum dolorem est rem voluptas nam!
-                                                Voluptatem.
-                                            </p>
-                                            <h3>Lorem ipsum dolor sit amet.</h3>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                <img src="./assets/img/product/item-1.png" alt="" />
-                                                <em>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</em>
-                                            </p>
-                                            <blockquote>
-                                                <p>
-                                                    Lorem ipsum dolor sit amet <em>consectetur</em>
-                                                    <u>adipisicing</u> elit. Aliquid, cupiditate. Modi, quidem, ullam
-                                                    sint dolorum recusandae voluptates dignissimos similique animi
-                                                    assumenda praesentium et! Illum dolorem est rem voluptas nam!
-                                                    Voluptatem.
-                                                </p>
-                                            </blockquote>
-                                            <h3>Lorem ipsum dolor sit amet.</h3>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-
-                                            <hr />
-
-                                            <h2>Lorem ipsum dolor sit amet.</h2>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                <img src="./assets/img/product/item-1.png" alt="" />
-                                                <em>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</em>
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-
-                                            <hr />
-
-                                            <h2>Lorem ipsum dolor sit amet.</h2>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
-                                            <p>
-                                                <img src="./assets/img/product/item-1.png" alt="" />
-                                                <em>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</em>
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-                                                cupiditate. Modi, quidem, ullam sint dolorum recusandae voluptates
-                                                dignissimos similique animi assumenda praesentium et! Illum dolorem est
-                                                rem voluptas nam! Voluptatem.
-                                            </p>
+                                            <?= nl2br(htmlspecialchars($product['description'])) ?>
                                         </div>
                                     </div>
                                 </div>
@@ -471,261 +545,54 @@
                             </div>
                             <div class="prod-tab__content">
                                 <div class="prod-content">
-                                    <h2 class="prod-content__heading">Similar items you might like</h2>
-                                    <div
-                                        class="row row-cols-6 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-2"
-                                    >
-                                        <!-- Product card 1 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-1.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Coffee Beans - Espresso Arabica and Robusta Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$47.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.3</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                    <h2 class="prod-content__heading">Gợi ý sản phẩm tương tự</h2>
+                                    <div class="row row-cols-6 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-2">
+                                        <?php if (mysqli_num_rows($relatedProducts) == 0): ?>
+                                            <p>Không có sản phẩm tương tự</p>
+                                        <?php else: ?>
+                                            <?php while ($rp = mysqli_fetch_assoc($relatedProducts)): ?>
+                                                <div class="col">
+                                                    <article class="product-card">
+                                                        <div class="product-card__img-wrap">
+                                                            <a href="product-detail.php?id=<?= $rp['id'] ?>">
+                                                                <img
+                                                                    src="<?= $rp['image_url'] ?? 'default-product.png' ?>"
+                                                                    class="product-card__thumb"
+                                                                />
+                                                            </a>
 
-                                        <!-- Product card 2 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-2.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza Coffee Blends - Try the Italian Espresso</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$53.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">3.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                                            <button
+                                                                class="like-btn product-card__like-btn <?= isset($_SESSION['wishlist'][$rp['id']]) ? 'like-btn--liked' : '' ?>"
+                                                                data-product-id="<?= $rp['id'] ?>"
+                                                            >
+                                                                <img src="./assets/icons/heart.svg" class="like-btn__icon icon" />
+                                                                <img src="./assets/icons/heart-red.svg" class="like-btn__icon--liked" />
+                                                            </button>
+                                                        </div>
 
-                                        <!-- Product card 3 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-3.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn like-btn--liked product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza - Caffè Espresso Black Tin - Ground coffee</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Welikecoffee</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$99.99</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">5.0</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                                        <h3 class="product-card__title">
+                                                            <a href="product-detail.php?id=<?= $rp['id'] ?>">
+                                                                <?= htmlspecialchars($rp['name']) ?>
+                                                            </a>
+                                                        </h3>
 
-                                        <!-- Product card 4 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-4.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Qualità Oro Mountain Grown - Espresso Coffee Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$38.65</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                                        <p class="product-card__brand">
+                                                            <?= htmlspecialchars($rp['brand']) ?>
+                                                        </p>
 
-                                        <!-- Product card 5 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-1.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
+                                                        <div class="product-card__row">
+                                                            <span class="product-card__price">
+                                                                <?= number_format($rp['price'], 0, ',', '.') ?> ₫
+                                                            </span>
+                                                            <img src="./assets/icons/star.svg" class="product-card__star" />
+                                                            <span class="product-card__score">
+                                                                <?= $rp['average_score'] ?>
+                                                            </span>
+                                                        </div>
+                                                    </article>
                                                 </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Coffee Beans - Espresso Arabica and Robusta Beans</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$47.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">4.3</span>
-                                                </div>
-                                            </article>
-                                        </div>
-
-                                        <!-- Product card 6 -->
-                                        <div class="col">
-                                            <article class="product-card">
-                                                <div class="product-card__img-wrap">
-                                                    <a href="./product-detail.php">
-                                                        <img
-                                                            src="./assets/img/product/item-2.png"
-                                                            alt=""
-                                                            class="product-card__thumb"
-                                                        />
-                                                    </a>
-                                                    <button class="like-btn product-card__like-btn">
-                                                        <img
-                                                            src="./assets/icons/heart.svg"
-                                                            alt=""
-                                                            class="like-btn__icon icon"
-                                                        />
-                                                        <img
-                                                            src="./assets/icons/heart-red.svg"
-                                                            alt=""
-                                                            class="like-btn__icon--liked"
-                                                        />
-                                                    </button>
-                                                </div>
-                                                <h3 class="product-card__title">
-                                                    <a href="./product-detail.php"
-                                                        >Lavazza Coffee Blends - Try the Italian Espresso</a
-                                                    >
-                                                </h3>
-                                                <p class="product-card__brand">Lavazza</p>
-                                                <div class="product-card__row">
-                                                    <span class="product-card__price">$53.00</span>
-                                                    <img
-                                                        src="./assets/icons/star.svg"
-                                                        alt=""
-                                                        class="product-card__star"
-                                                    />
-                                                    <span class="product-card__score">3.4</span>
-                                                </div>
-                                            </article>
-                                        </div>
+                                            <?php endwhile; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -734,11 +601,106 @@
                 </div>
             </div>
         </main>
-
         <!-- Footer -->
         <footer id="footer" class="footer"></footer>
         <script>
             load("#footer", "./templates/footer.php");
         </script>
+        <!-- Phần chọn gram nhảy giá -->
+        <script>
+            const gia100 = <?= (float)$product['price'] ?>;
+            const thue = <?= (int)$product['tax_percent'] ?>;
+            function dinhDangGia(vnd) {
+                return vnd.toLocaleString('vi-VN') + ' ₫';
+            }
+            document.getElementById('weightSelect').addEventListener('change', function () {
+                const gram = parseInt(this.value);
+                const gia = gia100 * (gram / 100);
+                const giaSauThue = gia * (1 + thue / 100);
+
+                document.getElementById('gia-goc').innerText = dinhDangGia(gia);
+                document.getElementById('gia-sau-thue').innerText = dinhDangGia(giaSauThue);
+            });
+        </script>
+        <!-- Ảnh -->
+        <script>
+            const thumbs = document.querySelectorAll('.prod-preview__thumb-img');
+            const bigImages = document.querySelectorAll('.prod-preview__item');
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', function () {
+                    const index = this.dataset.index;
+                    // reset ảnh lớn
+                    bigImages.forEach(img => img.classList.remove('prod-preview__item--current'));
+                    // reset thumbnail
+                    thumbs.forEach(t => t.classList.remove('prod-preview__thumb-img--current'));
+                    // set ảnh được chọn
+                    bigImages[index].classList.add('prod-preview__item--current');
+                    this.classList.add('prod-preview__thumb-img--current');
+                });
+            });
+        </script>
+        <!-- mục yêu thích -->
+    <script>
+    function initWishlist() {
+        document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
+
+                const productId = this.dataset.productId;
+                const liked = this.classList.toggle('like-btn--liked');
+                const action = liked ? 'add' : 'remove';
+
+                const countEl = document.getElementById('wishlistCount');
+                const list = document.querySelector('.act-dropdown__list');
+
+                if (!countEl || !list) return;
+
+                fetch('product-detail.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status !== 'ok') return;
+
+                    // update số lượng
+                    countEl.innerText = String(data.count).padStart(2, '0');
+                    const textCount = document.getElementById('wishlistCountText');
+                    if (textCount) {
+                        textCount.textContent = data.count;
+                    }
+                    // render dropdown
+                    list.innerHTML = '';
+                    data.items.forEach(item => {
+                        list.insertAdjacentHTML('beforeend', `
+                            <div class="col">
+                                <article class="cart-preview-item">
+                                    <div class="cart-preview-item__img-wrap">
+                                        <img src="${item.image}" class="cart-preview-item__thumb">
+                                    </div>
+                                    <h3 class="cart-preview-item__title">${item.name}</h3>
+                                    <p class="cart-preview-item__price">
+                                        ${Number(item.price).toLocaleString('vi-VN')} ₫
+                                    </p>
+                                </article>
+                            </div>
+                        `);
+                    });
+                });
+            });
+        });
+    }
+
+    // ⏳ CHỜ HEADER LOAD XONG
+    const wait = setInterval(() => {
+        if (
+            document.getElementById('wishlistCount') &&
+            document.querySelector('.act-dropdown__list')
+        ) {
+            clearInterval(wait);
+            initWishlist();
+        }
+    }, 100);
+    </script>
     </body>
 </html>
