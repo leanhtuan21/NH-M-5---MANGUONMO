@@ -13,6 +13,21 @@ $min_price    = $_GET['min_price'] ?? '';
 $max_price    = $_GET['max_price'] ?? '';
 $weight       = $_GET['weight'] ?? '';
 $brand_filter = trim($_GET['brand_filter'] ?? '');
+/* === LẤY DANH SÁCH WISHLIST CỦA USER (ĐỂ GIỮ TIM KHI LOAD LẠI) === */
+$likedMap = [];
+
+$uid = $_SESSION['user_id'];
+
+$stmt = mysqli_prepare($conn,
+    "SELECT product_id FROM wishlists WHERE user_id = ?"
+);
+mysqli_stmt_bind_param($stmt, "i", $uid);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
+
+while ($row = mysqli_fetch_assoc($res)) {
+    $likedMap[$row['product_id']] = true;
+}
 
 // Flags kiểm tra trạng thái
 $isSearching = !empty($keyword);
@@ -94,51 +109,64 @@ if ($result->num_rows > 0) {
     }
 }
 /* ===XỬ LÝ AJAX WISHLIST=== */
+/* === XỬ LÝ AJAX WISHLIST (CSDL) === */
 if (isset($_POST['ajax_wishlist'])) {
-    if (!isset($_SESSION['wishlist'][$_SESSION['user_id']])) {
-        $_SESSION['wishlist'][$_SESSION['user_id']] = [];
-    }
+    $uid = $_SESSION['user_id'];
     $product_id = (int)($_POST['product_id'] ?? 0);
     $action = $_POST['action'] ?? '';
-    if ($product_id > 0) {
-        // ADD
-        if ($action === 'add' && !isset($_SESSION['wishlist'][$_SESSION['user_id']][$product_id])) {
-            $stmt = mysqli_prepare($conn, "
-                SELECT p.id, p.name, p.price, p.tax_percent, pi.image_url
-                FROM products p
-                LEFT JOIN product_images pi 
-                    ON p.id = pi.product_id AND pi.is_main = 1
-                WHERE p.id = ?
-            ");
-            mysqli_stmt_bind_param($stmt, "i", $product_id);
-            mysqli_stmt_execute($stmt);
-            $p = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-            if ($p) {
-                $price = $p['price'] * (1 + $p['tax_percent'] / 100);
-                $_SESSION['wishlist'][$_SESSION['user_id']][$product_id] = [
-    'id'    => $p['id'],
-    'name'  => $p['name'],
-    'price' => $price,
-    'image' => $p['image_url'] ?? 'default-product.png'
-];
-            }
+    if ($product_id > 0) {
+
+        /* ADD */
+        if ($action === 'add') {
+            $stmt = mysqli_prepare($conn,
+                "INSERT IGNORE INTO wishlists (user_id, product_id) VALUES (?, ?)"
+            );
+            mysqli_stmt_bind_param($stmt, "ii", $uid, $product_id);
+            mysqli_stmt_execute($stmt);
         }
 
-        // REMOVE
+        /* REMOVE */
         if ($action === 'remove') {
-            unset($_SESSION['wishlist'][$_SESSION['user_id']][$product_id]);
+            $stmt = mysqli_prepare($conn,
+                "DELETE FROM wishlists WHERE user_id = ? AND product_id = ?"
+            );
+            mysqli_stmt_bind_param($stmt, "ii", $uid, $product_id);
+            mysqli_stmt_execute($stmt);
         }
     }
-        echo json_encode([
-        'status' => 'ok',
-        'count'  => count($_SESSION['wishlist'][$_SESSION['user_id']]),
-        'items'  => array_values($_SESSION['wishlist'][$_SESSION['user_id']]),
-        'liked'  => isset($_SESSION['wishlist'][$_SESSION['user_id']][$product_id])
-    ]);
-exit;
 
+    /* LẤY LẠI DANH SÁCH YÊU THÍCH */
+    $items = [];
+    $stmt = mysqli_prepare($conn, "
+        SELECT p.id, p.name, p.price, pi.image_url
+        FROM wishlists w
+        JOIN products p ON w.product_id = p.id
+        LEFT JOIN product_images pi 
+            ON p.id = pi.product_id AND pi.is_main = 1
+        WHERE w.user_id = ?
+    ");
+    mysqli_stmt_bind_param($stmt, "i", $uid);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+
+    while ($row = mysqli_fetch_assoc($res)) {
+        $items[] = [
+            'id'    => $row['id'],
+            'name'  => $row['name'],
+            'price' => $row['price'],
+            'image' => $row['image_url'] ?? 'default-product.png'
+        ];
+    }
+
+    echo json_encode([
+        'status' => 'ok',
+        'count'  => count($items),
+        'items'  => $items
+    ]);
+    exit;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -333,7 +361,9 @@ exit;
                                     <a href="./product-detail.php?id=<?php echo $row['id']; ?>">
                                         <img src="<?php echo $row['image']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-card__thumb" />
                                     </a>
-                                    <button type="button" class="like-btn product-card__like-btn <?= isset($_SESSION['wishlist'][$_SESSION['user_id']][$row['id']]) ? 'like-btn--liked' : '' ?>" data-product-id="<?= $row['id'] ?>" >
+                                    <button type="button"
+    class="like-btn product-card__like-btn <?= isset($likedMap[$row['id']]) ? 'like-btn--liked' : '' ?>"
+    data-product-id="<?= $row['id'] ?>">
                                         <img
                                             src="./assets/icons/heart.svg"
                                             alt=""
