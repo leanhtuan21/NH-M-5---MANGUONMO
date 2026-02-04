@@ -172,14 +172,6 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                 Thông tin cá nhân
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/message-2.svg" alt="" class="icon" />
-                                                </span>
-                                                Quyền riêng tư & liên hệ
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
 
@@ -196,39 +188,15 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="#!" class="profile-menu__link">
+                                            <a href="favourite.php" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/heart.svg" alt="" class="icon" />
                                                 </span>
                                                 Danh sách yêu thích
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/gift-2.svg" alt="" class="icon" />
-                                                </span>
-                                                Quà tặng
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
-
-                                <!-- Menu 3 -->
-                                <div class="profile-menu">
-                                    <h3 class="profile-menu__title">Gói & đăng ký</h3>
-                                    <ul class="profile-menu__list">
-                                        <li>
-                                            <a href="#!" class="profile-menu__link">
-                                                <span class="profile-menu__icon">
-                                                    <img src="./assets/icons/shield.svg" alt="" class="icon" />
-                                                </span>
-                                                Gói bảo vệ
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
                                 <!-- Menu 4 -->
                                 <div class="profile-menu">
                                     <h3 class="profile-menu__title">Hỗ trợ khách hàng</h3>
