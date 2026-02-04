@@ -344,7 +344,7 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                             type="text"
                                                             name="address"
                                                             value="<?= htmlspecialchars($address) ?>"
-                                                            placeholder="Nhập mật địa chỉ"
+                                                            placeholder="Nhập một địa chỉ"
                                                             class="form__input"
                                                             required
                                                         />

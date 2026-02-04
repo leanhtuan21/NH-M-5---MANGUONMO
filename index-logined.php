@@ -47,10 +47,10 @@ $types = "";
 
 // 1. XỬ LÝ TÌM KIẾM
 if ($isSearching) {
-    $sql .= " AND (REPLACE(p.name, ' ', '') LIKE ? OR REPLACE(p.brand, ' ', '') LIKE ?)";
-    $clean_keyword = "%" . str_replace(' ', '', $keyword) . "%";
-    $params[] = $clean_keyword; 
-    $params[] = $clean_keyword;
+    $sql .= " AND (p.name LIKE ? OR p.brand LIKE ?)";
+    $search_param = "%$keyword%";
+    $params[] = $search_param; 
+    $params[] = $search_param;
     $types .= "ss";
 }
 
@@ -64,14 +64,13 @@ if ($max_price !== '') {
     $params[] = $max_price; $types .= "d";
 }
 if (!empty($weight)) {
-    $sql .= " AND p.weight_unit = ?";
-    $params[] = $weight; $types .= "s";
+    // Dùng LIKE vì một sản phẩm có thể có nhiều trọng lượng "100g, 200g"
+    $sql .= " AND p.weight_unit LIKE ?";
+    $params[] = "%$weight%"; $types .= "s";
 }
 if (!empty($brand_filter)) {
-    $sql .= " AND REPLACE(p.brand, ' ', '') LIKE ?";
-    $clean_brand = "%" . str_replace(' ', '', $brand_filter) . "%";
-    $params[] = $clean_brand; 
-    $types .= "s";
+    $sql .= " AND p.brand LIKE ?";
+    $params[] = "%$brand_filter%"; $types .= "s";
 }
 
 // --- BƯỚC QUAN TRỌNG: TÍNH TỔNG SỐ TRANG ($total_page) ---
