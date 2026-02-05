@@ -27,6 +27,8 @@ $sql = "
         p.id,
         p.name,
         p.price,
+        p.stock_quantity,
+        p.weight_unit,
         pi.image_url AS image,
         p.brand
     FROM wishlists w
@@ -137,23 +139,20 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 </h3>
                                                 <p class="cart-item__price-wrap">
                                                     <?= number_format($item['price'], 0, ',', '.') ?> ₫
-                                                    <span class="cart-item__status">In Stock</span>
+                                                    <p class="cart-item__weight" style="font-size: 1.4rem; color: #717385; margin-top: 4px;">
+                                                        Khối lượng: 100g
+                                                    </p>
+                                                    <?php if ($item['stock_quantity'] >= 1): ?>
+                                                        <span class="cart-item__status" style="color: #67ce5d;">Còn hàng</span>
+                                                    <?php else: ?>
+                                                        <span class="cart-item__status" style="color: #ed6237;">Hết hàng</span>
+                                                    <?php endif; ?>
                                                 </p>
                                                 <!-- GIỮ NGUYÊN CTRL -->
                                                 <div class="cart-item__ctrl-wrap">
                                                     <div class="cart-item__ctrl cart-item__ctrl--md-block">
                                                         <div class="cart-item__input">
                                                             <?= htmlspecialchars($item['brand']) ?>
-                                                        </div>
-
-                                                        <div class="cart-item__input">
-                                                            <button class="cart-item__input-btn">
-                                                                <img class="icon" src="./assets/icons/minus.svg" />
-                                                            </button>
-                                                            <span>1</span>
-                                                            <button class="cart-item__input-btn">
-                                                                <img class="icon" src="./assets/icons/plus.svg" />
-                                                            </button>
                                                         </div>
                                                     </div>
                                                     <div class="cart-item__ctrl">
@@ -175,10 +174,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <p class="cart-item__total-price">
                                                     <?= number_format($item['price'], 0, ',', '.') ?> ₫
                                                 </p>
-                                                <!-- CHECK OUT GIỮ NGUYÊN -->
-                                                <button class="cart-item__checkout-btn btn btn--primary btn--rounded">
-                                                    Check Out
-                                                </button>
                                             </div>
                                         </div>
                                     </article>
@@ -197,12 +192,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 Continue Shopping
                                             </a>
                                         </div>
-                                        <a
-                                            href="./checkout.php"
-                                            class="cart-info__checkout-all btn btn--primary btn--rounded"
-                                        >
-                                            All Check Out
-                                        </a>
                                     </div>
                                 </div>
                             </div>
