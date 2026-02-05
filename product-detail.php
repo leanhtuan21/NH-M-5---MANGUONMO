@@ -589,14 +589,6 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                                                     class="product-card__thumb"
                                                                 />
                                                             </a>
-
-                                                            <button
-                                                                class="like-btn product-card__like-btn"
-                                                                data-product-id="<?= $rp['id'] ?>"
-                                                            >
-                                                                <img src="./assets/icons/heart.svg" class="like-btn__icon icon" />
-                                                                <img src="./assets/icons/heart-red.svg" class="like-btn__icon--liked" />
-                                                            </button>
                                                         </div>
 
                                                         <h3 class="product-card__title">
