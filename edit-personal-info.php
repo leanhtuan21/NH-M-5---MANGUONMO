@@ -10,8 +10,9 @@ $user_id = $_SESSION['user_id'];
 $email = $_SESSION['email'];
 $full_name = $_SESSION['user_name'];
 
-/* 3. Lấy thông tin user từ CSDL */
-$sql = "SELECT id, full_name, email, phone, address, avatar
+/* 3. Lấy thông tin user từ CSDL + câu hỏi xác minh */
+$sql = "SELECT id, full_name, email, phone, address, avatar,
+               security_answer_1, security_answer_2
         FROM users
         WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
@@ -20,29 +21,70 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
 $avatar = !empty($user['avatar']) ? $user['avatar'] : 'avatar-3.png';
+
 /* 5. Gán dữ liệu ra form */
 $full_name = $user['full_name'] ?? '';
 $phone     = $user['phone'] ?? '';
 $address   = $user['address'] ?? '';
+$has_security_info =
+    !empty($user['security_answer_1']) &&
+    !empty($user['security_answer_2']);
+
+
 /* 6. Xử lý cập nhật */
 if (isset($_POST['update_profile'])) {
+
     $phone = trim($_POST['phone'] ?? '');
-    // kiểm tra số điện thoại: đúng 10 chữ số
-    if (!preg_match('/^0\d{9}$/', $phone)) {
-        echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0');</script>";
+    if (!preg_match('/^[0-9]{10}$/', $phone)) {
+        echo "<script>alert('Số điện thoại phải gồm đúng 10 chữ số');</script>";
         exit;
     }
-    $address   = trim($_POST['address'] ?? '');
-    $sql_update = "UPDATE users 
-                    SET phone = ?, address = ?
-                    WHERE id = ?";
-    $stmt = mysqli_prepare($conn, $sql_update);
-    mysqli_stmt_bind_param($stmt, "ssi", $phone, $address, $user_id);
+
+    $address = trim($_POST['address'] ?? '');
+
+    // LẤY CÂU TRẢ LỜI XÁC MINH
+    $ans1 = trim($_POST['security_answer_1'] ?? '');
+    $ans2 = trim($_POST['security_answer_2'] ?? '');
+
+    // NẾU USER NHẬP ĐỦ 2 CÂU → LƯU
+    if ($ans1 !== '' && $ans2 !== '') {
+        $ans1 = strtolower($ans1);
+        $ans2 = strtolower($ans2);
+
+        $sql_update = "UPDATE users 
+                        SET phone = ?, address = ?, 
+                            security_answer_1 = ?, security_answer_2 = ?
+                        WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql_update);
+        mysqli_stmt_bind_param(
+            $stmt,
+            "ssssi",
+            $phone,
+            $address,
+            $ans1,
+            $ans2,
+            $user_id
+        );
+    } else {
+        // KHÔNG NHẬP → CHỈ UPDATE INFO THƯỜNG
+        $sql_update = "UPDATE users 
+                        SET phone = ?, address = ?
+                        WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql_update);
+        mysqli_stmt_bind_param(
+            $stmt,
+            "ssi",
+            $phone,
+            $address,
+            $user_id
+        );
+    }
+
     mysqli_stmt_execute($stmt);
-    // cập nhật lại session để header hiển thị đúng tên
     header("Location: profile.php");
     exit;
 }
+
 // Ảnh đại diện
 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
 
@@ -193,6 +235,14 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                 Thông tin cá nhân
                                             </a>
                                         </li>
+                                        <li>
+                                            <a href="#!" class="profile-menu__link">
+                                                <span class="profile-menu__icon">
+                                                    <img src="./assets/icons/message-2.svg" alt="" class="icon" />
+                                                </span>
+                                                Quyền riêng tư & liên hệ
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
 
@@ -209,15 +259,39 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="favourite.php" class="profile-menu__link">
+                                            <a href="#!" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/heart.svg" alt="" class="icon" />
                                                 </span>
                                                 Danh sách yêu thích
                                             </a>
                                         </li>
+                                        <li>
+                                            <a href="#!" class="profile-menu__link">
+                                                <span class="profile-menu__icon">
+                                                    <img src="./assets/icons/gift-2.svg" alt="" class="icon" />
+                                                </span>
+                                                Quà tặng
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
+
+                                <!-- Menu 3 -->
+                                <div class="profile-menu">
+                                    <h3 class="profile-menu__title">Gói & đăng ký</h3>
+                                    <ul class="profile-menu__list">
+                                        <li>
+                                            <a href="#!" class="profile-menu__link">
+                                                <span class="profile-menu__icon">
+                                                    <img src="./assets/icons/shield.svg" alt="" class="icon" />
+                                                </span>
+                                                Gói bảo vệ
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
                                 <!-- Menu 4 -->
                                 <div class="profile-menu">
                                     <h3 class="profile-menu__title">Hỗ trợ khách hàng</h3>
@@ -358,10 +432,49 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                                 </div>
                                             </div>
 
+                                            <!-- ===== SECURITY QUESTIONS (XÁC MINH CHÍNH CHỦ) ===== -->
+                                            <div class="form__row">
+                                                <div class="form__group">
+                                                    <label class="form__label form-card__label">
+                                                        Sở thích
+                                                    </label>
+                                                    <div class="form__text-input">
+                                                        <input
+                                                            type="text"
+                                                            name="security_answer_1"
+                                                            value="<?= htmlspecialchars($user['security_answer_1'] ?? '') ?>"
+                                                            placeholder="Sở thích"
+                                                            class="form__input"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <p class="form__error">Vui lòng nhập câu trả lời</p>
+                                                </div>
+
+                                                <div class="form__group">
+                                                    <label class="form__label form-card__label">
+                                                        Năng khiếu
+                                                    </label>
+                                                    <div class="form__text-input">
+                                                        <input
+                                                            type="text"
+                                                            name="security_answer_2"
+                                                            value="<?= htmlspecialchars($user['security_answer_2'] ?? '') ?>"
+                                                            placeholder="Năng khiếu"
+                                                            class="form__input"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <p class="form__error">Vui lòng nhập câu trả lời</p>
+                                                </div>
+                                            </div>
+
                                             <div class="form-card__bottom">
                                                 <a class="btn btn--text" href="./profile.php">Hủy</a>
                                                 <button type="submit" name="update_profile" class="btn btn--primary btn--rounded">Lưu thay đổi</button>
                                             </div>
+
+
                                         </form>
                                     </div>
                                 </div>
