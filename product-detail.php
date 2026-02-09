@@ -1,4 +1,7 @@
 <?php
+
+/** * 1. KHỞI TẠO VÀ KẾT NỐI 
+ */
 session_start();
 require_once 'db_connect.php';
 
@@ -90,17 +93,31 @@ $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
 if (!$product) { die('Sản phẩm không tồn tại'); }
 
-// Xử lý khối lượng (weight unit)
+// Lấy danh sách khối lượng + tồn kho từ bảng product_weights
 $ds_khoi_luong = [];
-if (!empty($product['weight_unit'])) {
-    $ds_khoi_luong = array_map('trim', explode(',', $product['weight_unit']));
+
+$stmt_w = mysqli_prepare($conn, "
+    SELECT weight_gram, stock_quantity 
+    FROM product_weights 
+    WHERE product_id = ?
+    ORDER BY weight_gram ASC
+");
+mysqli_stmt_bind_param($stmt_w, "i", $product_id);
+mysqli_stmt_execute($stmt_w);
+$res_w = mysqli_stmt_get_result($stmt_w);
+
+while ($row = mysqli_fetch_assoc($res_w)) {
+    $ds_khoi_luong[] = $row;
 }
+
 
 /** * 5. TÍNH TOÁN GIÁ CẢ BAN ĐẦU 
  */
 $gia_goc = (float)$product['price'];
 $thue = (int)$product['tax_percent'];
-$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0] : 100;
+$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0]['weight_gram'] : 100;
+$stock_mac_dinh = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0]['stock_quantity'] : 0;
+
 $gia_theo_gram = $gia_goc * ($gram_chon / 100);
 $gia_sau_thue = $gia_theo_gram * (1 + $thue / 100);
 
@@ -145,7 +162,7 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
 
     <style>
         .prod-info__row:has(#gia-goc) { flex-direction: column; align-items: flex-start; gap: 6px; }
-        .prod-info__price { font-size: 32px; font-weight: 700; color: #e53935; padding: 4px 8px; }
+        .prod-info__price { font-size: 32px; font-weight: 700; color: #e53935; }
         .prod-info__tax { font-size: 14px; color: #2e7d32; background: #e8f5e9; padding: 4px 8px; border-radius: 6px; }
         .prod-info__total-price { font-size: 18px; font-weight: 600; }
         .like-btn--liked .like-btn__icon { display: none; }
@@ -256,12 +273,8 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                 <h1 class="prod-info__heading"><?= htmlspecialchars($product['name']) ?></h1>
                                 
                                 <div class="prod-info__row">
-                                   <div class="prod-info__price" id="gia-sau-thue">
-                                        <?= number_format($gia_sau_thue, 0, ',', '.') ?> ₫
-                                    </div>
-                                    <div class="prod-info__total-price" id="gia-goc">
-                                        <?= number_format($gia_theo_gram, 0, ',', '.') ?> ₫
-                                    </div>
+                                    <div class="prod-info__price" id="gia-sau-thue"><?= number_format($gia_sau_thue, 0, ',', '.') ?> ₫</div>
+                                    <div class="prod-info__total-price" id="gia-goc"><?= number_format($gia_theo_gram, 0, ',', '.') ?> ₫</div>
                                     <div class="prod-info__tax">Thuế VAT: <?= $thue ?>%</div>
                                 </div>
 
@@ -276,20 +289,25 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                         <div class="filter__form-group">
                                             <div class="form__select-wrap">
                                                 <div class="form__select" style="--width: 146px">
-                                                    <select name="weight_unit" id="weightSelect" class="prod-prop__title">
-                                                        <?php foreach ($ds_khoi_luong as $khoi_luong): ?>
-                                                            <option value="<?= $khoi_luong ?>">
-                                                                <?= $khoi_luong >= 1000 ? ($khoi_luong / 1000) . 'kg' : $khoi_luong . 'g' ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
+                                                <select name="weight_unit" id="weightSelect" class="prod-prop__title">
+                                                    <?php foreach ($ds_khoi_luong as $row): ?>
+                                                        <option 
+                                                            value="<?= $row['weight_gram'] ?>" 
+                                                            data-stock="<?= $row['stock_quantity'] ?>"
+                                                        >
+                                                            <?= $row['weight_gram'] >= 1000 
+                                                                ? ($row['weight_gram'] / 1000) . 'kg' 
+                                                                : $row['weight_gram'] . 'g' ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <label class="form__label prod-info__label">Số lượng</label>
                                         <div class="filter__form-group">
-                                            <small>Còn <?= $product['stock_quantity'] ?> sản phẩm</small>
+                                            <small id="stockText">Còn <?= (int)$stock_mac_dinh ?> sản phẩm</small>
                                         </div>
                                     </div>
 
@@ -423,13 +441,18 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
     <div id="toast" style="position: fixed; top: 24px; right: 24px; min-width: 320px; max-width: 420px; padding: 18px 22px; background: #333; color: #fff; border-radius: 12px; box-shadow: 0 10px 28px rgba(0,0,0,0.35); font-size: 16px; font-weight: 600; line-height: 1.4; z-index: 99999; opacity: 0; transform: translateY(-12px); transition: all .25s ease; pointer-events: none;"></div>
 
     <script>
-        const MAX_STOCK = <?= (int)$product['stock_quantity'] ?>;
+        let MAX_STOCK = <?= (int)$stock_mac_dinh ?>;
+
         function increaseQuantity() {
             const input = document.getElementById('quantityInput');
             let current = parseInt(input.value) || 1;
-            if (current < MAX_STOCK) { input.value = current + 1; } 
-            else { alert('❌ Số lượng vượt quá tồn kho (' + MAX_STOCK + ')'); }
+            if (current < MAX_STOCK) { 
+                input.value = current + 1; 
+            } else { 
+                alert('❌ Số lượng vượt quá tồn kho (' + MAX_STOCK + ')'); 
+            }
         }
+
         function decreaseQuantity() {
             const input = document.getElementById('quantityInput');
             let current = parseInt(input.value) || 1;
@@ -437,17 +460,41 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
         }
     </script>
 
+
     <script>
         const gia100 = <?= (float)$product['price'] ?>;
         const thue = <?= (int)$product['tax_percent'] ?>;
-        function dinhDangGia(vnd) { return vnd.toLocaleString('vi-VN') + ' ₫'; }
-        document.getElementById('weightSelect').addEventListener('change', function () {
-            const gram = parseInt(this.value);
+
+        function dinhDangGia(vnd) { 
+            return vnd.toLocaleString('vi-VN') + ' ₫'; 
+        }
+
+        const weightSelect = document.getElementById('weightSelect');
+        const stockText = document.getElementById('stockText');
+        const qtyInput = document.getElementById('quantityInput');
+
+        function updatePriceAndStock() {
+            const gram = parseInt(weightSelect.value);
+            const selectedOption = weightSelect.options[weightSelect.selectedIndex];
+            const stock = parseInt(selectedOption.dataset.stock) || 0;
+
+            // Update giá
             const gia = gia100 * (gram / 100);
             const giaSauThue = gia * (1 + thue / 100);
             document.getElementById('gia-goc').innerText = dinhDangGia(gia);
             document.getElementById('gia-sau-thue').innerText = dinhDangGia(giaSauThue);
-        });
+
+            // Update tồn kho
+            stockText.innerText = 'Còn ' + stock + ' sản phẩm';
+            MAX_STOCK = stock;
+
+            // Reset số lượng nếu vượt tồn kho
+            if (parseInt(qtyInput.value) > stock) {
+                qtyInput.value = stock > 0 ? 1 : 0;
+            }
+        }
+
+        weightSelect.addEventListener('change', updatePriceAndStock);
     </script>
 
     <script>
@@ -502,6 +549,13 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
     <script>
     function handleAddToCart(event) {
         event.preventDefault();
+
+        // --- ĐOẠN MỚI THÊM: Kiểm tra tồn kho ngay lập tức ---
+    if (typeof MAX_STOCK !== 'undefined' && MAX_STOCK <= 0) {
+        showToast('Sản phẩm này đã hết hàng!', 'error', 2000);
+        return false;
+    }
+
         var isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
         if (!isLoggedIn) {
             var modal = document.getElementById('loginModal');
@@ -513,26 +567,48 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
         var formData = new FormData(form);
 
         fetch('add_to_product.php', { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) {
-                showToast(data.message, 'error', 2200);
-                return;
+            .then(res => {
+                return res.text();
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+
+                    if (data.success) {
+                        const cartCountEl = document.getElementById('cartCount');
+                        if (cartCountEl && typeof data.cart_count !== 'undefined') {
+                            cartCountEl.innerText = String(data.cart_count).padStart(2, '0');
+                        }
+                        showToast(data.message, 'success', 1500);
+                        setTimeout(() => { window.location.href = 'checkout.php'; }, 1200);
+                    } else {
+                // --- PHẦN SỬA LỖI (SỬA TẠI ĐÂY) ---
+                
+                // Chuyển thông báo về chữ thường để so sánh cho chính xác
+                const msg = data.message.toLowerCase();
+
+                // Kiểm tra xem thông báo có chứa từ khóa liên quan đến tồn kho không
+                if (msg.includes('chỉ còn') || msg.includes('trong kho') || msg.includes('hết hàng')) {
+                    // Nếu là lỗi tồn kho -> Hiển thị thông báo thân thiện
+                    showToast('Hãy kiểm tra lại giỏ hàng của bạn', 'error');
+                } else {
+                    // Nếu là lỗi khác (code sai, thiếu dữ liệu...) -> Hiển thị nguyên văn để debug
+                    showToast(data.message, 'error');
+                }
             }
-            // Cập nhật số lượng giỏ hàng trên header
-            const cartCountEl = document.getElementById('cartCount');
-            if (cartCountEl && typeof data.cart_count !== 'undefined') {
-                cartCountEl.innerText = String(data.cart_count).padStart(2, '0');
-            }
-            showToast(data.message, 'success', 1500);
-            setTimeout(() => { window.location.href = 'checkout.php'; }, 1200);
-        })
-        .catch(err => {
-            showToast('Có lỗi xảy ra, vui lòng thử lại', 'error', 2000);
-        });
+
+        } catch (e) {
+            // Trường hợp server trả về lỗi PHP (không phải JSON)
+            console.error("Lỗi phản hồi:", text);
+            alert("Lỗi hệ thống: " + text); // Hiện popup để bạn dễ copy lỗi sửa
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('Lỗi kết nối server', 'error');
+    });
     }
     </script>
-
     <script>
         function showToast(message, type = 'success', duration = 2000) {
             const toast = document.getElementById('toast');
