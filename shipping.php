@@ -13,14 +13,32 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = (int) $_SESSION['user_id'];
-/* ===== LẤY SẢN PHẨM ĐANG CHECKOUT ===== */
-$checkoutItems = $_SESSION['checkout_items'] ?? [];
-
-if (empty($checkoutItems)) {
+if (!isset($_SESSION['checkout']) || empty($_SESSION['checkout']['items'])) {
     header("Location: checkout.php");
     exit;
 }
+/* ===== LẤY SẢN PHẨM ĐANG CHECKOUT ===== */
+$checkoutItems = $_SESSION['checkout']['items'];
+$total_qty     = $_SESSION['checkout']['total_qty'];
+$total_price   = $_SESSION['checkout']['total_price'];
+$total_price = (int)$total_price;
 
+if ($total_price >= 500000) {
+    $shipping_fee = 0;
+    $shipping_text = 'Miễn phí';
+} else {
+    $shipping_fee = 15000;
+    $shipping_text = number_format($shipping_fee, 0, ',', '.') . 'đ';
+}
+
+$grand_total = $total_price + $shipping_fee;
+/* ===== TÍNH NGÀY GIAO DỰ KIẾN ===== */
+$today = new DateTime();
+$min_days = 3;
+$max_days = 7;
+$delivery_from = (clone $today)->modify("+$min_days days")->format('Y-m-d');
+$delivery_to   = (clone $today)->modify("+$max_days days")->format('Y-m-d');
+$weight = $_SESSION['checkout']['items'];
 /* ===== LẤY DANH SÁCH ĐỊA CHỈ ===== */
 $sql = "
     SELECT * FROM shipping_addresses
@@ -57,6 +75,57 @@ if (isset($_GET['edit_id'])) {
 
 /* ===== XỬ LÝ ADD / UPDATE ===== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+ /* =========================
+       1. ĐẶT HÀNG
+    ==========================*/
+    if (isset($_POST['place_order'])) {
+
+        $order_code = 'ORD' . date('YmdHis') . rand(100,999);
+        $shipping_method = 'COD';
+        $address_id = (int)$_POST['address_id'];   // id địa chỉ user chọn
+        $stmt = $conn->prepare("
+        INSERT INTO orders
+        (order_code,user_id,total_amount,shipping_method,shipping_fee,status,payment_status,address_id)
+        VALUES (?,?,?,?,?,'pending','unpaid',?)
+        ");
+
+        $stmt->bind_param(
+            "siddsi",
+            $order_code,
+            $user_id,
+            $grand_total,
+            $shipping_method,
+            $shipping_fee,
+            $address_id
+        );
+        $stmt->execute();
+        $order_id = $conn->insert_id;
+        $stmt->close();
+
+        /* insert items */
+        $item_stmt = $conn->prepare("
+            INSERT INTO order_items
+            (order_id, product_id, quantity, price_at_purchase)
+            VALUES (?, ?, ?, ?)
+        ");
+
+        foreach ($_SESSION['checkout']['items'] as $item) {
+            $item_stmt->bind_param(
+                "iiid",
+                $order_id,
+                $item['product_id'],
+                $item['quantity'],
+                $item['price']
+            );
+            $item_stmt->execute();
+        }
+
+        $item_stmt->close();
+        unset($_SESSION['checkout']);
+
+        header("Location: payment.php?code=".$order_code);
+        exit;
+    }
 
     // ❌ $name = trim($_POST['name']);
     $receiver_name = trim($_POST['receiver_name']);
@@ -114,7 +183,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $stmt->execute();
     }
-
     header("Location: shipping.php");
     exit;
 }
@@ -239,7 +307,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="row gy-xl-3">
                         <div class="col-8 col-xl-12">
                             <div class="cart-info">
-                                <h1 class="cart-info__heading">1. Shipping, arrives between Mon, May 16—Tue, May 24</h1>
+                                <p>
+                                    Giao hàng dự kiến:
+                                    <?= date('d/m/Y', strtotime($delivery_from)) ?>
+                                    —
+                                    <?= date('d/m/Y', strtotime($delivery_to)) ?>
+                                    </p>
                                 <div class="cart-info__separate"></div>
 
                                 <!-- Checkout address -->
@@ -276,85 +349,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <div class="address-card__choose">
                                                                 <label class="cart-info__checkbox">
                                                                     <input type="radio"
-                                                name="shipping-address"
-                                                class="cart-info__checkbox-input js-select-address"
-                                                value="<?= $addr['id'] ?>"
-                                                data-name="<?= htmlspecialchars($addr['receiver_name']) ?>"
-                                                data-phone="<?= htmlspecialchars($addr['phone']) ?>"
-                                                data-address="<?= htmlspecialchars($addr['address'] . ', ' . $addr['city']) ?>"
-                                                <?= $addr['is_default'] ? 'checked' : '' ?>>
-                                            </label>
-                                        </div>
+                                                                        name="shipping-address"
+                                                                        class="cart-info__checkbox-input js-select-address"
+                                                                        value="<?= $addr['id'] ?>"
+                                                                        data-name="<?= htmlspecialchars($addr['receiver_name']) ?>"
+                                                                        data-phone="<?= htmlspecialchars($addr['phone']) ?>"
+                                                                        data-address="<?= htmlspecialchars($addr['address'] . ', ' . $addr['city']) ?>"
+                                                                        <?= $addr['is_default'] ? 'checked' : '' ?>>
+                                                                    </label>
+                                                                </div>
 
-                                        <div class="address-card__info">
-                                            <h3 class="address-card__title">
-                                                <?= htmlspecialchars($addr['receiver_name']) ?>
-                                            </h3>
+                                                                <div class="address-card__info">
+                                                                    <h3 class="address-card__title">
+                                                                        <?= htmlspecialchars($addr['receiver_name']) ?>
+                                                                    </h3>
 
-                                            <p class="address-card__desc">
-                                                <?= htmlspecialchars($addr['address']) ?>,
-                                                <?= htmlspecialchars($addr['city']) ?><br>
-                                                📞 <?= htmlspecialchars($addr['phone']) ?>
-                                            </p>
+                                                                    <p class="address-card__desc">
+                                                                        <?= htmlspecialchars($addr['address']) ?>,
+                                                                        <?= htmlspecialchars($addr['city']) ?><br>
+                                                                        📞 <?= htmlspecialchars($addr['phone']) ?>
+                                                                    </p>
 
-                                            <ul class="address-card__list">
-                                                <li class="address-card__list-item">Shipping</li>
-                                                <?php if ($addr['is_default']): ?>
-                            <li class="address-card__list-item">Mặc định</li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
+                                                                    <ul class="address-card__list">
+                                                                        <li class="address-card__list-item">Shipping</li>
+                                                                        <?php if ($addr['is_default']): ?>
+                                                                <li class="address-card__list-item">Mặc định</li>
+                                                            <?php endif; ?>
+                                                        </ul>
+                                                    </div>
+                                                </div>
 
-            <div class="address-card__right">
-                <div class="address-card__ctrl">
-                    <a href="shipping.php?edit_id=<?= $addr['id'] ?>"
-                       class="cart-info__edit-btn">
-                        <img class="icon" src="./assets/icons/edit.svg" alt="">
-                        Sửa
-                    </a>
-                </div>
-            </div>
-        </article>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-</div>
-
+                                                <div class="address-card__right">
+                                                    <div class="address-card__ctrl">
+                                                        <a href="shipping.php?edit_id=<?= $addr['id'] ?>"
+                                                        class="cart-info__edit-btn">
+                                                            <img class="icon" src="./assets/icons/edit.svg" alt="">
+                                                            Sửa
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
+                </div>
 
                                 <div class="cart-info__separate"></div>
 
-                                <h2 class="cart-info__sub-heading">Items details</h2>
+                                <h2 class="cart-info__sub-heading">Sản phẩm đã mua</h2>
                                 <div class="cart-info__list">
                                 <?php foreach ($checkoutItems as $item): ?>
+                                    <?php
+                                        $weight = (int)($item['weight_gram'] ?? 0);
+
+                                        if ($weight >= 1000) {
+                                            $weight_text = ($weight / 1000) . ' kg';
+                                        } else {
+                                            $weight_text = $weight . ' g';
+                                        }
+                                    ?>
                                     <article class="cart-item">
-                                        <img
-                                            src="<?= htmlspecialchars($item['image']) ?>"
-                                            class="cart-item__thumb"
-                                            alt=""
-                                        />
+                                        <img 
+                                        src="<?= $item['image_url'] ?? './assets/img/product/item-1.png' ?>" 
+                                        class="cart-item__thumb"
+                                        style="width:80px; height:80px; object-fit:cover;"
+                                    >
                                         <div class="cart-item__content">
                                             <div class="cart-item__content-left">
                                                 <h3 class="cart-item__title">
-                                                    <?= htmlspecialchars($item['name']) ?>
+                                                    <?= htmlspecialchars($item['product_name']) ?>
                                                 </h3>
                                                 <p class="cart-item__price-wrap">
-                                                    <?= number_format($item['price']) ?>đ |
-                                                    <span class="cart-item__status">In Stock</span>
+                                                    <?= number_format($item['price'], 0, ',', '.') ?>đ |
+                                                    <span><?= $weight_text ?></span>
                                                 </p>
-                                                <div class="cart-item__ctrl cart-item__ctrl--md-block">
-                                                    <div class="cart-item__input">
-                                                        <?= htmlspecialchars($item['brand']) ?>
-                                                    </div>
-                                                    <div class="cart-item__input">
-                                                        <span>Số lượng: <?= $item['quantity'] ?></span>
-                                                    </div>
-                                                </div>
+                                                <div>Số lượng: <?= (int)$item['quantity'] ?></div>
                                             </div>
+
                                             <div class="cart-item__content-right">
                                                 <p class="cart-item__total-price">
-                                                    <?= number_format($item['price'] * $item['quantity']) ?>đ
+                                                    <?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?>đ
                                                 </p>
                                             </div>
                                         </div>
@@ -371,23 +445,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         src="./assets/icons/arrow-down-2.svg"
                                                         alt=""
                                                     />
-                                                    Continue Shopping
+                                                    Tiếp tục mua sắm
                                                 </a>
                                             </div>
                                         </div>
                                         <div class="col-4 col-xxl-5">
                                             <div class="cart-info__row">
-                                                <span>Subtotal:</span>
-                                                <span>$191.65</span>
+                                                <span>Tổng tiền hàng: <span class="cart-info__sub-label"></span></span>
+                                                <span><?= number_format($total_price, 0, ',', '.') ?>đ</span>
+                                            </div>
+
+                                            <div class="cart-info__row">
+                                                <span>Tiền ship: </span>
+                                                <span><?= $shipping_text ?></span>
                                             </div>
                                             <div class="cart-info__row">
-                                                <span>Shipping:</span>
-                                                <span>$10.00</span>
+                                                <small style="color:#666">
+                                                    Tiền ship sẽ trả khi nhận đơn hàng
+                                                </small>
                                             </div>
                                             <div class="cart-info__separate"></div>
                                             <div class="cart-info__row cart-info__row--bold">
-                                                <span>Total:</span>
-                                                <span>$201.65</span>
+                                                <span>Thành tiền</span>
+                                                <span><?= number_format($grand_total, 0, ',', '.') ?>đ</span>
                                             </div>
                                         </div>
                                     </div>
@@ -397,40 +477,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="col-4 col-xl-12">
                             <div class="cart-info">
                                 <div class="cart-info__row">
-                                    <span>Subtotal <span class="cart-info__sub-label">(items)</span></span>
-                                    <span>3</span>
+                                    <span>Tổng tiền hàng: </span>
+                                    <span><?= number_format($total_price, 0, ',', '.') ?>đ</span>
                                 </div>
                                 <div class="cart-info__row">
-                                    <span>Price <span class="cart-info__sub-label">(Total)</span></span>
-                                    <span>$191.65</span>
+                                    <span>Tổng sản phẩm</span>
+                                    <span><?= $total_qty ?></span>
+                                </div>
+
+                                <div class="cart-info__row">
+                                    <span>Tiền ship: </span>
+                                    <span><?= $shipping_text ?></span>
                                 </div>
                                 <div class="cart-info__row">
-                                    <span>Shipping</span>
-                                    <span>$10.00</span>
+                                    <small style="color:#666">
+                                        Tiền ship sẽ trả khi nhận đơn hàng
+                                    </small>
                                 </div>
                                 <div class="cart-info__separate"></div>
-                                <div class="cart-info__row">
-                                    <span>Estimated Total</span>
-                                    <span>$201.65</span>
+
+                                <div class="cart-info__row cart-info__row--bold">
+                                    <span>Thành tiền: </span>
+                                    <span><?= number_format($grand_total, 0, ',', '.') ?>đ</span>
                                 </div>
-                                <a href="./payment.php" class="cart-info__next-btn btn btn--primary btn--rounded">
-                                    Continue to checkout
-                                </a>
-                            </div>
-                            <div class="cart-info">
-                                <a href="#!">
-                                    <article class="gift-item">
-                                        <div class="gift-item__icon-wrap">
-                                            <img src="./assets/icons/gift.svg" alt="" class="gift-item__icon" />
-                                        </div>
-                                        <div class="gift-item__content">
-                                            <h3 class="gift-item__title">Send this order as a gift.</h3>
-                                            <p class="gift-item__desc">
-                                                Available items will be shipped to your gift recipient.
-                                            </p>
-                                        </div>
-                                    </article>
-                                </a>
+                                <form method="post" id="order-form">
+                                    <input type="hidden" name="address_id" id="address_id_input">
+                                    <button name="place_order"
+                                            class="cart-info__next-btn btn btn--primary btn--rounded">
+                                        Đặt hàng
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -625,6 +701,18 @@ const defaultRadio = document.querySelector('.js-select-address:checked');
 if (defaultRadio) {
     renderSelected(defaultRadio);
 }
+const addressInput = document.getElementById('address_id_input');
+
+document.querySelectorAll('.js-select-address').forEach(radio => {
+    radio.addEventListener('change', function () {
+        addressInput.value = this.value;
+    });
+});
+
+// auto set mặc định
+const checked = document.querySelector('.js-select-address:checked');
+if (checked) addressInput.value = checked.value;
+
 </script>
 
 </html>
