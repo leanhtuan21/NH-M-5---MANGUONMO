@@ -72,6 +72,22 @@ if (isset($_GET['edit_id'])) {
     $res = $stmt->get_result();
     $editAddress = $res->fetch_assoc();
 }
+/* ===== Xoá địa chỉ ===== */
+if (isset($_GET['delete_id'])) {
+    $delete_id = (int)$_GET['delete_id'];
+
+    $stmt = $conn->prepare("
+        DELETE FROM shipping_addresses
+        WHERE id = ? AND user_id = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param("ii", $delete_id, $user_id);
+    $stmt->execute();
+    $stmt->close();
+
+    header("Location: shipping.php");
+    exit;
+}
 
 /* ===== XỬ LÝ ADD / UPDATE ===== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -135,7 +151,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_default = isset($_POST['is_default']) ? 1 : 0;
     // CHECK: bắt đầu bằng 0 & đủ 10 số
     if (!preg_match('/^0\d{9}$/', $phone_raw)) {
-        echo "<script>alert('Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và đủ 10 số)')</script>";
+        echo "<script>
+            alert('Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và đủ 10 số)');
+            window.location.href='shipping.php';
+          </script>";
         exit; 
     }
 
@@ -265,6 +284,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         -webkit-appearance: none;
         -moz-appearance: none;
     }
+        .form__group--error .form__text-input{
+        border: 1px solid #ff4d4f;
+    }
+
+    .form__group--error .form__error{
+        display: block;
+    }
     </style>
     <body>
         <!-- Header -->
@@ -376,7 +402,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     </p>
 
                                                                     <ul class="address-card__list">
-                                                                        <li class="address-card__list-item">Shipping</li>
                                                                         <?php if ($addr['is_default']): ?>
                                                                 <li class="address-card__list-item">Mặc định</li>
                                                             <?php endif; ?>
@@ -390,6 +415,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         class="cart-info__edit-btn">
                                                             <img class="icon" src="./assets/icons/edit.svg" alt="">
                                                             Sửa
+                                                        </a>
+                                                        <a href="shipping.php?delete_id=<?= $addr['id'] ?>"
+                                                            class="cart-info__edit-btn"
+                                                            onclick="return confirm('Bạn có chắc muốn xoá địa chỉ này?')"
+                                                            style="margin-left:10px;">
+                                                            <img class="icon" src="./assets/icons/trash.svg" alt="">
+                                                            Xóa
                                                         </a>
                                                     </div>
                                                 </div>
@@ -531,7 +563,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="modal__text">Do you want to remove this item from shopping cart?</p>
                 <div class="modal__bottom">
                     <button class="btn btn--small btn--outline modal__btn js-toggle" toggle-target="#delete-confirm">
-                        Cancel
+                        
                     </button>
                     <button
                         class="btn btn--small btn--danger btn--primary modal__btn btn--no-margin js-toggle"
@@ -563,10 +595,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     required>
                                     <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                                 </div>
-                                <p class="form__error">Name must be at least 2 characters</p>
+                                <p class="form__error">Tên phải có ít nhất 2 ký tự.</p>
                             </div>
                             <div class="form__group">
-                                <label for="phone" class="form__label form__label--small">Phone</label>
+                                <label for="phone" class="form__label form__label--small">Số điện thoại</label>
                                 <div class="form__text-input form__text-input--small">
                                     <input type="tel"
                                         name="phone"
@@ -577,11 +609,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         >
                                     <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
                                 </div>
-                                <p class="form__error">Phone must be at least 10 characters</p>
+                                <p class="form__error">Số điện thoại phải có ít nhất 10 ký tự, và là chữ số.</p>
                             </div>
                         </div>
                         <div class="form__group">
-                            <label for="address" class="form__label form__label--small">Address</label>
+                            <label for="address" class="form__label form__label--small">Địa chỉ nhận hàng</label>
                             <div class="form__text-area">
                                 <textarea name="address" class="form__text-area-input" required><?= htmlspecialchars($editAddress['address'] ?? '') ?></textarea>
                                 <img src="./assets/icons/form-error.svg" alt="" class="form__input-icon-error" />
@@ -589,7 +621,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p class="form__error">Address not empty</p>
                         </div>
                         <div class="form__group">
-                            <label for="city" class="form__label form__label--small">City/District/Town</label>
+                            <label for="city" class="form__label form__label--small">Tỉnh/Thành phố</label>
                             <div class="form__text-input form__text-input--small">
                                 
 
@@ -623,16 +655,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        <?php if (isset($editAddress)): ?>
                             <a href="shipping.php"
                             class="btn btn--small btn--text modal__btn">
-                                Cancel
+                                Hủy bỏ
                             </a>
                         <?php else: ?>
                             <button class="btn btn--small btn--text modal__btn js-toggle"
                                     toggle-target="#add-new-address">
-                                Cancel
+                                Hủy bỏ
                             </button>
                         <?php endif; ?>
                         <button type="submit" class="btn btn--small btn--primary modal__btn btn--no-margin">
-                            <?= isset($editAddress) ? 'Update' : 'Create' ?>
+                            <?= isset($editAddress) ? 'Cập nhật' : 'Tạo' ?>
                         </button>
                         <input type="hidden" name="address_id"
                             value="<?= $editAddress['id'] ?? '' ?>">
@@ -718,6 +750,24 @@ document.querySelectorAll('.js-select-address').forEach(radio => {
 const checked = document.querySelector('.js-select-address:checked');
 if (checked) addressInput.value = checked.value;
 
+</script>
+<script>
+const phoneInput = document.querySelector('input[name="phone"]');
+const phoneGroup = phoneInput.closest('.form__group');
+
+function validatePhone() {
+    const value = phoneInput.value.trim();
+    const regex = /^0\d{9}$/;
+
+    if (!regex.test(value)) {
+        phoneGroup.classList.add('form__group--error');   // class đỏ
+    } else {
+        phoneGroup.classList.remove('form__group--error');
+    }
+}
+
+phoneInput.addEventListener('input', validatePhone);
+phoneInput.addEventListener('blur', validatePhone);
 </script>
 
 </html>
