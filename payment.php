@@ -1,3 +1,80 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+if (!isset($_GET['code'])) {
+    header("Location: checkout.php");
+    exit;
+}
+
+$order_code = $_GET['code'];
+
+/* lấy đơn */
+$stmt = $conn->prepare("SELECT * FROM orders WHERE order_code=? LIMIT 1");
+$stmt->bind_param("s", $order_code);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+if (!$order) {
+    die("Không tìm thấy đơn hàng");
+}
+/* ===== ngày giao dự kiến ===== */
+$today = new DateTime();
+
+/* ví dụ: giao 3–7 ngày */
+$delivery_from = (clone $today)->modify('+3 days')->format('d/m/Y');
+$delivery_to   = (clone $today)->modify('+7 days')->format('d/m/Y');
+
+/* lấy item của đơn */
+$stmt2 = $conn->prepare("
+    SELECT SUM(quantity) AS total_qty,
+           SUM(quantity * price_at_purchase) AS total_amount
+    FROM order_items
+    WHERE order_id = ?
+");
+$stmt2->bind_param("i", $order['id']);
+$stmt2->execute();
+$sum = $stmt2->get_result()->fetch_assoc();
+$stmt2->close();
+$stmt_items = $conn->prepare("
+    SELECT 
+        p.name AS product_name,
+        oi.quantity,
+        oi.price_at_purchase,
+        img.image_url
+    FROM order_items oi
+    LEFT JOIN products p ON p.id = oi.product_id
+    LEFT JOIN product_images img 
+        ON img.product_id = p.id AND img.is_main = 1
+    WHERE oi.order_id = ?
+");
+
+$stmt_items->bind_param("i", $order['id']);
+$stmt_items->execute();
+$items = $stmt_items->get_result();
+$total_qty = $sum['total_qty'] ?? 0;
+$total_amount = $sum['total_amount'] ?? 0;
+
+/* lấy đơn */
+$stmt = $conn->prepare("SELECT * FROM orders WHERE order_code=? LIMIT 1");
+$stmt->bind_param("s", $order_code);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
+
+/* lấy địa chỉ */
+$address = null;
+if (!empty($order['address_id'])) {
+
+    $stmt3 = $conn->prepare("SELECT * FROM shipping_addresses WHERE id=?");
+    $stmt3->bind_param("i", $order['address_id']);
+    $stmt3->execute();
+    $address = $stmt3->get_result()->fetch_assoc();
+    $stmt3->close();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -76,7 +153,7 @@
                             <div class="cart-info">
                                 <div class="cart-info__top">
                                     <h2 class="cart-info__heading cart-info__heading--lv2">
-                                        1. Shipping, arrives between Mon, May 16—Tue, May 24
+                                        1. Thời gian giao dự kiến giữa <?= $delivery_from ?> — <?= $delivery_to ?>
                                     </h2>
                                     <a class="cart-info__edit-btn" href="./shipping.php">
                                         <img class="icon" src="./assets/icons/edit.svg" alt="" />
@@ -87,21 +164,44 @@
                                 <!-- Payment item 1 -->
                                 <article class="payment-item">
                                     <div class="payment-item__info">
-                                        <h3 class="payment-item__title">Imran Khan</h3>
-                                        <p class="payment-item__desc">Museum of Rajas, Sylhet Sadar, Sylhet 3100.</p>
+                                            <h3 class="payment-item__title">
+                                            <?= htmlspecialchars($address['receiver_name'] ?? '') ?>
+                                        </h3>
+                                        <p class="payment-item__desc">
+                                            <?= htmlspecialchars(($address['address'] ?? '') . ', ' . ($address['city'] ?? '')) ?>
+                                            <br>
+                                            <?= htmlspecialchars($address['phone'] ?? '') ?>
+                                        </p>
                                     </div>
                                 </article>
 
                                 <!-- Payment item 2 -->
                                 <article class="payment-item">
-                                    <div class="payment-item__info">
-                                        <h3 class="payment-item__title">Items details</h3>
-                                        <p class="payment-item__desc">2 items</p>
+                                <div class="payment-item__info">
+                                    <h3 class="payment-item__title">Chi tiết sản phẩm</h3>
+
+                                    <div style="color:#9e9da8;font-size:14px;margin-bottom:6px;">
+                                        Mã đơn hàng: <?= htmlspecialchars($order_code) ?>
                                     </div>
-                                    <a href="./shipping.php" class="payment-item__detail">View details</a>
+
+                                        <?php while($it = $items->fetch_assoc()): ?>
+                                        <div style="display:flex;align-items:center;margin-bottom:10px">
+                                            <img src="<?= htmlspecialchars($it['image_url'] ?? './assets/img/product/no-image.png') ?>"
+                                            style="width:50px;height:50px;object-fit:cover;margin-right:10px">
+
+                                            <div style="font-size:14px">
+                                                <?= htmlspecialchars($it['product_name'] ?? '') ?>
+                                                (x<?= (int)$it['quantity'] ?>)
+                                                <br>
+                                                <span style="color:#9e9da8">
+                                                    <?= number_format($it['price_at_purchase'],0,',','.') ?>đ
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <?php endwhile; ?>
+                                    </div>
                                 </article>
                             </div>
-
                             <div class="cart-info">
                                 <h2 class="cart-info__heading cart-info__heading--lv2">2. Shipping method</h2>
                                 <div class="cart-info__separate"></div>
@@ -274,12 +374,11 @@
                                 </form>
                                 <div class="cart-info__row">
                                     <span>Subtotal <span class="cart-info__sub-label">(items)</span></span>
-                                    <span>3</span>
+                                    <span><?= $total_qty ?></span>
                                 </div>
                                 <div class="cart-info__row">
                                     <span>Price <span class="cart-info__sub-label">(Total)</span></span>
-                                    <span>$191.65</span>
-                                </div>
+                                    <span><?= number_format($total_amount,0,',','.') ?>đ</span>                                </div>
                                 <div class="cart-info__row">
                                     <span>Shipping</span>
                                     <span>$10.00</span>
