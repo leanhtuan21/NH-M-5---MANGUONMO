@@ -260,6 +260,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-size: 14px;
         color: #333;
     }
+        .form__checkbox input[type="checkbox"]{
+        appearance: none;      /* ẩn checkbox mặc định */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
     </style>
     <body>
         <!-- Header -->
