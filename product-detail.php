@@ -1,10 +1,22 @@
 <?php
+
+/** * 1. KHỞI TẠO VÀ KẾT NỐI 
+ */
 session_start();
 require_once 'db_connect.php';
 
-/* === AJAX WISHLIST (Xử lý khi bấm tim) === */
+$message = '';
+if (isset($_GET['added']) && $_GET['added'] == '1') {
+    $message = 'Sản phẩm đã được thêm vào giỏ hàng!';
+}
+
+$product = null;
+$images = [];
+
+/** * 2. XỬ LÝ AJAX WISHLIST (YÊU THÍCH)
+ * Đặt ở đầu để khi gọi AJAX, script dừng lại và trả về JSON ngay lập tức, không load phần HTML bên dưới.
+ */
 if (isset($_POST['ajax_wishlist'])) {
-    require_once 'db_connect.php';
     header('Content-Type: application/json');
 
     if (!isset($_SESSION['user_id'])) {
@@ -33,26 +45,21 @@ if (isset($_POST['ajax_wishlist'])) {
         mysqli_stmt_execute($stmt);
     }
 
-    /* Kiểm tra lại trạng thái thật trong DB */
     $check = mysqli_prepare($conn, "SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ? LIMIT 1");
     mysqli_stmt_bind_param($check, "ii", $uid, $product_id);
     mysqli_stmt_execute($check);
     mysqli_stmt_store_result($check);
     $liked = mysqli_stmt_num_rows($check) > 0;
 
-    /* Đếm tổng wishlist */
     $countRes = mysqli_query($conn, "SELECT COUNT(*) AS total FROM wishlists WHERE user_id = $uid");
     $count = mysqli_fetch_assoc($countRes)['total'];
 
-    echo json_encode([
-        'status' => 'ok',
-        'liked'  => $liked,
-        'count'  => $count
-    ]);
+    echo json_encode(['status' => 'ok', 'liked' => $liked, 'count' => $count]);
     exit;
 }
 
-/* === LOGIC TRANG CHI TIẾT SẢN PHẨM === */
+/** * 3. KIỂM TRA ĐĂNG NHẬP & ID SẢN PHẨM 
+ */
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
@@ -65,65 +72,69 @@ if (!isset($_GET['id'])) {
 $product_id = (int) $_GET['id'];
 $uid = $_SESSION['user_id'];
 
-// Kiểm tra xem sản phẩm này User đã thích chưa
+/** * 4. TRUY VẤN DỮ LIỆU SẢN PHẨM & TRẠNG THÁI YÊU THÍCH
+ */
+// Kiểm tra sản phẩm đã thích chưa
 $isLiked = false;
 $check = mysqli_prepare($conn, "SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ? LIMIT 1");
 mysqli_stmt_bind_param($check, "ii", $uid, $product_id);
 mysqli_stmt_execute($check);
 mysqli_stmt_store_result($check);
-if (mysqli_stmt_num_rows($check) > 0) {
-    $isLiked = true;
-}
+if (mysqli_stmt_num_rows($check) > 0) { $isLiked = true; }
 
-/* Lấy thông tin sản phẩm */
-$sql = "SELECT p.id, p.category_id, p.name, p.price, p.tax_percent, p.average_score, 
-               p.stock_quantity, p.description, p.weight_unit, pi.image_url
-        FROM products p
-        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1
+// Lấy thông tin chi tiết sản phẩm
+$sql = "SELECT p.*, pi.image_url FROM products p 
+        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1 
         WHERE p.id = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $product_id);
 mysqli_stmt_execute($stmt);
 $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-if (!$product) {
-    die('Sản phẩm không tồn tại');
-}
+if (!$product) { die('Sản phẩm không tồn tại'); }
 
+// Lấy danh sách khối lượng + tồn kho từ bảng product_weights
 $ds_khoi_luong = [];
-if (!empty($product['weight_unit'])) {
-    $ds_khoi_luong = array_map('trim', explode(',', $product['weight_unit']));
+
+$stmt_w = mysqli_prepare($conn, "
+    SELECT weight_gram, stock_quantity 
+    FROM product_weights 
+    WHERE product_id = ?
+    ORDER BY weight_gram ASC
+");
+mysqli_stmt_bind_param($stmt_w, "i", $product_id);
+mysqli_stmt_execute($stmt_w);
+$res_w = mysqli_stmt_get_result($stmt_w);
+
+while ($row = mysqli_fetch_assoc($res_w)) {
+    $ds_khoi_luong[] = $row;
 }
 
-/* ===== TÍNH GIÁ & THUẾ ===== */
+
+/** * 5. TÍNH TOÁN GIÁ CẢ BAN ĐẦU 
+ */
 $gia_goc = (float)$product['price'];
 $thue = (int)$product['tax_percent'];
-$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0] : 100;
+$gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0]['weight_gram'] : 100;
+$stock_mac_dinh = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0]['stock_quantity'] : 0;
+
 $gia_theo_gram = $gia_goc * ($gram_chon / 100);
 $gia_sau_thue = $gia_theo_gram * (1 + $thue / 100);
 
-/* Lấy danh sách ảnh sản phẩm */
-$images = [];
+/** * 6. LẤY DANH SÁCH ẢNH SẢN PHẨM 
+ */
 $stmt_img = mysqli_prepare($conn, "SELECT image_url FROM product_images WHERE product_id = ? ORDER BY is_main DESC");
 mysqli_stmt_bind_param($stmt_img, "i", $product_id);
 mysqli_stmt_execute($stmt_img);
 $result_img = mysqli_stmt_get_result($stmt_img);
+while ($row = mysqli_fetch_assoc($result_img)) { $images[] = $row['image_url']; }
+if (empty($images)) { $images[] = 'default-product.png'; }
 
-while ($row = mysqli_fetch_assoc($result_img)) {
-    $images[] = $row['image_url'];
-}
-
-if (empty($images)) {
-    $images[] = 'default-product.png';
-}
-
-/* ===== SẢN PHẨM TƯƠNG TỰ ===== */
-$sql_related = "SELECT p.id, p.name, p.price, p.average_score, p.brand, pi.image_url
-                FROM products p
-                LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1
-                WHERE p.category_id = ? AND p.id != ?
-                LIMIT 6";
-
+/** * 7. LẤY SẢN PHẨM TƯƠNG TỰ 
+ */
+$sql_related = "SELECT p.id, p.name, p.price, p.average_score, p.brand, pi.image_url 
+                FROM products p LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1 
+                WHERE p.category_id = ? AND p.id != ? LIMIT 6";
 $stmt_related = mysqli_prepare($conn, $sql_related);
 mysqli_stmt_bind_param($stmt_related, "ii", $product['category_id'], $product['id']);
 mysqli_stmt_execute($stmt_related);
@@ -135,7 +146,7 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><?php echo htmlspecialchars($product['name']); ?> - Grocery Mart</title>
+    <title>Grocery Mart - <?= htmlspecialchars($product['name']) ?></title>
 
     <link rel="apple-touch-icon" sizes="76x76" href="./assets/favicon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
@@ -147,60 +158,72 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
     <link rel="stylesheet" href="./assets/fonts/stylesheet.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
 
+    <script src="./assets/js/scripts.js"></script>
+
     <style>
-        /* Ép dòng giá xuống cột */
-        .prod-info__row:has(#gia-goc) {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 6px;
-        }
-        /* Style giá */
-        .prod-info__price {
-            font-size: 32px;
-            font-weight: 700;
-            color: #e53935;
-        }
-        .prod-info__tax {
-            font-size: 14px;
-            color: #2e7d32;
-            background: #e8f5e9;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-        .prod-info__total-price {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        /* Nút tim */
+        .prod-info__row:has(#gia-goc) { flex-direction: column; align-items: flex-start; gap: 6px; }
+        .prod-info__price { font-size: 32px; font-weight: 700; color: #e53935; }
+        .prod-info__tax { font-size: 14px; color: #2e7d32; background: #e8f5e9; padding: 4px 8px; border-radius: 6px; }
+        .prod-info__total-price { font-size: 18px; font-weight: 600; }
         .like-btn--liked .like-btn__icon { display: none; }
         .like-btn--liked .like-btn__icon--liked { display: inline-block; }
         .like-btn__icon--liked { display: none; }
-
-        /* Logic hiển thị ảnh */
         .prod-preview__item { display: none; }
         .prod-preview__item--current { display: block; }
-        
-        /* Thumbnail */
-        .prod-preview__thumb-img {
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: 0.3s;
+
+        .cart-item__input {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 4px 6px;
+            width: fit-content;
         }
-        .prod-preview__thumb-img:hover,
-        .prod-preview__thumb-img--current {
-            border-color: #e53935;
-            opacity: 1;
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            background: #f2f2f2;
+            font-size: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .qty-input {
+            width: 40px;          /* QUAN TRỌNG: đủ chỗ cho 2-3 chữ số */
+            text-align: center;
+            border: none;
+            outline: none;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Ẩn mũi tên tăng giảm mặc định của input number */
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .qty-input[type=number] {
+            -moz-appearance: textfield;
         }
     </style>
-
-    <script src="./assets/js/scripts.js"></script>
 </head>
 
 <body>
     <header id="header" class="header"></header>
-    <script>
-        load("#header", "./templates/header-logined.php");
-    </script>
+    <script>load("#header", "./templates/header-logined.php");</script>
 
     <main class="product-page">
         <div class="container">
@@ -218,7 +241,7 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                     <li><a href="#!" class="breadcrumbs__link">Departments <img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
                     <li><a href="#!" class="breadcrumbs__link">Coffee <img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
                     <li><a href="#!" class="breadcrumbs__link">Coffee Beans <img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
-                    <li><a href="#!" class="breadcrumbs__link breadcrumbs__link--current"><?= htmlspecialchars($product['name']) ?></a></li>
+                    <li><a href="#!" class="breadcrumbs__link breadcrumbs__link--current">LavAzza</a></li>
                 </ul>
             </div>
 
@@ -226,75 +249,68 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                 <div class="row">
                     <div class="col-5 col-xl-6 col-lg-12">
                         <div class="prod-preview">
-                            
                             <div class="prod-preview__list">
                                 <?php foreach ($images as $i => $img): ?>
                                     <div class="prod-preview__item <?= $i === 0 ? 'prod-preview__item--current' : '' ?>">
-                                        <img src="<?= htmlspecialchars($img) ?>" class="prod-preview__img" alt="Product Image">
+                                        <img src="<?= htmlspecialchars($img) ?>" class="prod-preview__img">
                                     </div>
                                 <?php endforeach; ?>
-                            </div> 
+                            </div>
                             <div class="prod-preview__thumbs">
                                 <?php foreach ($images as $i => $img): ?>
-                                    <img 
-                                        src="<?= htmlspecialchars($img) ?>"
-                                        class="prod-preview__thumb-img <?= $i === 0 ? 'prod-preview__thumb-img--current' : '' ?>"
-                                        data-index="<?= $i ?>"
-                                        alt="Thumbnail"
-                                    >
+                                    <img src="<?= htmlspecialchars($img) ?>"
+                                         class="prod-preview__thumb-img <?= $i === 0 ? 'prod-preview__thumb-img--current' : '' ?>"
+                                         data-index="<?= $i ?>">
                                 <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-7 col-xl-6 col-lg-12">
-                        <form method="POST" class="form" action="product-detail.php?id=<?= $product['id'] ?>" >
+                        <form method="POST" class="form" action="add_to_product.php">
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                             <section class="prod-info">
-                                <h1 class="prod-info__heading">
-                                    <?= htmlspecialchars($product['name']) ?>
-                                </h1>
+                                <h1 class="prod-info__heading"><?= htmlspecialchars($product['name']) ?></h1>
+                                
                                 <div class="prod-info__row">
-                                    <div class="prod-info__total-price" id="gia-sau-thue">
-                                        <?= number_format($gia_sau_thue, 0, ',', '.') ?> ₫
-                                    </div>
-                                    <div class="prod-info__price" id="gia-goc">
-                                        <?= number_format($gia_theo_gram, 0, ',', '.') ?> ₫
-                                    </div>
-                                    <div class="prod-info__tax">
-                                        Thuế VAT: <?= $thue ?>%
-                                    </div>
+                                    <div class="prod-info__total-price" id="gia-sau-thue"><?= number_format($gia_sau_thue, 0, ',', '.') ?> ₫</div>
+                                    <div class="prod-info__price" id="gia-goc"><?= number_format($gia_theo_gram, 0, ',', '.') ?> ₫</div>
+                                    <div class="prod-info__tax">Thuế VAT: <?= $thue ?>%</div>
                                 </div>
+
                                 <div class="row">
                                     <div class="col-5 col-xxl-6 col-xl-12">
                                         <div class="prod-prop">
                                             <img src="./assets/icons/star.svg" alt="" class="prod-prop__icon" />
-                                            <h4 class="prod-prop__title">
-                                                (<?= $product['average_score'] ?>) Reviews
-                                            </h4>
+                                            <h4 class="prod-prop__title">(<?= $product['average_score'] ?>) Reviews</h4>
                                         </div>
+
                                         <label class="form__label prod-info__label">Khối lượng</label>
                                         <div class="filter__form-group">
                                             <div class="form__select-wrap">
                                                 <div class="form__select" style="--width: 146px">
-                                                    <select name="weight_unit" id="weightSelect" class="prod-prop__title">
-                                                        <?php foreach ($ds_khoi_luong as $khoi_luong): ?>
-                                                            <option value="<?= $khoi_luong ?>">
-                                                                <?= $khoi_luong >= 1000 
-                                                                    ? ($khoi_luong / 1000) . 'kg' 
-                                                                    : $khoi_luong . 'g' 
-                                                                ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
+                                                <select name="weight_unit" id="weightSelect" class="prod-prop__title">
+                                                    <?php foreach ($ds_khoi_luong as $row): ?>
+                                                        <option 
+                                                            value="<?= $row['weight_gram'] ?>" 
+                                                            data-stock="<?= $row['stock_quantity'] ?>"
+                                                        >
+                                                            <?= $row['weight_gram'] >= 1000 
+                                                                ? ($row['weight_gram'] / 1000) . 'kg' 
+                                                                : $row['weight_gram'] . 'g' ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                                 </div>
                                             </div>
                                         </div>
+
                                         <label class="form__label prod-info__label">Số lượng</label>
                                         <div class="filter__form-group">
-                                            <small>Còn <?= $product['stock_quantity'] ?> sản phẩm</small>
+                                            <small id="stockText">Còn <?= (int)$stock_mac_dinh ?> sản phẩm</small>
                                         </div>
                                     </div>
+
                                     <div class="col-7 col-xxl-6 col-xl-12">
                                         <div class="prod-props">
                                             <div class="prod-prop">
@@ -304,11 +320,15 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                                     <p class="prod-prop__desc">Thời gian vận chuyển sẽ từ 3 - 6 ngày</p>
                                                 </div>
                                             </div>
+
                                             <div class="prod-info__card">
+                                            <div class="cart-item__input">
+                                                <button type="button" class="qty-btn" onclick="decreaseQuantity()">−</button>
+                                                    <input type="number" name="product_quantity" id="quantityInput" value="1" min="1" class="qty-input">
+                                                <button type="button" class="qty-btn" onclick="increaseQuantity()">+</button>
+                                            </div>
                                                 <div class="prod-info__row">
-                                                    <button type="submit" name="add_to_cart" class="btn btn--primary prod-info__add-to-cart">
-                                                        Add to cart
-                                                    </button>
+                                                    <button type="button" class="btn btn--primary prod-info__add-to-cart" onclick="handleAddToCart(event)">Thêm vào giỏ hàng</button>
                                                     <button type="button" class="like-btn <?= $isLiked ? 'like-btn--liked' : '' ?>" data-product-id="<?= $product['id'] ?>">
                                                         <img src="./assets/icons/heart.svg" class="like-btn__icon icon" />
                                                         <img src="./assets/icons/heart-red.svg" class="like-btn__icon--liked" />
@@ -335,20 +355,38 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                         <div class="prod-tab__content prod-tab__content--current">
                             <div class="row">
                                 <div class="col-8 col-xl-10 col-lg-12">
-                                    <div class="text-content prod-tab__text-content">
-                                        <?= nl2br(htmlspecialchars($product['description'] ?? '')) ?>
-                                    </div>
+                                    <div class="text-content prod-tab__text-content"><?= nl2br(htmlspecialchars($product['description'])) ?></div>
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="prod-tab__content">
                             <div class="prod-content">
                                 <h2 class="prod-content__heading">What our customers are saying</h2>
-                                <p>Chức năng đánh giá đang cập nhật...</p>
+                                <div class="row row-cols-3 gx-lg-2 row-cols-md-1 gy-md-3">
+                                    <div class="col">
+                                        <div class="review-card">
+                                            <div class="review-card__content">
+                                                <img src="./assets/img/avatar/avatar-1.png" alt="" class="review-card__avatar" />
+                                                <div class="review-card__info">
+                                                    <h4 class="review-card__title">Jakir Hussen</h4>
+                                                    <p class="review-card__desc">Great product, I love this Coffee Beans</p>
+                                                </div>
+                                            </div>
+                                            <div class="review-card__rating">
+                                                <div class="review-card__star-list">
+                                                    <img src="./assets/icons/star.svg" class="review-card__star" />
+                                                    <img src="./assets/icons/star.svg" class="review-card__star" />
+                                                    <img src="./assets/icons/star.svg" class="review-card__star" />
+                                                    <img src="./assets/icons/star-half.svg" class="review-card__star" />
+                                                    <img src="./assets/icons/star-blank.svg" class="review-card__star" />
+                                                </div>
+                                                <span class="review-card__rating-title">(3.5) Review</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
                             </div>
                         </div>
-
                         <div class="prod-tab__content">
                             <div class="prod-content">
                                 <h2 class="prod-content__heading">Gợi ý sản phẩm tương tự</h2>
@@ -363,10 +401,6 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                                                         <a href="product-detail.php?id=<?= $rp['id'] ?>">
                                                             <img src="<?= $rp['image_url'] ?? 'default-product.png' ?>" class="product-card__thumb" />
                                                         </a>
-                                                        <button class="like-btn product-card__like-btn" data-product-id="<?= $rp['id'] ?>">
-                                                            <img src="./assets/icons/heart.svg" class="like-btn__icon icon" />
-                                                            <img src="./assets/icons/heart-red.svg" class="like-btn__icon--liked" />
-                                                        </button>
                                                     </div>
                                                     <h3 class="product-card__title">
                                                         <a href="product-detail.php?id=<?= $rp['id'] ?>"><?= htmlspecialchars($rp['name']) ?></a>
@@ -391,95 +425,203 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
     </main>
 
     <footer id="footer" class="footer"></footer>
-    <script>
-        load("#footer", "./templates/footer.php");
-    </script>
+    <script>load("#footer", "./templates/footer.php");</script>
+
+    <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 40px; border-radius: 10px; text-align: center; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <h2 style="margin-bottom: 20px; color: #333; font-size: 24px; font-weight: bold;">Vui lòng đăng nhập</h2>
+            <p style="margin-bottom: 30px; color: #666; font-size: 16px;">Bạn cần đăng nhập tài khoản để mua hàng</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="redirectToLogin()" style="background: #ed4337; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;">Đăng nhập</button>
+                <button onclick="closeLoginModal()" style="background: #f0f0f0; color: #333; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" style="position: fixed; top: 24px; right: 24px; min-width: 320px; max-width: 420px; padding: 18px 22px; background: #333; color: #fff; border-radius: 12px; box-shadow: 0 10px 28px rgba(0,0,0,0.35); font-size: 16px; font-weight: 600; line-height: 1.4; z-index: 99999; opacity: 0; transform: translateY(-12px); transition: all .25s ease; pointer-events: none;"></div>
 
     <script>
-        /* 1. Xử lý chọn khối lượng đổi giá */
+        let MAX_STOCK = <?= (int)$stock_mac_dinh ?>;
+
+        function increaseQuantity() {
+            const input = document.getElementById('quantityInput');
+            let current = parseInt(input.value) || 1;
+            if (current < MAX_STOCK) { 
+                input.value = current + 1; 
+            } else { 
+                alert('❌ Số lượng vượt quá tồn kho (' + MAX_STOCK + ')'); 
+            }
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantityInput');
+            let current = parseInt(input.value) || 1;
+            if (current > 1) { input.value = current - 1; }
+        }
+    </script>
+
+
+    <script>
         const gia100 = <?= (float)$product['price'] ?>;
         const thue = <?= (int)$product['tax_percent'] ?>;
 
-        function dinhDangGia(vnd) {
-            return vnd.toLocaleString('vi-VN') + ' ₫';
+        function dinhDangGia(vnd) { 
+            return vnd.toLocaleString('vi-VN') + ' ₫'; 
         }
 
         const weightSelect = document.getElementById('weightSelect');
-        if (weightSelect) {
-            weightSelect.addEventListener('change', function () {
-                const gram = parseInt(this.value);
-                const gia = gia100 * (gram / 100);
-                const giaSauThue = gia * (1 + thue / 100);
+        const stockText = document.getElementById('stockText');
+        const qtyInput = document.getElementById('quantityInput');
 
-                document.getElementById('gia-goc').innerText = dinhDangGia(gia);
-                document.getElementById('gia-sau-thue').innerText = dinhDangGia(giaSauThue);
-            });
+        function updatePriceAndStock() {
+            const gram = parseInt(weightSelect.value);
+            const selectedOption = weightSelect.options[weightSelect.selectedIndex];
+            const stock = parseInt(selectedOption.dataset.stock) || 0;
+
+            // Update giá
+            const gia = gia100 * (gram / 100);
+            const giaSauThue = gia * (1 + thue / 100);
+            document.getElementById('gia-goc').innerText = dinhDangGia(gia);
+            document.getElementById('gia-sau-thue').innerText = dinhDangGia(giaSauThue);
+
+            // Update tồn kho
+            stockText.innerText = 'Còn ' + stock + ' sản phẩm';
+            MAX_STOCK = stock;
+
+            // Reset số lượng nếu vượt tồn kho
+            if (parseInt(qtyInput.value) > stock) {
+                qtyInput.value = stock > 0 ? 1 : 0;
+            }
         }
 
-        /* 2. Xử lý chuyển ảnh Gallery */
+        weightSelect.addEventListener('change', updatePriceAndStock);
+    </script>
+
+    <script>
         const thumbs = document.querySelectorAll('.prod-preview__thumb-img');
         const bigImages = document.querySelectorAll('.prod-preview__item');
-
         thumbs.forEach(thumb => {
             thumb.addEventListener('click', function () {
                 const index = this.dataset.index;
-                // reset ảnh lớn
                 bigImages.forEach(img => img.classList.remove('prod-preview__item--current'));
-                // reset thumbnail
                 thumbs.forEach(t => t.classList.remove('prod-preview__thumb-img--current'));
-                // set ảnh được chọn
-                if(bigImages[index]) bigImages[index].classList.add('prod-preview__item--current');
+                bigImages[index].classList.add('prod-preview__item--current');
                 this.classList.add('prod-preview__thumb-img--current');
             });
         });
+    </script>
 
-        /* 3. Xử lý Wishlist (Tim) */
-        function initWishlist() {
-            document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+    <script>
+    function initWishlist() {
+        document.querySelectorAll('.like-btn[data-product-id]').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const productId = this.dataset.productId;
+                const isLikedNow = this.classList.contains('like-btn--liked');
+                const action = isLikedNow ? 'remove' : 'add';
 
-                    const productId = this.dataset.productId;
-                    const isLikedNow = this.classList.contains('like-btn--liked');
-                    const action = isLikedNow ? 'remove' : 'add';
-
-                    fetch('product-detail.php', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                        body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status !== 'ok') return;
-
-                        if (data.liked) {
-                            this.classList.add('like-btn--liked');
-                        } else {
-                            this.classList.remove('like-btn--liked');
-                        }
-
-                        // Cập nhật lại số lượng trên header (cần reload header hoặc update DOM)
-                        // Cách đơn giản: Update text nếu element tồn tại
-                        const countEl = document.getElementById('wishlistCount');
-                        if (countEl) countEl.innerText = String(data.count).padStart(2, '0');
-                        
-                        const textCount = document.getElementById('wishlistCountText');
-                        if (textCount) textCount.textContent = data.count;
-                    })
-                    .catch(err => console.error(err));
+                fetch('product-detail.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `ajax_wishlist=1&product_id=${productId}&action=${action}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status !== 'ok') return;
+                    if (data.liked) { this.classList.add('like-btn--liked'); } 
+                    else { this.classList.remove('like-btn--liked'); }
+                    // Update số lượng hiển thị trên header
+                    const countEl = document.getElementById('wishlistCount');
+                    if (countEl) countEl.innerText = String(data.count).padStart(2, '0');
                 });
             });
+        });
+    }
+    // Chờ header load xong để gắn event
+    const waitWishlist = setInterval(() => {
+        if (document.getElementById('wishlistCount')) {
+            clearInterval(waitWishlist);
+            initWishlist();
+        }
+    }, 100);
+    </script>
+
+    <script>
+    function handleAddToCart(event) {
+        event.preventDefault();
+
+        // --- ĐOẠN MỚI THÊM: Kiểm tra tồn kho ngay lập tức ---
+    if (typeof MAX_STOCK !== 'undefined' && MAX_STOCK <= 0) {
+        showToast('Sản phẩm này đã hết hàng!', 'error', 2000);
+        return false;
+    }
+
+        var isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+        if (!isLoggedIn) {
+            var modal = document.getElementById('loginModal');
+            if (modal) modal.style.display = 'flex';
+            return false;
         }
 
-        // Chờ header load xong mới chạy logic tìm element trong header
-        const wait = setInterval(() => {
-            // Kiểm tra xem header đã render xong chưa (dựa vào 1 element đặc trưng)
-            if (document.getElementById('header').innerHTML.trim() !== "") {
-                clearInterval(wait);
-                initWishlist();
+        var form = event.target.closest('form');
+        var formData = new FormData(form);
+
+        fetch('add_to_product.php', { method: 'POST', body: formData })
+            .then(res => {
+                return res.text();
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+
+                    if (data.success) {
+                        const cartCountEl = document.getElementById('cartCount');
+                        if (cartCountEl && typeof data.cart_count !== 'undefined') {
+                            cartCountEl.innerText = String(data.cart_count).padStart(2, '0');
+                        }
+                        showToast(data.message, 'success', 1500);
+                        setTimeout(() => { window.location.href = 'checkout.php'; }, 1200);
+                    } else {
+                // --- PHẦN SỬA LỖI (SỬA TẠI ĐÂY) ---
+                
+                // Chuyển thông báo về chữ thường để so sánh cho chính xác
+                const msg = data.message.toLowerCase();
+
+                // Kiểm tra xem thông báo có chứa từ khóa liên quan đến tồn kho không
+                if (msg.includes('chỉ còn') || msg.includes('trong kho') || msg.includes('hết hàng')) {
+                    // Nếu là lỗi tồn kho -> Hiển thị thông báo thân thiện
+                    showToast('Hãy kiểm tra lại giỏ hàng của bạn', 'error');
+                } else {
+                    // Nếu là lỗi khác (code sai, thiếu dữ liệu...) -> Hiển thị nguyên văn để debug
+                    showToast(data.message, 'error');
+                }
             }
-        }, 500);
+
+        } catch (e) {
+            // Trường hợp server trả về lỗi PHP (không phải JSON)
+            console.error("Lỗi phản hồi:", text);
+            alert("Lỗi hệ thống: " + text); // Hiện popup để bạn dễ copy lỗi sửa
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('Lỗi kết nối server', 'error');
+    });
+    }
+    </script>
+    <script>
+        function showToast(message, type = 'success', duration = 2000) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.innerText = message;
+            toast.style.background = type === 'error' ? '#d32f2f' : '#2e7d32';
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+            }, duration);
+        }
     </script>
 </body>
 </html>
