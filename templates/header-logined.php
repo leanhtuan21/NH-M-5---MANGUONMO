@@ -4,8 +4,66 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../db_connect.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: sign-in.php");
+    exit;
+}
+/* ====== LẤY SẢN PHẨM YÊU THÍCH TỪ CSDL ====== */
+$uid = $_SESSION['user_id'];
+
+$wishlist = [];
+$so_yeu_thich = 0;
+
+$sql = "
+    SELECT 
+        p.id AS product_id,
+        p.name,
+        p.price,
+        pi.image_url
+    FROM wishlists w
+    JOIN products p ON w.product_id = p.id
+    LEFT JOIN product_images pi 
+        ON p.id = pi.product_id AND pi.is_main = 1
+    WHERE w.user_id = ?
+    ORDER BY w.created_at DESC
+    LIMIT 6
+";
+
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $uid);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
+
+while ($row = mysqli_fetch_assoc($res)) {
+    $wishlist[] = [
+        'id'    => $row['product_id'],
+        'name'  => $row['name'],
+        'price' => $row['price'],
+        'image' => $row['image_url']
+    ];
+}
+
+$so_yeu_thich = count($wishlist);
+
+/* ========ảnh đại diện=========== */
+$user_id = (int)$_SESSION['user_id'];
+
+$sql = "SELECT full_name, email, avatar FROM users WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$user = mysqli_fetch_assoc($result);
+
+if (!$user) {
+    return; // tránh lỗi
+}
+$avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
     //ẢNH ĐẠI DIỆN 
     $email = $_SESSION['email'] ?? null;
+
     $avatar = 'avatar-3.png';
     $user_name = 'User';
 
@@ -1629,12 +1687,10 @@ require_once __DIR__ . '/../db_connect.php';
             </ul>
         </nav>
 
-        <!--  -->
         <div class="navbar__overlay js-toggle" toggle-target="#navbar"></div>
 
-        <!-- Actions -->
-        <div class="top-act">
-            <!-- Tìm kiếm sản phẩm -->
+    <div class="top-act">
+        <!-- Tìm kiếm sản phẩm  -->
         <div class="search-box">
             <form action="index-logined.php" method="GET" class="search-box">
                 <input 
@@ -1642,142 +1698,89 @@ require_once __DIR__ . '/../db_connect.php';
                     name="keyword" 
                     class="search-input" 
                     placeholder="Tìm kiếm ..."
-                    value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>"
+                    value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>"
                 >
                 <button type="submit" class="search-btn">
                     <img src="./assets/icons/search.svg" alt="" class="icon" />
                 </button>
             </form>
         </div>
+        <!-- Yêu thích trong giỏ hàng -->
+        <div class="top-act__group d-md-none">
+            <div class="top-act__btn-wrap">
+                <button class="top-act__btn" id="wishlistBtn">
+                    <img src="./assets/icons/heart.svg" alt="" class="icon top-act__icon" />
+                    <span class="top-act__title" id="wishlistCount">
+                        <span><?= str_pad($so_yeu_thich, 2, '0', STR_PAD_LEFT) ?></span>
+                    </span>
+                </button>
 
-            <!-- Sản phẩm được yêu thích -->
-            <div class="top-act__group d-md-none">
-                <div class="top-act__btn-wrap">
-                    <button class="top-act__btn">
-                        <img src="./assets/icons/heart.svg" alt="" class="icon top-act__icon" />
-                        <span class="top-act__title">03</span>
-                    </button>
-
-                    <!-- Dropdown -->
-                    <div class="act-dropdown">
-                        <div class="act-dropdown__inner">
-                            <img src="./assets/icons/arrow-up.png" alt="" class="act-dropdown__arrow" />
-                            <div class="act-dropdown__top">
-                                <h2 class="act-dropdown__title">You have 3 item(s)</h2>
-                                <a href="./favourite.php" class="act-dropdown__view-all">See All</a>
-                            </div>
-                            <div class="row row-cols-3 gx-2 act-dropdown__list">
-                                <!-- Cart preview item 1 -->
-                                <div class="col">
-                                    <article class="cart-preview-item">
-                                        <div class="cart-preview-item__img-wrap">
-                                            <img
-                                                src="./assets/img/product/item-1.png"
-                                                alt=""
-                                                class="cart-preview-item__thumb"
-                                            />
-                                        </div>
-                                        <h3 class="cart-preview-item__title">Lavazza Coffee Blends</h3>
-                                    </article>
-                                </div>
-
-                                <!-- Cart preview item 2 -->
-                                <div class="col">
-                                    <article class="cart-preview-item">
-                                        <div class="cart-preview-item__img-wrap">
-                                            <img
-                                                src="./assets/img/product/item-2.png"
-                                                alt=""
-                                                class="cart-preview-item__thumb"
-                                            />
-                                        </div>
-                                        <h3 class="cart-preview-item__title">Coffee Beans Espresso</h3>
-                                    </article>
-                                </div>
-
-                                <!-- Cart preview item 3 -->
-                                <div class="col">
-                                    <article class="cart-preview-item">
-                                        <div class="cart-preview-item__img-wrap">
-                                            <img
-                                                src="./assets/img/product/item-3.png"
-                                                alt=""
-                                                class="cart-preview-item__thumb"
-                                            />
-                                        </div>
-                                        <h3 class="cart-preview-item__title">Qualità Oro Mountain</h3>
-                                    </article>
-                                </div>
-                            </div>
-                            <div class="act-dropdown__separate"></div>
-                            <div class="act-dropdown__checkout">
-                            </div>
+                <div class="act-dropdown">
+                    <div class="act-dropdown__inner">
+                        <img src="./assets/icons/arrow-up.png" alt="" class="act-dropdown__arrow" />
+                        <div class="act-dropdown__top">
+                            
+                            <a href="./favourite.php" class="act-dropdown__view-all">Tất cả</a>
                         </div>
+                        <div class="row row-cols-3 gx-2 act-dropdown__list" id="wishlistPreview">
+                            <?php if (empty($wishlist)): ?>
+                                <p style="padding: 12px; font-size: 14px;">Chưa có sản phẩm yêu thích</p>
+                            <?php else: ?>
+                                <?php foreach ($wishlist as $item): ?>
+                                    <div class="col">
+                                        <article class="cart-preview-item">
+                                            <div class="cart-preview-item__img-wrap">
+                                                <img src="<?= htmlspecialchars($item['image'] ?? '') ?>" class="cart-preview-item__thumb" alt="" />
+                                            </div>
+                                            <h3 class="cart-preview-item__title"><?= htmlspecialchars($item['name'] ?? 'Sản phẩm') ?></h3>
+                                            <p class="cart-preview-item__price"><?= number_format((float)($item['price'] ?? 0), 0, ',', '.') ?> ₫</p>
+                                        </article>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="act-dropdown__separate"></div>
                     </div>
-                </div>
-
-                <div class="top-act__separate"></div>
-
-                <div class="top-act__btn-wrap">
-                    <a href="./checkout.php" class="top-act__btn">
-                        <img src="./assets/icons/buy.svg" alt="" class="icon top-act__icon" />
-                    </a>
                 </div>
             </div>
-            <!-- Thông tin người dùng -->
-            <div class="top-act__user">
-                <img
-                    src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
-                    alt="Avatar"
-                    class="user-menu__avatar"
-                />
 
-                <!-- Dropdown -->
-                <div class="act-dropdown top-act__dropdown">
-                    <div class="act-dropdown__inner user-menu">
-                        <img
-                            src="./assets/icons/arrow-up.png"
-                            alt=""
-                            class="act-dropdown__arrow top-act__dropdown-arrow"
-                        />
+            <div class="top-act__separate"></div>
+            <!-- Giỏ hàng -->
+            <div class="top-act__btn-wrap">
+                <a href="./checkout.php" class="top-act__btn" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="./assets/icons/buy.svg" alt="" class="icon top-act__icon">
+                    <span class="top-act__title" style="color: inherit;">Cart</span> 
+                </a>
+            </div>
+        </div>
+        <!-- Thông tin người dùng -->
+        <div class="top-act__user">
+            <img src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>" alt="Avatar" class="user-menu__avatar" />
 
-                        <div class="user-menu__top">
-                            <img
-                                src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>"
-                                alt="Avatar"
-                                class="user-menu__avatar"
-                            />
-                            <div class="header-user__info">
-                                <p class="header-user__name">
-                                    <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
-                                </p>
-                                <p class="header-user__email">
-                                    <?= htmlspecialchars($_SESSION['email'] ?? '') ?>
-                                </p>
-                            </div>
+            <div class="act-dropdown top-act__dropdown">
+                <div class="act-dropdown__inner user-menu">
+                    <img src="./assets/icons/arrow-up.png" alt="" class="act-dropdown__arrow top-act__dropdown-arrow" />
+
+                    <div class="user-menu__top">
+                        <img src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>" alt="Avatar" class="user-menu__avatar" />
+                        <div class="header-user__info">
+                            <p class="header-user__name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></p>
+                            <p class="header-user__email"><?= htmlspecialchars($_SESSION['email'] ?? '') ?></p>
                         </div>
-
-                        <ul class="user-menu__list">
-                            <li>
-                                <a href="./profile.php" class="user-menu__link">Profile</a>
-                            </li>
-                            <li>
-                                <a href="./favourite.php" class="user-menu__link">Favourite list</a>
-                            </li>
-                            <li class="user-menu__separate">
-                                <a href="#!" class="user-menu__link" id="switch-theme-btn">
-                                    <span>Dark mode</span>
-                                    <img src="./assets/icons/sun.svg" alt="" class="icon user-menu__icon" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#!" class="user-menu__link">Settings</a>
-                            </li>
-                            <li class="user-menu__separate">
-                                <a href="./logout.php" class="user-menu__link">Logout</a>
-                            </li>
-                        </ul>
                     </div>
+
+                    <ul class="user-menu__list">
+                        <li><a href="./profile.php" class="user-menu__link">Profile</a></li>
+                        <li><a href="./favourite.php" class="user-menu__link">Favourite list</a></li>
+                        <li class="user-menu__separate">
+                            <a href="#!" class="user-menu__link" id="switch-theme-btn">
+                                <span>Dark mode</span>
+                                <img src="./assets/icons/sun.svg" alt="" class="icon user-menu__icon" />
+                            </a>
+                        </li>
+                        <li><a href="#!" class="user-menu__link">Settings</a></li>
+                        <li class="user-menu__separate"><a href="./logout.php" class="user-menu__link">Logout</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
