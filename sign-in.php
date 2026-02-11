@@ -2,23 +2,28 @@
 session_start();
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
-/* === KẾT NỐI VỚI FILE CSDL === */
 require_once __DIR__ . "/db_connect.php";
 
-// Nếu ĐÃ login thì mới đá về index
+/* ===============================
+   NẾU ĐÃ LOGIN → CHUYỂN TRANG
+=================================*/
 if (isset($_SESSION['user_id'])) {
     header("Location: index-logined.php");
     exit;
 }
 
-/* === LẤY EMAIL ĐÃ GHI NHỚ (ĐỂ ĐIỀN VÀO INPUT === */
+/* ===============================
+   LẤY EMAIL COOKIE
+=================================*/
 if (isset($_COOKIE['remember_email'])) {
     $remembered_email = $_COOKIE['remember_email'];
 } else {
     $remembered_email = '';
 }
 
-/* === TỰ ĐĂNG NHẬP KHI LOAD TRANG (AUTO LOGIN) === */
+/* ===============================
+   AUTO LOGIN BẰNG COOKIE
+=================================*/
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_login'])) {
 
     $data = json_decode(base64_decode($_COOKIE['remember_login']), true);
@@ -48,153 +53,154 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_login'])) {
     }
 }
 
-/* === BIẾN KIỂM SOÁT ĐĂNG NHẬP === */
-$error_message = "";
+/* ===============================
+   BIẾN CẤU HÌNH
+=================================*/
 $max_attempts = 3;
 $lockout_time = 30;
+$error_message = "";
 $remaining_seconds = 0;
 
-/* === HIỂN THỊ TRẠNG THÁI KHÓA KHI LOAD TRANG === */
-if ($_SERVER["REQUEST_METHOD"] === "GET" && !empty($_SESSION['last_email'])) {
+/* ===============================
+   HIỂN THỊ LỖI SAU REDIRECT (GET)
+=================================*/
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_SESSION['login_error'])) {
 
-    $email = $_SESSION['last_email'];
-    $lock_key = 'lockout_until_' . md5($email);
+    $error_message = $_SESSION['login_error'];
+    $remaining_seconds = $_SESSION['remaining_seconds'] ?? 0;
 
-    if (isset($_SESSION[$lock_key]) && time() < $_SESSION[$lock_key]) {
-        $remaining_seconds = $_SESSION[$lock_key] - time();
-        $error_message =
-            "Tài khoản đang bị tạm khóa. Vui lòng thử lại sau 
-            <span id='countdown'>$remaining_seconds</span> giây.";
-    }
+    unset($_SESSION['login_error'], $_SESSION['remaining_seconds']);
 }
 
-/* === XỬ LÝ ĐĂNG NHẬP (POST) === */
+/* ===============================
+   XỬ LÝ ĐĂNG NHẬP (POST)
+=================================*/
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $email    = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
+    /* ==== CHẶN POST RỖNG (KHÔNG TRỪ LƯỢT) ==== */
     if ($email === '' || $password === '') {
-        $error_message = "Vui lòng nhập đầy đủ email và mật khẩu";
-    } else {
 
-        /* RESET KHI ĐỔI EMAIL */
-        if (isset($_SESSION['last_email']) && $_SESSION['last_email'] !== $email) {
-            unset($_SESSION['login_attempts_' . md5($_SESSION['last_email'])]);
-            unset($_SESSION['lockout_until_' . md5($_SESSION['last_email'])]);
+        $_SESSION['login_error'] = "Vui lòng nhập đầy đủ email và mật khẩu";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    /* ==== KEY THEO EMAIL ==== */
+    $attempt_key = 'login_attempts_' . md5($email);
+    $lock_key    = 'lockout_until_' . md5($email);
+
+    /* ==== KIỂM TRA ĐANG BỊ KHÓA ==== */
+    if (isset($_SESSION[$lock_key]) && time() < $_SESSION[$lock_key]) {
+
+        $remaining_seconds = $_SESSION[$lock_key] - time();
+
+        $_SESSION['login_error'] =
+            "Tài khoản đang bị khóa. Vui lòng thử lại sau 
+            <span id='countdown'>$remaining_seconds</span> giây.";
+
+        $_SESSION['remaining_seconds'] = $remaining_seconds;
+
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    /* ==== HẾT KHÓA → RESET ==== */
+    if (isset($_SESSION[$lock_key]) && time() >= $_SESSION[$lock_key]) {
+        unset($_SESSION[$lock_key], $_SESSION[$attempt_key]);
+    }
+
+    /* ==== TRUY VẤN USER ==== */
+    $sql = "SELECT id, full_name, password, role FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $login_success = false;
+
+    if ($result && mysqli_num_rows($result) === 1) {
+
+        $user = mysqli_fetch_assoc($result);
+
+        if (md5($password) === $user['password']) {
+            $login_success = true;
         }
-        $_SESSION['last_email'] = $email;
+    }
 
-        $attempt_key = 'login_attempts_' . md5($email);
-        $lock_key    = 'lockout_until_' . md5($email);
+    /* ===============================
+       NẾU LOGIN THÀNH CÔNG
+    =================================*/
+    if ($login_success) {
 
-        /* KIỂM TRA KHÓA */
-        if (isset($_SESSION[$lock_key]) && time() < $_SESSION[$lock_key]) {
+        unset($_SESSION[$attempt_key], $_SESSION[$lock_key]);
 
-            $remaining_seconds = $_SESSION[$lock_key] - time();
-            $error_message =
-                "Tài khoản đang bị tạm khóa. Vui lòng thử lại sau 
-                <span id='countdown'>$remaining_seconds</span> giây.";
+        session_regenerate_id(true);
+
+        $_SESSION['user_id']   = $user['id'];
+        $_SESSION['user_name'] = $user['full_name'];
+        $_SESSION['email']     = $email;
+        $_SESSION['user_role'] = $user['role'];
+
+        /* ==== COOKIE REMEMBER ==== */
+        if (isset($_POST['remember'])) {
+
+            setcookie('remember_email', $email, time() + 86400 * 3, '/');
+
+            setcookie(
+                'remember_login',
+                base64_encode(json_encode(['email' => $email])),
+                time() + 86400 * 3,
+                '/',
+                '',
+                false,
+                true
+            );
 
         } else {
 
-            /* RESET SAU KHI HẾT KHÓA */
-            if (isset($_SESSION[$lock_key])) {
-                unset($_SESSION[$lock_key], $_SESSION[$attempt_key]);
-            }
-
-            /* TRUY VẤN USER */
-            $sql = "SELECT id, full_name, password, role FROM users WHERE email = ?";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "s", $email);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-
-            if ($result && mysqli_num_rows($result) === 1) {
-
-                $user = mysqli_fetch_assoc($result);
-
-                if (md5($password) === $user['password']) {
-
-                    /* ================= LOGIN THÀNH CÔNG ================= */
-                    unset($_SESSION[$attempt_key], $_SESSION[$lock_key]);
-
-                    session_regenerate_id(true);
-
-                    $_SESSION['user_id']   = $user['id'];
-                    $_SESSION['user_name'] = $user['full_name'];
-                    $_SESSION['email']     = $email;
-                    $_SESSION['user_role'] = $user['role'];
-
-                    /* ===== GHI NHỚ ĐĂNG NHẬP (COOKIE) ===== */
-                    if (isset($_POST['remember'])) {
-
-                        // Cookie điền email
-                        setcookie(
-                            'remember_email',
-                            $email,
-                            time() + 86400 * 3,
-                            '/'
-                        );
-
-                        // Cookie auto login
-                        setcookie(
-                            'remember_login',
-                            base64_encode(json_encode([
-                                'email' => $email
-                            ])),
-                            time() + 86400 * 3,
-                            '/',
-                            '',
-                            false,
-                            true
-                        );
-
-                    } else {
-                        //chỉ xóa cookie khi login THÀNH CÔNG mà KHÔNG tick remember
-                        if (isset($_COOKIE['remember_email'])) {
-                            setcookie('remember_email', '', time() - 3600, '/');
-                        }
-                        if (isset($_COOKIE['remember_login'])) {
-                            setcookie('remember_login', '', time() - 3600, '/');
-                        }
-                    }
-
-
-                    /* PHÂN QUYỀN THEO ROLE */
-                    if (strtolower($user['role']) === 'admin') {
-                        header("Location: admin-dashboard.php");
-                    } else {
-                        header("Location: index-logined.php");
-                    }
-                    exit();
-
-                } else {
-                    $_SESSION[$attempt_key] = ($_SESSION[$attempt_key] ?? 0) + 1;                }
-            } else {
-                $_SESSION[$attempt_key] = ($_SESSION[$attempt_key] ?? 0) + 1;
-            }
-
-            /* ===== GIỚI HẠN SAI ===== */
-             if ($_SESSION[$attempt_key] >= $max_attempts) {
-
-                $_SESSION[$attempt_key] = 0;
-                $_SESSION[$lock_key] = time() + $lockout_time;
-                $remaining_seconds = $lockout_time;
-                $error_message =
-                    "Nhập sai quá $max_attempts lần. Tài khoản bị khóa 
-                    <span id='countdown'>$remaining_seconds</span> giây.";
-            } else {
-                $remaining_tries = $max_attempts - $_SESSION[$attempt_key];
-                $error_message =
-                    "Email hoặc mật khẩu không chính xác! Bạn còn $remaining_tries lần thử.";
-            }
-
-            if (isset($stmt)) {
-                mysqli_stmt_close($stmt);
-            }
+            setcookie('remember_email', '', time() - 3600, '/');
+            setcookie('remember_login', '', time() - 3600, '/');
         }
+
+        /* ==== PHÂN QUYỀN ==== */
+        if (strtolower($user['role']) === 'admin') {
+            header("Location: admin-dashboard.php");
+        } else {
+            header("Location: index-logined.php");
+        }
+
+        exit;
     }
+
+    /* ===============================
+       LOGIN THẤT BẠI
+    =================================*/
+    $_SESSION[$attempt_key] = ($_SESSION[$attempt_key] ?? 0) + 1;
+
+    if ($_SESSION[$attempt_key] >= $max_attempts) {
+
+        $_SESSION[$lock_key] = time() + $lockout_time;
+        $_SESSION[$attempt_key] = 0;
+
+        $_SESSION['login_error'] =
+            "Nhập sai quá $max_attempts lần. Tài khoản bị khóa 
+            <span id='countdown'>$lockout_time</span> giây.";
+
+        $_SESSION['remaining_seconds'] = $lockout_time;
+
+    } else {
+
+        $remaining = $max_attempts - $_SESSION[$attempt_key];
+
+        $_SESSION['login_error'] =
+            "Email hoặc mật khẩu không chính xác! Bạn còn $remaining lần thử.";
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 mysqli_close($conn);
@@ -374,6 +380,7 @@ mysqli_close($conn);
                 </div>
             </div>
         </main>
+
         <script>
             window.dispatchEvent(new Event("template-loaded"));
         </script>
