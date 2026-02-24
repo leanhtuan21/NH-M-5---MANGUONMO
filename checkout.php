@@ -9,8 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Lấy dữ liệu giỏ hàng
-$sql = "SELECT 
+/* =========================================
+   1. LẤY DỮ LIỆU HIỂN THỊ GIỎ HÀNG
+   ========================================= */
+$sql_cart = "SELECT 
     c.id, 
     c.quantity, 
     c.price, 
@@ -30,10 +32,15 @@ LEFT JOIN product_weights pw
     AND pw.weight_gram = c.weight_gram
 WHERE c.user_id = ?";
 
-$stmt = $conn->prepare($sql);
+$stmt = $conn->prepare($sql_cart);
+
+if (!$stmt) {
+    die("Lỗi truy vấn giỏ hàng: " . $conn->error);
+}
+
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$result = $stmt->get_result();
+$result = $stmt->get_result(); 
 
 $cart_items = [];
 $subtotal = 0;
@@ -42,17 +49,20 @@ $total_quantity = 0;
 while ($row = $result->fetch_assoc()) {
     $cart_items[] = $row;
     
-    // PHP chỉ tính tổng ban đầu cho những món ĐÃ TÍCH
+    // Chỉ tính tổng ban đầu cho những món ĐÃ TÍCH CHỌN
     if ($row['selected'] == 1) {
         $subtotal += $row['price'] * $row['quantity'];
         $total_quantity += $row['quantity'];
     }
 }
 
-$total_all = $subtotal; // Phí ship = 0
-////////////// Nút tiếp tục thanh toán
-/* Lấy các sản phẩm ĐÃ CHỌN */
-$sql = "
+$total_all = $subtotal; // Mặc định phí ship = 0
+$stmt->close();
+
+/* =========================================
+   2. LẤY CÁC SẢN PHẨM ĐỂ LƯU SESSION THANH TOÁN
+   ========================================= */
+$sql_checkout = "
 SELECT 
     c.id,
     c.product_name,
@@ -70,11 +80,15 @@ LEFT JOIN product_images pi
 WHERE c.user_id = ? AND c.selected = 1
 ";
 
+$stmt2 = $conn->prepare($sql_checkout);
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$res = $stmt->get_result();
+if (!$stmt2) {
+    die("Lỗi truy vấn thanh toán: " . $conn->error);
+}
+
+$stmt2->bind_param("i", $user_id);
+$stmt2->execute();
+$res = $stmt2->get_result();
 
 $items = [];
 $total_qty = 0;
@@ -86,7 +100,7 @@ while ($row = $res->fetch_assoc()) {
     $total_price += $row['line_total'];
 }
 
-$stmt->close();
+$stmt2->close();
 $conn->close();
 
 /* LƯU SESSION */
