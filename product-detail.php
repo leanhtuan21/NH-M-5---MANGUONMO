@@ -515,7 +515,7 @@ if (isset($_POST['ajax_filter_review'])) {
         .review-images img {
             width: 60px;
             height: 60px;
-            object-fit: cover;
+            object-fit: cover;++
             border-radius: 8px;
             cursor: pointer;
             transition: transform .2s ease, box-shadow .2s ease;

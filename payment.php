@@ -69,7 +69,7 @@ $stmt_items->execute();
 $items = $stmt_items->get_result();
 
 /* ===== PHÍ SHIP ===== */
-$shipping_fee = 15000;
+$shipping_fee = 15000; //đang để tạm cố định là 15k phí ship 
 if ($total_amount >= 5000000) {
     $shipping_fee = 0;
 }
