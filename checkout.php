@@ -1,6 +1,4 @@
 
-
-
 <?php
 session_start();
 include 'db_connect.php'; // Đảm bảo bạn đã có file kết nối DB
@@ -34,7 +32,8 @@ while ($row = $result->fetch_assoc()) {
     $total_quantity += $row['quantity'];
 }
 
-$shipping_fee = 10.00; // Phí ship cố định hoặc tính toán tùy ý
+
+$shipping_fee = 0; // Phí ship cố định hoặc tính toán tùy ý
 $total_all = $subtotal + $shipping_fee;
 
 $stmt->close();
@@ -187,16 +186,17 @@ $conn->close();
                                         </div>
                                         <div class="col-4 col-xxl-5">
                                             <div class="cart-info__row">
-                                                <span>Subtotal:</span>
+                                                <span>Giá:</span>
                                                 <span>$<?php echo number_format($subtotal, 2); ?></span>
                                             </div>
                                             <div class="cart-info__row">
-                                                <span>Shipping:</span>
-                                                <span>$<?php echo number_format($shipping_fee, 2); ?></span>
+                                
+
+                                                <span>Phí ship: Tính theo đơn vị vận chuyển (Miễn phí cho đơn trên 200k)</span>
                                             </div>
                                             <div class="cart-info__separate"></div>
                                             <div class="cart-info__row cart-info__row--bold">
-                                                <span>Total:</span>
+                                                <span>Tổng thanh toán:</span>
                                                 <span>$<?php echo number_format($total_all, 2); ?></span>
                                             </div>
                                         </div>
@@ -207,15 +207,15 @@ $conn->close();
                         <div class="col-4 col-xl-12">
                             <div class="cart-info">
                                 <div class="cart-info__row">
-                                    <span>Subtotal <span class="cart-info__sub-label">(items)</span></span>
+                                    <span>Giá <span class="cart-info__sub-label">(items)</span></span>
                                     <span><?php echo $total_quantity; ?></span>
                                 </div>
                                 <div class="cart-info__row">
-                                    <span>Price <span class="cart-info__sub-label">(Total)</span></span>
+                                    <span>Giá<span class="cart-info__sub-label">(Total)</span></span>
                                     <span>$<?php echo number_format($subtotal, 2); ?></span>
                                 </div>
                                 <div class="cart-info__row">
-                                    <span>Shipping</span>
+                                    <span>Phí vận chuyển</span>
                                     <span>$<?php echo number_format($shipping_fee, 2); ?></span>
                                 </div>
                                 <div class="cart-info__separate"></div>

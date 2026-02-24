@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <label class="form__checkbox">
                             <input type="checkbox" name="terms" class="form__checkbox-input" required />
                             <span class="form__checkbox-label">Tôi đồng ý với <a href="#" style="color: #007bff; text-decoration: underline;">điều khoản sử dụng</a></span>
-                        </label>
+                        </label>H
                     </div> -->
 
                     <div class="form__group auth__btn-group">
