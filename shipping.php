@@ -769,5 +769,14 @@ function validatePhone() {
 phoneInput.addEventListener('input', validatePhone);
 phoneInput.addEventListener('blur', validatePhone);
 </script>
+<script>
+document.getElementById('order-form').addEventListener('submit', function(e){
+    const addressId = document.getElementById('address_id_input').value;
 
+    if (!addressId) {
+        e.preventDefault(); // chặn submit
+        alert('Vui lòng chọn địa chỉ nhận hàng trước khi đặt hàng!');
+    }
+});
+</script>
 </html>
