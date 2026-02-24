@@ -50,8 +50,51 @@ while ($row = $result->fetch_assoc()) {
 }
 
 $total_all = $subtotal; // Phí ship = 0
+////////////// Nút tiếp tục thanh toán
+/* Lấy các sản phẩm ĐÃ CHỌN */
+$sql = "
+SELECT 
+    c.id,
+    c.product_name,
+    c.weight_gram,
+    c.price,
+    c.quantity,
+    (c.price * c.quantity) AS line_total,
+    p.id AS product_id,
+    pi.image_url
+FROM cart c
+JOIN products p 
+    ON c.product_name = p.name
+LEFT JOIN product_images pi 
+    ON p.id = pi.product_id AND pi.is_main = 1
+WHERE c.user_id = ? AND c.selected = 1
+";
+
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$items = [];
+$total_qty = 0;
+$total_price = 0;
+
+while ($row = $res->fetch_assoc()) {
+    $items[] = $row;
+    $total_qty += $row['quantity'];
+    $total_price += $row['line_total'];
+}
+
 $stmt->close();
 $conn->close();
+
+/* LƯU SESSION */
+$_SESSION['checkout'] = [
+    'items' => $items,
+    'total_qty' => $total_qty,
+    'total_price' => $total_price
+];
 ?>
 
 <!DOCTYPE html>
