@@ -228,3 +228,44 @@ window.addEventListener("template-loaded", () => {
 
 const isDark = localStorage.dark === "true";
 document.querySelector("html").classList.toggle("dark", isDark);
+
+/**
+ * Xử lý tăng/giảm số lượng sản phẩm trong giỏ hàng
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    // Tìm tất cả các nút có class js-qty-change
+    const qtyButtons = document.querySelectorAll('.js-qty-change');
+
+    qtyButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const cartId = this.getAttribute('data-id');
+            const action = this.getAttribute('data-action');
+            const qtySpan = document.getElementById(`qty-${cartId}`);
+
+            // Gửi dữ liệu bằng Fetch API
+            fetch('update_quantity.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `id=${cartId}&action=${action}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cập nhật số lượng hiển thị trên màn hình
+                    qtySpan.innerText = data.new_qty;
+                    
+                    // Để các con số tổng tiền (Subtotal, Total) tự động cập nhật, 
+                    // cách nhanh nhất là tải lại trang
+                    location.reload(); 
+                } else {
+                    alert("Không thể cập nhật số lượng!");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});

@@ -823,7 +823,8 @@ if (isset($_POST['ajax_filter_review'])) {
 
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
 
     <footer id="footer" class="footer"></footer>
     <script>load("#footer", "./templates/footer.php");</script>
