@@ -1,7 +1,6 @@
 <?php
 
-/** * 1. KHỞI TẠO VÀ KẾT NỐI 
- */
+/*1. KHỞI TẠO VÀ KẾT NỐI */
 session_start();
 require_once 'db_connect.php';
 
@@ -13,9 +12,7 @@ if (isset($_GET['added']) && $_GET['added'] == '1') {
 $product = null;
 $images = [];
 
-/** * 2. XỬ LÝ AJAX WISHLIST (YÊU THÍCH)
- * Đặt ở đầu để khi gọi AJAX, script dừng lại và trả về JSON ngay lập tức, không load phần HTML bên dưới.
- */
+/*2. XỬ LÝ AJAX WISHLIST (YÊU THÍCH)*/
 if (isset($_POST['ajax_wishlist'])) {
     header('Content-Type: application/json');
 
@@ -58,8 +55,7 @@ if (isset($_POST['ajax_wishlist'])) {
     exit;
 }
 
-/** * 3. KIỂM TRA ĐĂNG NHẬP & ID SẢN PHẨM 
- */
+/*3. KIỂM TRA ĐĂNG NHẬP & ID SẢN PHẨM */
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
@@ -72,8 +68,7 @@ if (!isset($_GET['id'])) {
 $product_id = (int) $_GET['id'];
 $uid = $_SESSION['user_id'];
 
-/** * 4. TRUY VẤN DỮ LIỆU SẢN PHẨM & TRẠNG THÁI YÊU THÍCH
- */
+/*4. TRUY VẤN DỮ LIỆU SẢN PHẨM & TRẠNG THÁI YÊU THÍCH*/
 // Kiểm tra sản phẩm đã thích chưa
 $isLiked = false;
 $check = mysqli_prepare($conn, "SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ? LIMIT 1");
@@ -111,8 +106,7 @@ while ($row = mysqli_fetch_assoc($res_w)) {
 }
 
 
-/** * 5. TÍNH TOÁN GIÁ CẢ BAN ĐẦU 
- */
+/*5. TÍNH TOÁN GIÁ CẢ BAN ĐẦU */
 $gia_goc = (float)$product['price'];
 $thue = (int)$product['tax_percent'];
 $gram_chon = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0]['weight_gram'] : 100;
@@ -121,8 +115,7 @@ $stock_mac_dinh = isset($ds_khoi_luong[0]) ? (int)$ds_khoi_luong[0]['stock_quant
 $gia_theo_gram = $gia_goc * ($gram_chon / 100);
 $gia_sau_thue = $gia_theo_gram * (1 + $thue / 100);
 
-/** * 6. LẤY DANH SÁCH ẢNH SẢN PHẨM 
- */
+/*6. LẤY DANH SÁCH ẢNH SẢN PHẨM */
 $stmt_img = mysqli_prepare($conn, "SELECT image_url FROM product_images WHERE product_id = ? ORDER BY is_main DESC");
 mysqli_stmt_bind_param($stmt_img, "i", $product_id);
 mysqli_stmt_execute($stmt_img);
@@ -130,8 +123,7 @@ $result_img = mysqli_stmt_get_result($stmt_img);
 while ($row = mysqli_fetch_assoc($result_img)) { $images[] = $row['image_url']; }
 if (empty($images)) { $images[] = 'default-product.png'; }
 
-/** * 7. LẤY SẢN PHẨM TƯƠNG TỰ 
- */
+/* 7. LẤY SẢN PHẨM TƯƠNG TỰ */
 $sql_related = "SELECT p.id, p.name, p.price, p.average_score, p.brand, pi.image_url 
                 FROM products p LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1 
                 WHERE p.category_id = ? AND p.id != ? LIMIT 6";
@@ -200,15 +192,13 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
         }
 
         .qty-input {
-            width: 40px;          /* QUAN TRỌNG: đủ chỗ cho 2-3 chữ số */
+            width: 40px;          
             text-align: center;
             border: none;
             outline: none;
             font-size: 20px;
             font-weight: 600;
         }
-
-        /* Ẩn mũi tên tăng giảm mặc định của input number */
         .qty-input::-webkit-outer-spin-button,
         .qty-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -238,10 +228,7 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
 
             <div class="product-container">
                 <ul class="breadcrumbs">
-                    <li><a href="#!" class="breadcrumbs__link">Departments <img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
-                    <li><a href="#!" class="breadcrumbs__link">Coffee <img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
-                    <li><a href="#!" class="breadcrumbs__link">Coffee Beans <img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
-                    <li><a href="#!" class="breadcrumbs__link breadcrumbs__link--current">LavAzza</a></li>
+                    <li><a href="index-logined.php" class="breadcrumbs__link">Home<img src="./assets/icons/arrow-right.svg" alt="" /></a></li>
                 </ul>
             </div>
 
@@ -530,14 +517,12 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                     if (data.status !== 'ok') return;
                     if (data.liked) { this.classList.add('like-btn--liked'); } 
                     else { this.classList.remove('like-btn--liked'); }
-                    // Update số lượng hiển thị trên header
                     const countEl = document.getElementById('wishlistCount');
                     if (countEl) countEl.innerText = String(data.count).padStart(2, '0');
                 });
             });
         });
     }
-    // Chờ header load xong để gắn event
     const waitWishlist = setInterval(() => {
         if (document.getElementById('wishlistCount')) {
             clearInterval(waitWishlist);
@@ -549,8 +534,6 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
     <script>
     function handleAddToCart(event) {
         event.preventDefault();
-
-        // --- ĐOẠN MỚI THÊM: Kiểm tra tồn kho ngay lập tức ---
     if (typeof MAX_STOCK !== 'undefined' && MAX_STOCK <= 0) {
         showToast('Sản phẩm này đã hết hàng!', 'error', 2000);
         return false;
@@ -582,25 +565,17 @@ $relatedProducts = mysqli_stmt_get_result($stmt_related);
                         showToast(data.message, 'success', 1500);
                         setTimeout(() => { window.location.href = 'checkout.php'; }, 1200);
                     } else {
-                // --- PHẦN SỬA LỖI (SỬA TẠI ĐÂY) ---
-                
-                // Chuyển thông báo về chữ thường để so sánh cho chính xác
                 const msg = data.message.toLowerCase();
-
-                // Kiểm tra xem thông báo có chứa từ khóa liên quan đến tồn kho không
                 if (msg.includes('chỉ còn') || msg.includes('trong kho') || msg.includes('hết hàng')) {
-                    // Nếu là lỗi tồn kho -> Hiển thị thông báo thân thiện
                     showToast('Hãy kiểm tra lại giỏ hàng của bạn', 'error');
                 } else {
-                    // Nếu là lỗi khác (code sai, thiếu dữ liệu...) -> Hiển thị nguyên văn để debug
                     showToast(data.message, 'error');
                 }
             }
 
         } catch (e) {
-            // Trường hợp server trả về lỗi PHP (không phải JSON)
             console.error("Lỗi phản hồi:", text);
-            alert("Lỗi hệ thống: " + text); // Hiện popup để bạn dễ copy lỗi sửa
+            alert("Lỗi hệ thống: " + text); 
         }
     })
     .catch(err => {
