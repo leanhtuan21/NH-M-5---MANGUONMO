@@ -1755,7 +1755,7 @@ $avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
         </div>
         <!-- Thông tin người dùng -->
         <div class="top-act__user">
-            <img src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>" alt="Avatar" class="user-menu__avatar" />
+            <img src="/NH-M-5---MANGUONMO/assets/img/avatar/<?= htmlspecialchars($avatar) ?>" alt="Avatar" class="top-act__avatar" />
 
             <div class="act-dropdown top-act__dropdown">
                 <div class="act-dropdown__inner user-menu">
@@ -1784,5 +1784,3 @@ $avatar = (!empty($user['avatar'])) ? $user['avatar'] : 'avatar.png';
                 </div>
             </div>
         </div>
-    </div>
-</div>
