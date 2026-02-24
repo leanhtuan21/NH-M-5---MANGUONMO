@@ -32,197 +32,215 @@ $order = $result->fetch_assoc();
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<title>Đặt hàng thành công</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt hàng thành công</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+    <!-- Favicon -->
+    <link rel="icon" href="./assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="./assets/favicon/apple-touch-icon.png">
 
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: linear-gradient(135deg, #eef2f7, #dfe6f0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+    <!-- CSS hệ thống -->
+    <link rel="stylesheet" href="./assets/fonts/stylesheet.css" />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/panagition.css" />
 
-.card {
-    width: 100%;
-    max-width: 650px;
-    background: #ffffff;
-    padding: 50px 45px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    animation: fadeIn 0.4s ease-in-out;
-}
+    <!-- JS load header -->
+    <script src="./assets/js/scripts.js"></script>
 
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(15px);}
-    to {opacity:1; transform: translateY(0);}
-}
+    <style>
+    * { box-sizing: border-box; }
 
-.icon-success {
-    width: 90px;
-    height: 90px;
-    margin: 0 auto 20px;
-    background: #28a745;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 45px;
-    color: white;
-}
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f5f6fa;
+    }
 
-h2 {
-    text-align: center;
-    margin: 0 0 30px;
-    font-weight: 600;
-    color: #222;
-}
+    .success-wrapper {
+        padding: 60px 20px 80px;
+        min-height: calc(100vh - 80px);
+    }
 
-.order-box {
-    background: #f8fafc;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-}
+    .card {
+        max-width: 520px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 35px 30px;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
 
-.order-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 14px;
-}
+    .icon-success {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 15px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        color: #fff;
+    }
 
-.order-row strong {
-    color: #333;
-}
+    h2 {
+        text-align: center;
+        margin: 10px 0 25px;
+        font-weight: 600;
+    }
 
-.badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
+    .order-box {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
 
-.badge-processing { background: #fff3cd; color: #856404; }
-.badge-paid { background: #d4edda; color: #155724; }
-.badge-pending { background: #cce5ff; color: #004085; }
+    .order-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
 
-.notice {
-    padding: 15px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    margin-bottom: 30px;
-}
+    .badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
 
-.notice-unpaid { background: #fff3cd; color: #856404; }
-.notice-pending { background: #cce5ff; color: #004085; }
-.notice-paid { background: #d4edda; color: #155724; }
+    .badge-processing { background: #fff3cd; color: #856404; }
+    .badge-paid { background: #d4edda; color: #166534; }
+    .badge-pending { background: #cce5ff; color: #1e40af; }
 
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
+    .notice {
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
 
-.btn {
-    padding: 12px 22px;
-    border-radius: 8px;
-    font-size: 14px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.25s ease;
-}
+    .notice-unpaid { background: #fff3cd; color: #856404; }
+    .notice-pending { background: #cce5ff; color: #1e40af; }
+    .notice-paid { background: #d4edda; color: #166534; }
 
-.btn-primary {
-    background: #2563eb;
-    color: white;
-}
+    /* FIX NÚT */
+    .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
 
-.btn-primary:hover {
-    background: #1e40af;
-}
+    .btn {
+        width: 100%;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .2s;
+    }
 
-.btn-outline {
-    border: 1px solid #2563eb;
-    color: #2563eb;
-}
+    .btn-primary {
+        background: #2563eb;
+        color: #fff;
+    }
 
-.btn-outline:hover {
-    background: #2563eb;
-    color: white;
-}
-</style>
+    .btn-primary:hover { background: #1e40af; }
+
+    .btn-outline {
+        border: 1px solid #2563eb;
+        color: #2563eb;
+    }
+
+    .btn-outline:hover {
+        background: #2563eb;
+        color: #fff;
+    }
+
+    @media (max-width: 500px) {
+        .actions {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
 </head>
 
 <body>
 
-<div class="card">
+<!-- HEADER -->
+<header id="header" class="header"></header>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    load("#header", "./templates/header-logined.php");
+});
+</script>
 
-    <div class="icon-success">✓</div>
-    <h2>Đặt hàng thành công!</h2>
+<!-- CONTENT -->
+<main class="success-wrapper">
+    <div class="card">
 
-    <div class="order-box">
-        <div class="order-row">
-            <span>Mã đơn</span>
-            <strong>#<?= $order['id']; ?></strong>
+        <div class="icon-success">✓</div>
+        <h2>Đặt hàng thành công!</h2>
+
+        <div class="order-box">
+            <div class="order-row">
+                <span>Mã đơn</span>
+                <strong>#<?= $order['id']; ?></strong>
+            </div>
+
+            <div class="order-row">
+                <span>Tổng tiền</span>
+                <strong><?= number_format($order['total_amount']); ?> VND</strong>
+            </div>
+
+            <div class="order-row">
+                <span>Ngày đặt</span>
+                <strong><?= $order['order_date']; ?></strong>
+            </div>
+
+            <div class="order-row">
+                <span>Trạng thái đơn</span>
+                <span class="badge badge-processing"><?= $order['status']; ?></span>
+            </div>
+
+            <div class="order-row">
+                <span>Thanh toán</span>
+                <span class="badge 
+                <?= $order['payment_status']=='paid'?'badge-paid':
+                    ($order['payment_status']=='pending_confirmation'?'badge-pending':'badge-processing'); ?>">
+                    <?= $order['payment_status']; ?>
+                </span>
+            </div>
         </div>
 
-        <div class="order-row">
-            <span>Tổng tiền</span>
-            <strong><?= number_format($order['total_amount']); ?> VND</strong>
+        <?php
+        if ($order['payment_status'] === 'unpaid') {
+            echo "<div class='notice notice-unpaid'>Bạn sẽ thanh toán khi nhận hàng (COD).</div>";
+        } elseif ($order['payment_status'] === 'pending_confirmation') {
+            echo "<div class='notice notice-pending'>Chúng tôi đã ghi nhận thanh toán và đang chờ xác nhận.</div>";
+        } elseif ($order['payment_status'] === 'paid') {
+            echo "<div class='notice notice-paid'>Thanh toán đã được xác nhận. Đơn hàng đang được xử lý.</div>";
+        }
+        ?>
+
+        <!-- FIXED CLASS HERE -->
+        <div class="actions">
+            <a href="index-logined.php" class="btn btn-primary">Tiếp tục mua sắm</a>
+            <a href="order-detail.php?order_id=<?= $order['id']; ?>" class="btn btn-outline">Xem đơn hàng</a>
         </div>
 
-        <div class="order-row">
-            <span>Ngày đặt</span>
-            <strong><?= $order['order_date']; ?></strong>
-        </div>
-
-        <div class="order-row">
-            <span>Trạng thái đơn</span>
-            <span class="badge badge-processing"><?= $order['status']; ?></span>
-        </div>
-
-        <div class="order-row">
-            <span>Thanh toán</span>
-            <span class="badge 
-            <?= $order['payment_status']=='paid'?'badge-paid':
-                ($order['payment_status']=='pending_confirmation'?'badge-pending':'badge-processing'); ?>">
-                <?= $order['payment_status']; ?>
-            </span>
-        </div>
     </div>
-
-    <?php
-    if ($order['payment_status'] === 'unpaid') {
-        echo "<div class='notice notice-unpaid'>
-                Bạn sẽ thanh toán khi nhận hàng (COD).
-              </div>";
-    } elseif ($order['payment_status'] === 'pending_confirmation') {
-        echo "<div class='notice notice-pending'>
-                Chúng tôi đã ghi nhận thanh toán và đang chờ xác nhận.
-              </div>";
-    } elseif ($order['payment_status'] === 'paid') {
-        echo "<div class='notice notice-paid'>
-                Thanh toán đã được xác nhận. Đơn hàng đang được xử lý.
-              </div>";
-    }
-    ?>
-
-    <div class="actions">
-        <a href="index-logined.php" class="btn btn-primary">Tiếp tục mua sắm</a>
-        <a href="order-detail.php?order_id=<?= $order['id']; ?>" class="btn btn-outline">Xem đơn hàng</a>
-    </div>
-
-</div>
+</main>
 
 </body>
 </html>
-
