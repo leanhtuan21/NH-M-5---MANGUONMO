@@ -142,12 +142,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     <p class="cart-item__weight" style="font-size: 1.4rem; color: #717385; margin-top: 4px;">
                                                         Khối lượng: 100g
                                                     </p>
+                                                    <br>
                                                     <?php if ($item['stock_quantity'] >= 1): ?>
                                                         <span class="cart-item__status" style="color: #67ce5d;">Còn hàng</span>
                                                     <?php else: ?>
                                                         <span class="cart-item__status" style="color: #ed6237;">Hết hàng</span>
                                                     <?php endif; ?>
                                                 </p>
+                                                <br>
                                                 <!-- GIỮ NGUYÊN CTRL -->
                                                 <div class="cart-item__ctrl-wrap">
                                                     <div class="cart-item__ctrl cart-item__ctrl--md-block">
@@ -189,7 +191,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     src="./assets/icons/arrow-down-2.svg"
                                                     alt=""
                                                 />
-                                                Continue Shopping
+                                                Tiếp tục mua sắm
                                             </a>
                                         </div>
                                     </div>
