@@ -1,13 +1,14 @@
 <?php
 require_once 'includes/auth.php';
 require_once '../db_connect.php';
-require_once 'includes/header.php';
-require_once 'includes/sidebar.php';
 
-if (!isset($_GET['id'])) header("Location: orders.php");
+if (!isset($_GET['id'])) {
+    header("Location: orders.php");
+    exit;
+}
 $id = (int)$_GET['id'];
 
-// XỬ LÝ CẬP NHẬT TRẠNG THÁI
+// 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI (Đặt lên đầu trang)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['status'];
     $new_payment = $_POST['payment_status'];
@@ -17,12 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     
     if ($stmt->execute()) {
         echo "<script>alert('Cập nhật đơn hàng thành công!'); window.location.href='order_view.php?id=$id';</script>";
+        exit;
     } else {
-        echo "<script>alert('Lỗi: ".$conn->error."');</script>";
+        echo "<script>alert('Lỗi hệ thống: " . $conn->error . "');</script>";
     }
 }
 
-// LẤY THÔNG TIN ĐƠN HÀNG
+// 2. LẤY THÔNG TIN ĐƠN HÀNG SAU KHI CẬP NHẬT
 $order_sql = "SELECT o.*, u.full_name, u.email, u.phone, u.address as user_address 
               FROM orders o 
               LEFT JOIN users u ON o.user_id = u.id 
@@ -38,6 +40,9 @@ $items_sql = "SELECT oi.*, p.name, p.brand,
               LEFT JOIN products p ON oi.product_id = p.id
               WHERE oi.order_id = $id";
 $items = $conn->query($items_sql);
+
+require_once 'includes/header.php';
+require_once 'includes/sidebar.php';
 ?>
 
 <div class="header-bar mb-4">
@@ -108,16 +113,17 @@ $items = $conn->query($items_sql);
                 <h6 class="fw-bold m-0"><i class="fas fa-cog me-2 text-warning"></i>Xử lý đơn hàng</h6>
             </div>
             <div class="card-body">
-                <form method="POST">
+                <form method="POST" action="order_view.php?id=<?php echo $id; ?>">
                     <input type="hidden" name="update_status" value="1">
                     
                     <div class="mb-3">
                         <label class="form-label fw-bold">Trạng thái đơn hàng</label>
                         <select name="status" class="form-select">
                             <option value="pending" <?php if($order['status']=='pending') echo 'selected'; ?>>Chờ xử lý</option>
+                            <option value="paid" <?php if($order['status']=='paid') echo 'selected'; ?>>Đã thanh toán (Chờ giao)</option>
                             <option value="processing" <?php if($order['status']=='processing') echo 'selected'; ?>>Đang xử lý (Đóng gói)</option>
-                            <option value="shipped" <?php if($order['status']=='shipped') echo 'selected'; ?>>Đang giao hàng</option>
-                            <option value="delivered" <?php if($order['status']=='delivered') echo 'selected'; ?>>Đã giao thành công</option>
+                            <option value="shipping" <?php if($order['status']=='shipping') echo 'selected'; ?>>Đang giao hàng</option>
+                            <option value="completed" <?php if($order['status']=='completed') echo 'selected'; ?>>Đã giao thành công</option>
                             <option value="cancelled" <?php if($order['status']=='cancelled') echo 'selected'; ?>>Đã hủy</option>
                         </select>
                     </div>
@@ -126,11 +132,12 @@ $items = $conn->query($items_sql);
                         <label class="form-label fw-bold">Thanh toán</label>
                         <select name="payment_status" class="form-select">
                             <option value="unpaid" <?php if($order['payment_status']=='unpaid') echo 'selected'; ?>>Chưa thanh toán</option>
+                            <option value="pending_confirmation" <?php if($order['payment_status']=='pending_confirmation') echo 'selected'; ?>>Chờ xác nhận (QR/CK)</option>
                             <option value="paid" <?php if($order['payment_status']=='paid') echo 'selected'; ?>>Đã thanh toán</option>
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 fw-bold">Cập nhật</button>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">Cập nhật đơn hàng</button>
                 </form>
             </div>
         </div>

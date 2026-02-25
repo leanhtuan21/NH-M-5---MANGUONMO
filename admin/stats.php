@@ -6,17 +6,15 @@ require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 
 // --- 1. XỬ LÝ BỘ LỌC THỜI GIAN ---
-// Mặc định: 30 ngày gần nhất
 $start_date = isset($_GET['start']) ? $_GET['start'] : date('Y-m-d', strtotime('-30 days'));
 $end_date = isset($_GET['end']) ? $_GET['end'] : date('Y-m-d');
 
-// Chuyển đổi định dạng để query (thêm giờ phút giây để lấy trọn ngày cuối)
 $start_sql = $start_date . " 00:00:00";
 $end_sql = $end_date . " 23:59:59";
 
 // --- 2. TRUY VẤN DỮ LIỆU TỔNG QUAN ---
-// Tổng doanh thu (Chỉ tính đơn đã giao)
-$stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0) as revenue FROM orders WHERE status = 'delivered' AND order_date BETWEEN ? AND ?");
+// ĐÃ SỬA: Thay 'delivered' thành 'completed' để khớp với Database của bạn
+$stmt = $conn->prepare("SELECT COALESCE(SUM(total_amount), 0) as revenue FROM orders WHERE status = 'completed' AND order_date BETWEEN ? AND ?");
 $stmt->bind_param("ss", $start_sql, $end_sql);
 $stmt->execute();
 $revenue = (float)$stmt->get_result()->fetch_assoc()['revenue'];
@@ -27,8 +25,8 @@ $stmt->bind_param("ss", $start_sql, $end_sql);
 $stmt->execute();
 $total_orders = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 
-// Đơn hàng thành công
-$stmt = $conn->prepare("SELECT COUNT(*) as total FROM orders WHERE status = 'delivered' AND order_date BETWEEN ? AND ?");
+// Đơn hàng thành công (ĐÃ SỬA: Thay 'delivered' thành 'completed')
+$stmt = $conn->prepare("SELECT COUNT(*) as total FROM orders WHERE status = 'completed' AND order_date BETWEEN ? AND ?");
 $stmt->bind_param("ss", $start_sql, $end_sql);
 $stmt->execute();
 $success_orders = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
@@ -40,11 +38,10 @@ $stmt->execute();
 $cancelled_orders = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 
 
-// --- 3. DỮ LIỆU BIỂU ĐỒ DOANH THU (LINE CHART) ---
-// Gom nhóm theo ngày
+// --- 3. DỮ LIỆU BIỂU ĐỒ DOANH THU (ĐÃ SỬA: Thay 'delivered' thành 'completed') ---
 $chart_sql = "SELECT DATE(order_date) as date, SUM(total_amount) as total 
               FROM orders 
-              WHERE status = 'delivered' AND order_date BETWEEN ? AND ? 
+              WHERE status = 'completed' AND order_date BETWEEN ? AND ? 
               GROUP BY DATE(order_date) 
               ORDER BY date ASC";
 $stmt = $conn->prepare($chart_sql);
@@ -58,13 +55,12 @@ while($row = $chart_res->fetch_assoc()) {
     $dates[] = date('d/m', strtotime($row['date']));
     $totals[] = (float)$row['total'];
 }
-// Nếu không có dữ liệu, thêm dữ liệu mặc định
 if (empty($dates)) {
     $dates = ['Không có dữ liệu'];
     $totals = [0];
 }
 
-// --- 4. DỮ LIỆU TRẠNG THÁI ĐƠN (DOUGHNUT CHART) ---
+// --- 4. DỮ LIỆU TRẠNG THÁI ĐƠN (Giữ nguyên vì lấy theo GROUP BY) ---
 $status_sql = "SELECT status, COUNT(*) as count FROM orders WHERE order_date BETWEEN ? AND ? GROUP BY status";
 $stmt = $conn->prepare($status_sql);
 $stmt->bind_param("ss", $start_sql, $end_sql);
@@ -74,21 +70,20 @@ $status_res = $stmt->get_result();
 $stt_labels = [];
 $stt_data = [];
 while($row = $status_res->fetch_assoc()) {
-    $stt_labels[] = ucfirst($row['status']); // Viết hoa chữ cái đầu
+    $stt_labels[] = ucfirst($row['status']); 
     $stt_data[] = (int)$row['count'];
 }
-// Nếu không có dữ liệu, thêm dữ liệu mặc định
 if (empty($stt_labels)) {
     $stt_labels = ['Không có dữ liệu'];
     $stt_data = [0];
 }
 
-// --- 5. TOP SẢN PHẨM BÁN CHẠY ---
+// --- 5. TOP SẢN PHẨM BÁN CHẠY (ĐÃ SỬA: Thay 'delivered' thành 'completed') ---
 $top_prod_sql = "SELECT p.name, SUM(oi.quantity) as sold, SUM(oi.quantity * oi.price_at_purchase) as earned
                  FROM order_items oi
                  JOIN orders o ON oi.order_id = o.id
                  JOIN products p ON oi.product_id = p.id
-                 WHERE o.status = 'delivered' AND o.order_date BETWEEN ? AND ?
+                 WHERE o.status = 'completed' AND o.order_date BETWEEN ? AND ?
                  GROUP BY p.id
                  ORDER BY sold DESC
                  LIMIT 5";
@@ -97,11 +92,11 @@ $stmt->bind_param("ss", $start_sql, $end_sql);
 $stmt->execute();
 $top_products = $stmt->get_result();
 
-// --- 6. TOP KHÁCH HÀNG VIP ---
+// --- 6. TOP KHÁCH HÀNG VIP (ĐÃ SỬA: Thay 'delivered' thành 'completed') ---
 $top_user_sql = "SELECT u.full_name, u.email, COUNT(o.id) as orders_count, SUM(o.total_amount) as total_spent
                  FROM orders o
                  JOIN users u ON o.user_id = u.id
-                 WHERE o.status = 'delivered' AND o.order_date BETWEEN ? AND ?
+                 WHERE o.status = 'completed' AND o.order_date BETWEEN ? AND ?
                  GROUP BY u.id
                  ORDER BY total_spent DESC
                  LIMIT 5";

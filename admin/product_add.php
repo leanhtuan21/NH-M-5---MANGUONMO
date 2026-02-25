@@ -69,7 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             // 3. INSERT SẢN PHẨM CHÍNH
             $stmt = $conn->prepare("INSERT INTO products (category_id, name, brand, price, tax_percent, stock_quantity, description, average_score) VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
-            $stmt->bind_param("issdiiss", $cat_id, $name, $brand, $min_price, $tax, $total_stock, $desc);
+
+// ĐÃ SỬA: Xóa 1 chữ 's' ở cuối, chỉ còn 7 ký tự "issdiis" tương ứng với 7 biến
+            $stmt->bind_param("issdiis", $cat_id, $name, $brand, $min_price, $tax, $total_stock, $desc);
 
             if ($stmt->execute()) {
                 $product_id = $stmt->insert_id;
