@@ -49,8 +49,8 @@ $result = $conn->query($sql);
                     <option value="">-- Tất cả trạng thái --</option>
                     <option value="pending" <?php if($status=='pending') echo 'selected'; ?>>Chờ xử lý</option>
                     <option value="processing" <?php if($status=='processing') echo 'selected'; ?>>Đang xử lý</option>
-                    <option value="shipped" <?php if($status=='shipped') echo 'selected'; ?>>Đang giao hàng</option>
-                    <option value="delivered" <?php if($status=='delivered') echo 'selected'; ?>>Đã giao thành công</option>
+                    <option value="shipping" <?php if($status=='shipping') echo 'selected'; ?>>Đang giao hàng</option>
+                    <option value="completed" <?php if($status=='completed') echo 'selected'; ?>>Đã giao thành công</option>
                     <option value="cancelled" <?php if($status=='cancelled') echo 'selected'; ?>>Đã hủy</option>
                 </select>
             </div>
@@ -79,20 +79,28 @@ $result = $conn->query($sql);
                 <?php if ($result && $result->num_rows > 0): ?>
                     <?php while($row = $result->fetch_assoc()): 
                         // Màu sắc trạng thái
-                        $stt_badge = match($row['status']) {
-                            'delivered' => 'bg-success bg-opacity-10 text-success',
+                        // Chuẩn hóa chuỗi (chuyển thành chữ thường và xóa khoảng trắng thừa)
+                        // Lấy trạng thái chuẩn từ Database
+                        $db_status = strtolower(trim($row['status']));
+
+                        // Màu sắc trạng thái
+                        $stt_badge = match($db_status) {
+                            'completed' => 'bg-success bg-opacity-10 text-success',
                             'pending' => 'bg-warning bg-opacity-10 text-warning',
                             'cancelled' => 'bg-danger bg-opacity-10 text-danger',
-                            'shipped' => 'bg-primary bg-opacity-10 text-primary',
-                            default => 'bg-info bg-opacity-10 text-info'
+                            'shipping' => 'bg-primary bg-opacity-10 text-primary',
+                            'processing' => 'bg-info bg-opacity-10 text-info',
+                            default => 'bg-secondary bg-opacity-10 text-secondary'
                         };
-                        $stt_text = match($row['status']) {
-                            'delivered' => 'Đã giao',
+                        
+                        // Chữ hiển thị ra tiếng Việt
+                        $stt_text = match($db_status) {
+                            'completed' => 'Đã giao',
                             'pending' => 'Chờ xử lý',
                             'cancelled' => 'Đã hủy',
-                            'shipped' => 'Đang giao',
+                            'shipping' => 'Đang giao',
                             'processing' => 'Đang xử lý',
-                            default => $row['status']
+                            default => ucfirst($db_status)
                         };
                         
                         $pay_badge = ($row['payment_status'] == 'paid') ? 'text-success' : 'text-muted';
@@ -105,7 +113,9 @@ $result = $conn->query($sql);
                             <small class="text-muted"><?php echo $row['email']; ?></small>
                         </td>
                         <td><?php echo date('d/m/Y H:i', strtotime($row['order_date'])); ?></td>
-                        <td class="fw-bold">$<?php echo number_format($row['total_amount'], 2); ?></td>
+                        
+                        <td class="fw-bold"><?php echo number_format($row['total_amount'], 0, ',', '.'); ?> Đ</td>
+                        
                         <td>
                             <span class="small fw-bold <?php echo $pay_badge; ?>">
                                 <i class="fas fa-circle small me-1" style="font-size: 8px;"></i><?php echo $pay_text; ?>
@@ -122,6 +132,7 @@ $result = $conn->query($sql);
                 <?php else: ?>
                     <tr><td colspan="7" class="text-center py-5 text-muted">Chưa có đơn hàng nào.</td></tr>
                 <?php endif; ?>
+
             </tbody>
         </table>
     </div>

@@ -44,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         for ($i = 0; $i < count($v_weights); $i++) {
             $val = (float)$v_weights[$i];
             $unit = $v_units[$i];
-            $price = (float)$v_prices[$i];
+            // Tiền Việt dùng số nguyên
+            $price = (int)$v_prices[$i];
             $stock = (int)$v_stocks[$i];
 
             // Chỉ lấy dòng có dữ liệu hợp lệ
@@ -68,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             // 3. INSERT SẢN PHẨM CHÍNH
             $stmt = $conn->prepare("INSERT INTO products (category_id, name, brand, price, tax_percent, stock_quantity, description, average_score) VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
-            $stmt->bind_param("issdiss", $cat_id, $name, $brand, $min_price, $tax, $total_stock, $desc);
+            $stmt->bind_param("issdiiss", $cat_id, $name, $brand, $min_price, $tax, $total_stock, $desc);
 
             if ($stmt->execute()) {
                 $product_id = $stmt->insert_id;
@@ -177,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <thead class="bg-light">
                                         <tr>
                                             <th style="width: 35%">Khối lượng</th>
-                                            <th style="width: 30%">Giá ($)</th>
+                                            <th style="width: 30%">Giá (Đ)</th>
                                             <th style="width: 25%">Kho</th>
                                             <th style="width: 10%"></th>
                                         </tr>
@@ -193,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td><input type="number" step="0.01" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" placeholder="0" required></td>
+                                            <td><input type="number" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" placeholder="VD: 100000" required></td>
                                             <td><input type="number" name="var_stock[]" class="form-control form-control-sm text-center" placeholder="0" required></td>
                                             <td><button type="button" class="btn btn-sm text-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>
                                         </tr>
@@ -243,8 +244,8 @@ function addVariantRow() {
                 </select>
             </div>
         </td>
-        <td><input type="number" step="0.01" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" placeholder="0" required></td>
-        <td><input type="number" name="var_stock[]" class="form-control form-control-sm text-center" placeholder="0" required></td>
+        <td><input type="number" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" placeholder="Giá" required></td>
+        <td><input type="number" name="var_stock[]" class="form-control form-control-sm text-center" placeholder="Kho" required></td>
         <td><button type="button" class="btn btn-sm text-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>
     `;
     tbody.appendChild(row);

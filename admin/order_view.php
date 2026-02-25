@@ -82,19 +82,19 @@ $items = $conn->query($items_sql);
                                 </div>
                             </td>
                             <td class="text-center fw-bold">x<?php echo $item['quantity']; ?></td>
-                            <td class="text-end">$<?php echo number_format($item['price_at_purchase'], 2); ?></td>
-                            <td class="text-end pe-4 fw-bold">$<?php echo number_format($subtotal, 2); ?></td>
+                            <td class="text-end"><?php echo number_format($item['price_at_purchase'], 0, ',', '.'); ?> Đ</td>
+                            <td class="text-end pe-4 fw-bold"><?php echo number_format($subtotal, 0, ',', '.'); ?> Đ</td>
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
                     <tfoot class="bg-light">
                         <tr>
                             <td colspan="3" class="text-end fw-bold py-3">Phí vận chuyển:</td>
-                            <td class="text-end pe-4 fw-bold py-3">$<?php echo number_format($order['shipping_fee'], 2); ?></td>
+                            <td class="text-end pe-4 fw-bold py-3"><?php echo number_format($order['shipping_fee'], 0, ',', '.'); ?> Đ</td>
                         </tr>
                         <tr>
                             <td colspan="3" class="text-end fw-bold py-3 text-dark h6 mb-0">TỔNG CỘNG:</td>
-                            <td class="text-end pe-4 fw-bold py-3 text-primary h5 mb-0">$<?php echo number_format($order['total_amount'], 2); ?></td>
+                            <td class="text-end pe-4 fw-bold py-3 text-primary h5 mb-0"><?php echo number_format($order['total_amount'], 0, ',', '.'); ?> Đ</td>
                         </tr>
                     </tfoot>
                 </table>

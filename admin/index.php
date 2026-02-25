@@ -30,9 +30,9 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
             <div class="stat-card">
                 <div>
                     <p class="text-muted small fw-bold text-uppercase mb-1">Doanh thu</p>
-                    <h3 class="fw-bold mb-0 text-dark">$<?php echo number_format($revenue, 2); ?></h3>
+                    <h3 class="fw-bold mb-0 text-dark"><?php echo number_format($revenue, 0, ',', '.'); ?> Đ</h3>
                 </div>
-                <div class="stat-icon bg-light-primary"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-icon bg-light-primary"><i class="fas fa-money-bill-wave"></i></div>
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
             <div class="stat-card">
                 <div>
                     <p class="text-muted small fw-bold text-uppercase mb-1">Đơn hàng</p>
-                    <h3 class="fw-bold mb-0 text-dark"><?php echo $orders; ?></h3>
+                    <h3 class="fw-bold mb-0 text-dark"><?php echo number_format($orders, 0, ',', '.'); ?></h3>
                 </div>
                 <div class="stat-icon bg-light-warning"><i class="fas fa-shopping-bag"></i></div>
             </div>
@@ -52,7 +52,7 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
             <div class="stat-card">
                 <div>
                     <p class="text-muted small fw-bold text-uppercase mb-1">Sản phẩm</p>
-                    <h3 class="fw-bold mb-0 text-dark"><?php echo $products; ?></h3>
+                    <h3 class="fw-bold mb-0 text-dark"><?php echo number_format($products, 0, ',', '.'); ?></h3>
                 </div>
                 <div class="stat-icon bg-light-info"><i class="fas fa-box-open"></i></div>
             </div>
@@ -63,7 +63,7 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
             <div class="stat-card">
                 <div>
                     <p class="text-muted small fw-bold text-uppercase mb-1">Khách hàng</p>
-                    <h3 class="fw-bold mb-0 text-dark"><?php echo $customers; ?></h3>
+                    <h3 class="fw-bold mb-0 text-dark"><?php echo number_format($customers, 0, ',', '.'); ?></h3>
                 </div>
                 <div class="stat-icon bg-light-danger"><i class="fas fa-users"></i></div>
             </div>
@@ -71,14 +71,14 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <span>Đơn hàng mới nhất</span>
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <span class="fw-bold text-dark m-0"><i class="fas fa-shopping-cart text-primary me-2"></i> Đơn hàng mới nhất</span>
         <a href="orders.php" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
     </div>
     <div class="table-responsive">
-        <table class="table mb-0 table-hover">
-            <thead>
+        <table class="table mb-0 table-hover align-middle">
+            <thead class="bg-light">
                 <tr>
                     <th class="ps-4">Mã Đơn</th>
                     <th>Khách hàng</th>
@@ -90,10 +90,10 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
             <tbody>
                 <?php while($row = $recent_query->fetch_assoc()): 
                     $badge = match($row['status']) {
-                        'delivered' => 'status-completed',
-                        'pending' => 'status-pending',
-                        'cancelled' => 'status-cancel',
-                        default => 'status-info'
+                        'delivered' => 'bg-success bg-opacity-10 text-success border border-success border-opacity-25',
+                        'pending' => 'bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25',
+                        'cancelled' => 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25',
+                        default => 'bg-info bg-opacity-10 text-info border border-info border-opacity-25'
                     };
                     $txt = match($row['status']) {
                         'delivered' => 'Đã giao',
@@ -104,12 +104,15 @@ $recent_query = $conn->query("SELECT o.*, u.full_name FROM orders o LEFT JOIN us
                 ?>
                 <tr>
                     <td class="ps-4 fw-bold text-primary">#<?php echo $row['id']; ?></td>
-                    <td><?php echo $row['full_name']; ?></td>
-                    <td><?php echo date('d/m/Y', strtotime($row['order_date'])); ?></td>
-                    <td class="fw-bold">$<?php echo number_format($row['total_amount'], 2); ?></td>
-                    <td><span class="status-badge <?php echo $badge; ?>"><?php echo $txt; ?></span></td>
+                    <td class="fw-bold text-dark"><?php echo $row['full_name']; ?></td>
+                    <td class="text-muted small"><?php echo date('d/m/Y H:i', strtotime($row['order_date'])); ?></td>
+                    <td class="fw-bold text-danger"><?php echo number_format($row['total_amount'], 0, ',', '.'); ?> Đ</td>
+                    <td><span class="badge rounded-pill <?php echo $badge; ?> px-3"><?php echo $txt; ?></span></td>
                 </tr>
                 <?php endwhile; ?>
+                <?php if($recent_query->num_rows == 0): ?>
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có đơn hàng nào</td></tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>

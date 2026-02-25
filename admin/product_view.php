@@ -18,7 +18,6 @@ $prod = $result->fetch_assoc();
 if (!$prod) die("Không tìm thấy sản phẩm");
 
 // 2. Lấy danh sách biến thể từ bảng product_weights (Mới)
-// Sắp xếp theo trọng lượng tăng dần để dễ nhìn
 $var_sql = "SELECT * FROM product_weights WHERE product_id = $id ORDER BY weight_gram ASC";
 $variants = $conn->query($var_sql);
 
@@ -88,7 +87,7 @@ while($row = $img_res->fetch_assoc()) {
                     </div>
                     <div class="text-end">
                         <small class="text-muted d-block">Giá khởi điểm từ</small>
-                        <h3 class="fw-bold text-success mb-0">$<?php echo number_format($prod['price'], 2); ?></h3>
+                        <h3 class="fw-bold text-success mb-0"><?php echo number_format($prod['price'], 0, ',', '.'); ?> Đ</h3>
                         <small class="text-muted">Thuế VAT: <?php echo $prod['tax_percent']; ?>%</small>
                     </div>
                 </div>
@@ -129,13 +128,12 @@ while($row = $img_res->fetch_assoc()) {
                             </thead>
                             <tbody>
                                 <?php while($var = $variants->fetch_assoc()): 
-                                    // Xử lý hiển thị Gram/Kg
                                     $gram = (int)$var['weight_gram'];
                                     $display_weight = ($gram >= 1000) ? ($gram / 1000) . ' kg' : $gram . ' g';
                                 ?>
                                 <tr>
                                     <td class="fw-bold text-dark"><?php echo $display_weight; ?></td>
-                                    <td class="text-success fw-bold">$<?php echo number_format($var['price'], 2); ?></td>
+                                    <td class="text-success fw-bold"><?php echo number_format($var['price'], 0, ',', '.'); ?> Đ</td>
                                     <td>
                                         <?php if($var['stock_quantity'] > 0): ?>
                                             <span class="text-dark fw-bold"><?php echo $var['stock_quantity']; ?></span>
@@ -154,7 +152,7 @@ while($row = $img_res->fetch_assoc()) {
 
                 <h6 class="fw-bold text-uppercase text-muted font-size-sm mb-2">Mô tả sản phẩm</h6>
                 <div class="bg-light p-3 rounded text-secondary" style="min-height: 150px; line-height: 1.6; white-space: pre-line;">
-                    <?php echo $prod['description']; ?>
+                    <?php echo htmlspecialchars($prod['description']); ?>
                 </div>
             </div>
         </div>
@@ -162,7 +160,6 @@ while($row = $img_res->fetch_assoc()) {
 </div>
 
 <script>
-// Hàm đổi ảnh khi click vào ảnh nhỏ
 function changeImage(src) {
     document.getElementById('main-view-img').src = src;
 }

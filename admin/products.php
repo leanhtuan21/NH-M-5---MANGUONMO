@@ -167,7 +167,7 @@ if (isset($_SESSION['msg'])) {
                             </span>
                         </td>
                         <td>
-                            <span class="fw-bold text-success">$<?php echo number_format($row['price'], 2); ?></span>
+                            <span class="fw-bold text-success"><?php echo number_format($row['price'], 0, ',', '.'); ?> Đ</span>
                         </td>
                         <td>
                             <?php if($row['stock_quantity'] > 10): ?>

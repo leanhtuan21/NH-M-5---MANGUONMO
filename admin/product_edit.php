@@ -168,7 +168,7 @@ $extra_imgs = $conn->query("SELECT * FROM product_images WHERE product_id=$id AN
                             <div class="mb-3">
                                 <table class="table table-bordered table-sm align-middle text-center" id="variantTable">
                                     <thead class="bg-light">
-                                        <tr><th style="width: 35%">Khối lượng</th><th style="width: 30%">Giá ($)</th><th style="width: 25%">Kho</th><th style="width: 10%"></th></tr>
+                                        <tr><th style="width: 35%">Khối lượng</th><th style="width: 30%">Giá (Đ)</th><th style="width: 25%">Kho</th><th style="width: 10%"></th></tr>
                                     </thead>
                                     <tbody id="variantBody">
                                         <?php if (!empty($variant_list)): ?>
@@ -187,7 +187,7 @@ $extra_imgs = $conn->query("SELECT * FROM product_images WHERE product_id=$id AN
                                                         </select>
                                                     </div>
                                                 </td>
-                                                <td><input type="number" step="0.01" name="var_price[]" value="<?php echo $var['price']; ?>" class="form-control form-control-sm text-center fw-bold text-success" required></td>
+                                                <td><input type="number" name="var_price[]" value="<?php echo (int)$var['price']; ?>" class="form-control form-control-sm text-center fw-bold text-success" required></td>
                                                 <td><input type="number" name="var_stock[]" value="<?php echo $var['stock_quantity']; ?>" class="form-control form-control-sm text-center" required></td>
                                                 <td><button type="button" class="btn btn-sm text-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>
                                             </tr>
@@ -200,7 +200,7 @@ $extra_imgs = $conn->query("SELECT * FROM product_images WHERE product_id=$id AN
                                                         <select name="var_unit[]" class="form-select px-1 bg-light" style="max-width: 50px;"><option value="g">g</option><option value="kg">kg</option></select>
                                                     </div>
                                                 </td>
-                                                <td><input type="number" step="0.01" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" required></td>
+                                                <td><input type="number" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" required></td>
                                                 <td><input type="number" name="var_stock[]" class="form-control form-control-sm text-center" required></td>
                                                 <td><button type="button" class="btn btn-sm text-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>
                                             </tr>
@@ -232,9 +232,10 @@ $extra_imgs = $conn->query("SELECT * FROM product_images WHERE product_id=$id AN
 function addVariantRow() {
     const tbody = document.getElementById('variantBody');
     const row = document.createElement('tr');
+    // Bỏ step="0.01" trong template JS
     row.innerHTML = `
         <td><div class="input-group input-group-sm"><input type="number" name="var_weight[]" class="form-control text-center px-1" required><select name="var_unit[]" class="form-select px-1 bg-light" style="max-width: 50px;"><option value="g">g</option><option value="kg">kg</option></select></div></td>
-        <td><input type="number" step="0.01" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" required></td>
+        <td><input type="number" name="var_price[]" class="form-control form-control-sm text-center fw-bold text-success" required></td>
         <td><input type="number" name="var_stock[]" class="form-control form-control-sm text-center" required></td>
         <td><button type="button" class="btn btn-sm text-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>`;
     tbody.appendChild(row);
