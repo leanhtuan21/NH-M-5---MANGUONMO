@@ -8,13 +8,21 @@ if (!isset($_GET['id'])) {
 }
 $id = (int)$_GET['id'];
 
-// 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI (Đặt lên đầu trang)
+// 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI & PHÍ SHIP (Đặt lên đầu trang)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['status'];
     $new_payment = $_POST['payment_status'];
+    $new_shipping_fee = (float)$_POST['shipping_fee']; // Lấy phí ship Admin nhập
+
+    // Tính lại Tổng tiền mới = (Tổng tiền hàng) + (Phí ship mới)
+    // Truy vấn tổng tiền hàng từ bảng order_items
+    $res_items = $conn->query("SELECT SUM(quantity * price_at_purchase) as subtotal FROM order_items WHERE order_id = $id");
+    $subtotal = $res_items->fetch_assoc()['subtotal'] ?? 0;
+    $new_total_amount = $subtotal + $new_shipping_fee;
     
-    $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ? WHERE id = ?");
-    $stmt->bind_param("ssi", $new_status, $new_payment, $id);
+    // Cập nhật Database: status, payment_status, shipping_fee và total_amount
+    $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ?, shipping_fee = ?, total_amount = ? WHERE id = ?");
+    $stmt->bind_param("ssddi", $new_status, $new_payment, $new_shipping_fee, $new_total_amount, $id);
     
     if ($stmt->execute()) {
         echo "<script>alert('Cập nhật đơn hàng thành công!'); window.location.href='order_view.php?id=$id';</script>";
@@ -72,9 +80,12 @@ require_once 'includes/sidebar.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while($item = $items->fetch_assoc()): 
+                        <?php 
+                        $total_items_price = 0; // Để hiển thị tạm tính
+                        while($item = $items->fetch_assoc()): 
                             $img = $item['thumbnail'] ? '../' . $item['thumbnail'] : '../assets/img/product/no-image.png';
                             $subtotal = $item['quantity'] * $item['price_at_purchase'];
+                            $total_items_price += $subtotal;
                         ?>
                         <tr>
                             <td class="ps-4">
@@ -94,8 +105,12 @@ require_once 'includes/sidebar.php';
                     </tbody>
                     <tfoot class="bg-light">
                         <tr>
-                            <td colspan="3" class="text-end fw-bold py-3">Phí vận chuyển:</td>
-                            <td class="text-end pe-4 fw-bold py-3"><?php echo number_format($order['shipping_fee'], 0, ',', '.'); ?> Đ</td>
+                            <td colspan="3" class="text-end fw-bold py-3">Tiền hàng:</td>
+                            <td class="text-end pe-4 fw-bold py-3"><?php echo number_format($total_items_price, 0, ',', '.'); ?> Đ</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold py-3 text-secondary">Phí vận chuyển:</td>
+                            <td class="text-end pe-4 fw-bold py-3 text-secondary"><?php echo number_format($order['shipping_fee'], 0, ',', '.'); ?> Đ</td>
                         </tr>
                         <tr>
                             <td colspan="3" class="text-end fw-bold py-3 text-dark h6 mb-0">TỔNG CỘNG:</td>
@@ -116,6 +131,12 @@ require_once 'includes/sidebar.php';
                 <form method="POST" action="order_view.php?id=<?php echo $id; ?>">
                     <input type="hidden" name="update_status" value="1">
                     
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Phí vận chuyển (VNĐ)</label>
+                        <input type="number" name="shipping_fee" class="form-control fw-bold text-primary" value="<?php echo (int)$order['shipping_fee']; ?>" min="0">
+                        <small class="text-muted">Admin tự nhập phí ship thực tế.</small>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Trạng thái đơn hàng</label>
                         <select name="status" class="form-select">

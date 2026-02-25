@@ -27,7 +27,7 @@ if ($total_price >= 500000) {
     $shipping_fee = 0;
     $shipping_text = 'Miễn phí';
 } else {
-    $shipping_fee = 15000;
+    $shipping_fee = 0;
     $shipping_text = number_format($shipping_fee, 0, ',', '.') . 'đ';
 }
 
@@ -492,10 +492,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <span><?= number_format($total_price, 0, ',', '.') ?>đ</span>
                                             </div>
 
-                                            <div class="cart-info__row">
-                                                <span>Tiền ship: </span>
-                                                <span><?= $shipping_text ?></span>
-                                            </div>
+                                    
                                             <div class="cart-info__row">
                                                 <small style="color:#666">
                                                     Tiền ship sẽ trả khi nhận đơn hàng
@@ -522,10 +519,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <span><?= $total_qty ?></span>
                                 </div>
 
-                                <div class="cart-info__row">
-                                    <span>Tiền ship: </span>
-                                    <span><?= $shipping_text ?></span>
-                                </div>
+                                
                                 <div class="cart-info__row">
                                     <small style="color:#666">
                                         Tiền ship sẽ trả khi nhận đơn hàng

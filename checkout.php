@@ -240,8 +240,10 @@ $_SESSION['checkout'] = [
                                     <span>Thanh toán : </span>
                                     <span id="summary-total"><?php echo number_format($total_all, 0, ',', '.'); ?>Đ</span>
                                 </div>
-                                <a href="./shipping.php" id="checkout-btn" class="cart-info__next-btn btn btn--primary btn--rounded">
-                                    Tiếp tục thanh toán
+                                <a href="./shipping.php" id="checkout-btn" 
+                                class="cart-info__next-btn btn btn--primary btn--rounded"
+                                onclick="location.reload();">
+                                Tiếp tục thanh toán
                                 </a>
                             </div>
                         </div>
