@@ -135,7 +135,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             $item_stmt->execute();
         }
+                $update_stock = $conn->prepare("
+        UPDATE product_weights
+        SET stock_quantity = stock_quantity - ?
+        WHERE product_id = ? AND weight_gram = ?
+    ");
 
+    $update_stock->bind_param(
+        "iii",
+        $item['quantity'],
+        $item['product_id'],
+        $item['weight_gram']
+    );
+
+$update_stock->execute();
+$update_stock->close();
         $item_stmt->close();
         unset($_SESSION['checkout']);
 
