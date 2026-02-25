@@ -53,6 +53,12 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
         }
     }
 }
+$sql_order = "SELECT id FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1";
+$stmt_order = mysqli_prepare($conn, $sql_order);
+mysqli_stmt_bind_param($stmt_order, "i", $user_id);
+mysqli_stmt_execute($stmt_order);
+$result_order = mysqli_stmt_get_result($stmt_order);
+$order = mysqli_fetch_assoc($result_order);
 ?>
 
 <!DOCTYPE html>
@@ -180,11 +186,11 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                     <h3 class="profile-menu__title">Sản phẩm của tôi</h3>
                                     <ul class="profile-menu__list">
                                         <li>
-                                            <a href="#!" class="profile-menu__link">
+                                            <a href="order-detail.php?order_id=<?= $order['id']; ?>" class="profile-menu__link">
                                                 <span class="profile-menu__icon">
                                                     <img src="./assets/icons/download.svg" alt="" class="icon" />
                                                 </span>
-                                                Đặt lại đơn hàng
+                                                Chi tiết đơn hàng
                                             </a>
                                         </li>
                                         <li>
@@ -283,44 +289,6 @@ if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="col-12">
-                                        <h2 class="cart-info__heading">Danh sách yêu thích</h2>
-                                        <p class="cart-info__desc profile__desc">2 sản phẩm - Chính</p>
-
-                                        <article class="favourite-item">
-                                            <img src="./assets/img/product/item-1.png" alt="" class="favourite-item__thumb" />
-                                            <div>
-                                                <h3 class="favourite-item__title">
-                                                    Hạt cà phê Espresso Arabica & Robusta
-                                                </h3>
-                                                <div class="favourite-item__content">
-                                                    <span class="favourite-item__price">$47.00</span>
-                                                    <button class="btn btn--primary btn--rounded">
-                                                        Thêm vào giỏ hàng
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </article>
-
-                                        <div class="separate" style="--margin: 20px"></div>
-
-                                        <article class="favourite-item">
-                                            <img src="./assets/img/product/item-2.png" alt="" class="favourite-item__thumb" />
-                                            <div>
-                                                <h3 class="favourite-item__title">
-                                                    Cà phê Lavazza – Hương vị Espresso Ý
-                                                </h3>
-                                                <div class="favourite-item__content">
-                                                    <span class="favourite-item__price">$53.00</span>
-                                                    <button class="btn btn--primary btn--rounded">
-                                                        Thêm vào giỏ hàng
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
